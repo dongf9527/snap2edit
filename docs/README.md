@@ -18,6 +18,7 @@
 - [`PRD.md`](PRD.md) —— 产品需求文档 v0.2
 - [`WORKFLOW.md`](WORKFLOW.md) —— 六步标准流程方法论
 - [`COLLABORATION.md`](COLLABORATION.md) —— 仓库协作规则（同步方式 / 提交规范 / 禁止事项）
+- [`AI_SPEC_MODEL.md`](AI_SPEC_MODEL.md) —— AI 规格书生成选型分析：需要接入多大的视觉模型
 - [`workbench/`](workbench/) —— 引擎化之前的过程脚本与对比证据（历史存档）
 
 > 约定：**以仓库为准**。新案例按「一个源图片一个子目录」归档，

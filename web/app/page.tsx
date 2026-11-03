@@ -1,3 +1,5 @@
+import Workbench from "./workbench";
+
 const PIPELINE = [
   { step: "01", title: "规格书 spec.yaml", desc: "坐标 + 色板 + 文案 + 元素，双产线唯一事实源" },
   { step: "02", title: "产线① HTML+SVG", desc: "全真实 <text>、独立 id 单元、零位图" },
@@ -17,23 +19,20 @@ export default function Home() {
   return (
     <main className="page">
       <header className="hero">
-        <p className="badge">Snap2Edit Web · v2 预备骨架（PRD F9）</p>
+        <p className="badge">Snap2Edit Web · v0.3 工作台（PRD F9）</p>
         <h1>
           把静态截图<span className="accent">“复活”</span>为可编辑文件
         </h1>
         <p className="sub">
           一份布局规格（spec.yaml），同步产出全可编辑的 HTML+SVG 与原生 PPTX；
-          四道校验门自动把关。当前为 Next.js 基础框架，引擎由 Python CLI（
-          <code>src/snap2edit/</code>）提供。
+          四道校验门自动把关。引擎由 Python CLI（<code>src/snap2edit/</code>）提供，本页提供
+          「上传图片 → 生成 spec」交互入口。
         </p>
-        <div className="cta">
-          <span className="chip">pip install -e .</span>
-          <span className="chip">snap2edit new my-chart</span>
-          <span className="chip">snap2edit build &amp;&amp; snap2edit check</span>
-        </div>
       </header>
 
-      <section className="grid">
+      <Workbench />
+
+      <section className="grid" aria-label="引擎流水线">
         {PIPELINE.map((p) => (
           <article key={p.step} className="card">
             <span className="step">{p.step}</span>
