@@ -1,0 +1,977 @@
+project: "德勤AI落地方法论"
+canvas:
+  width: 900
+  height: 506
+slide:
+  preset: "16:9"
+font:
+  name: "Noto Sans SC"
+  fallback: "Microsoft YaHei"
+  pptx_name: "Microsoft YaHei"
+palette:
+  primary: "#1A2B4C"
+  accent: "#3E4A6B"
+  card: "#EEF1F5"
+  muted: "#5A6478"
+  bg: "#FFFFFF"
+texts:
+  - "这条文案在渲染中不存在，必须新增一个text元素"
+  - "德勤AI落地方法论拆解"
+  - "评估、路线图、治理。"
+  - "01"
+  - "评估"
+  - "02"
+  - "路线图"
+  - "03"
+  - "治理"
+  - "识别价值与可行性，明确AI落地起点"
+  - "从试点到规模化，规划可实施的实施路径"
+  - "建立负责任的AI治理体系，保障可持续发展"
+  - "战略对齐"
+  - "结合业务战略，明确AI的价值方向与关键问题"
+  - "机会识别"
+  - "梳理业务场景，评估价值空间与可行性"
+  - "能力评估"
+  - "评估数据、技术、人才与组织现状"
+  - "风险与合规评估"
+  - "识别技术、数据、法律、伦理等潜在风险"
+  - "优先级排序"
+  - "基于价值、可行性与风险排序优先落地场景"
+  - "目标与愿景"
+  - "明确阶段目标与预期价值，设定可量化的里程碑"
+  - "场景与用例规划"
+  - "选定高价值场景，设计试点与扩展路径"
+  - "实施路径"
+  - "制定从试点到规模化的阶段计划，明确关键任务与协作关系"
+  - "资源与能力建设"
+  - "规划数据、技术、人才与生态合作的投入与建设"
+  - "价值度量"
+  - "建立量化指标体系，跟踪进展并持续优化"
+  - "治理框架"
+  - "明确治理原则、组织架构与决策机制"
+  - "风险管理"
+  - "覆盖数据安全、模型风险、合规与伦理"
+  - "政策与标准"
+  - "制定AI相关政策、流程与技术标准"
+  - "监控与审计"
+  - "建立全生命周期监控、审计与问责机制"
+  - "文化与人才"
+  - "推动负责任的AI文化，提升员工意识与专业能力"
+  - "云与基础设施"
+  - "算力 | 存储 | 平台"
+  - "数据层"
+  - "数据治理 | 数据安全"
+  - "数据资产 | 高质量数据"
+  - "模型与技术层"
+  - "基础模型 | 行业模型"
+  - "工具链 | MLOps"
+  - "应用层"
+  - "业务场景 | 智能体"
+  - "产品与服务"
+  - "组织与人才"
+  - "组织架构 | 人才能力"
+  - "文化变革"
+  - "治理与合规"
+  - "政策标准 | 风险管理"
+  - "监控审计 | 伦理责任"
+  - "业务价值"
+  - "效率提升 | 创新增长"
+  - "客户体验 | 社会价值"
+  - "基于德勤公开资料独立研究。"
+elements:
+  - id: "e1"
+    type: "rect"
+    x: 0
+    y: 0
+    w: 900
+    h: 506
+    fill: "#FFFFFF"
+  - id: "e2"
+    type: "text"
+    x: 24
+    y: 18
+    size: 34
+    weight: 700
+    color: "#1A2B4C"
+    text: "德勤AI落地方法论拆解"
+  - id: "e3"
+    type: "text"
+    x: 24
+    y: 60
+    size: 34
+    weight: 700
+    color: "#1A2B4C"
+    text: "评估、路线图、治理。"
+  - id: "e4"
+    type: "rrect"
+    x: 24
+    y: 132
+    w: 196
+    h: 46
+    fill: "#3E4A6B"
+    radius: 6
+  - id: "e5"
+    type: "text"
+    x: 34
+    y: 144
+    size: 22
+    weight: 700
+    color: "#FFFFFF"
+    text: "01"
+  - id: "e6"
+    type: "text"
+    x: 86
+    y: 144
+    size: 22
+    weight: 700
+    color: "#FFFFFF"
+    text: "评估"
+  - id: "e7"
+    type: "rrect"
+    x: 226
+    y: 132
+    w: 196
+    h: 46
+    fill: "#5A6B4F"
+    radius: 6
+  - id: "e8"
+    type: "text"
+    x: 236
+    y: 144
+    size: 22
+    weight: 700
+    color: "#FFFFFF"
+    text: "02"
+  - id: "e9"
+    type: "text"
+    x: 288
+    y: 144
+    size: 22
+    weight: 700
+    color: "#FFFFFF"
+    text: "路线图"
+  - id: "e10"
+    type: "rrect"
+    x: 428
+    y: 132
+    w: 196
+    h: 46
+    fill: "#4A5568"
+    radius: 6
+  - id: "e11"
+    type: "text"
+    x: 438
+    y: 144
+    size: 22
+    weight: 700
+    color: "#FFFFFF"
+    text: "03"
+  - id: "e12"
+    type: "text"
+    x: 490
+    y: 144
+    size: 22
+    weight: 700
+    color: "#FFFFFF"
+    text: "治理"
+  - id: "e13"
+    type: "text"
+    x: 24
+    y: 184
+    size: 11
+    color: "#3A4560"
+    text: "识别价值与可行性，明确AI落地起点"
+  - id: "e14"
+    type: "text"
+    x: 226
+    y: 184
+    size: 11
+    color: "#3A4560"
+    text: "从试点到规模化，规划可实施的实施路径"
+  - id: "e15"
+    type: "text"
+    x: 428
+    y: 184
+    size: 11
+    color: "#3A4560"
+    text: "建立负责任的AI治理体系，保障可持续发展"
+  - id: "e16"
+    type: "rrect"
+    x: 24
+    y: 202
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e17"
+    type: "circle"
+    x: 34
+    y: 206
+    w: 18
+    h: 18
+    fill: "#3E4A6B"
+  - id: "e18"
+    type: "text"
+    x: 37
+    y: 209
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "1"
+  - id: "e19"
+    type: "text"
+    x: 58
+    y: 208
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "战略对齐"
+  - id: "e20"
+    type: "text"
+    x: 58
+    y: 222
+    size: 9
+    color: "#5A6478"
+    text: "结合业务战略，明确AI的价值方向与关键问题"
+  - id: "e21"
+    type: "rrect"
+    x: 24
+    y: 234
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e22"
+    type: "circle"
+    x: 34
+    y: 238
+    w: 18
+    h: 18
+    fill: "#3E4A6B"
+  - id: "e23"
+    type: "text"
+    x: 37
+    y: 241
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "2"
+  - id: "e24"
+    type: "text"
+    x: 58
+    y: 240
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "机会识别"
+  - id: "e25"
+    type: "text"
+    x: 58
+    y: 254
+    size: 9
+    color: "#5A6478"
+    text: "梳理业务场景，评估价值空间与可行性"
+  - id: "e26"
+    type: "rrect"
+    x: 24
+    y: 266
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e27"
+    type: "circle"
+    x: 34
+    y: 270
+    w: 18
+    h: 18
+    fill: "#3E4A6B"
+  - id: "e28"
+    type: "text"
+    x: 37
+    y: 273
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "3"
+  - id: "e29"
+    type: "text"
+    x: 58
+    y: 272
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "能力评估"
+  - id: "e30"
+    type: "text"
+    x: 58
+    y: 286
+    size: 9
+    color: "#5A6478"
+    text: "评估数据、技术、人才与组织现状"
+  - id: "e31"
+    type: "rrect"
+    x: 24
+    y: 298
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e32"
+    type: "circle"
+    x: 34
+    y: 302
+    w: 18
+    h: 18
+    fill: "#3E4A6B"
+  - id: "e33"
+    type: "text"
+    x: 37
+    y: 305
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "4"
+  - id: "e34"
+    type: "text"
+    x: 58
+    y: 304
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "风险与合规评估"
+  - id: "e35"
+    type: "text"
+    x: 58
+    y: 318
+    size: 9
+    color: "#5A6478"
+    text: "识别技术、数据、法律、伦理等潜在风险"
+  - id: "e36"
+    type: "rrect"
+    x: 24
+    y: 330
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e37"
+    type: "circle"
+    x: 34
+    y: 334
+    w: 18
+    h: 18
+    fill: "#3E4A6B"
+  - id: "e38"
+    type: "text"
+    x: 37
+    y: 337
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "5"
+  - id: "e39"
+    type: "text"
+    x: 58
+    y: 336
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "优先级排序"
+  - id: "e40"
+    type: "text"
+    x: 58
+    y: 350
+    size: 9
+    color: "#5A6478"
+    text: "基于价值、可行性与风险排序优先落地场景"
+  - id: "e41"
+    type: "rrect"
+    x: 226
+    y: 202
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e42"
+    type: "circle"
+    x: 236
+    y: 206
+    w: 18
+    h: 18
+    fill: "#5A6B4F"
+  - id: "e43"
+    type: "text"
+    x: 239
+    y: 209
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "1"
+  - id: "e44"
+    type: "text"
+    x: 260
+    y: 208
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "目标与愿景"
+  - id: "e45"
+    type: "text"
+    x: 260
+    y: 222
+    size: 9
+    color: "#5A6478"
+    text: "明确阶段目标与预期价值，设定可量化的里程碑"
+  - id: "e46"
+    type: "rrect"
+    x: 226
+    y: 234
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e47"
+    type: "circle"
+    x: 236
+    y: 238
+    w: 18
+    h: 18
+    fill: "#5A6B4F"
+  - id: "e48"
+    type: "text"
+    x: 239
+    y: 241
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "2"
+  - id: "e49"
+    type: "text"
+    x: 260
+    y: 240
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "场景与用例规划"
+  - id: "e50"
+    type: "text"
+    x: 260
+    y: 254
+    size: 9
+    color: "#5A6478"
+    text: "选定高价值场景，设计试点与扩展路径"
+  - id: "e51"
+    type: "rrect"
+    x: 226
+    y: 266
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e52"
+    type: "circle"
+    x: 236
+    y: 270
+    w: 18
+    h: 18
+    fill: "#5A6B4F"
+  - id: "e53"
+    type: "text"
+    x: 239
+    y: 273
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "3"
+  - id: "e54"
+    type: "text"
+    x: 260
+    y: 272
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "实施路径"
+  - id: "e55"
+    type: "text"
+    x: 260
+    y: 286
+    size: 9
+    color: "#5A6478"
+    text: "制定从试点到规模化的阶段计划，明确关键任务与协作关系"
+  - id: "e56"
+    type: "rrect"
+    x: 226
+    y: 298
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e57"
+    type: "circle"
+    x: 236
+    y: 302
+    w: 18
+    h: 18
+    fill: "#5A6B4F"
+  - id: "e58"
+    type: "text"
+    x: 239
+    y: 305
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "4"
+  - id: "e59"
+    type: "text"
+    x: 260
+    y: 304
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "资源与能力建设"
+  - id: "e60"
+    type: "text"
+    x: 260
+    y: 318
+    size: 9
+    color: "#5A6478"
+    text: "规划数据、技术、人才与生态合作的投入与建设"
+  - id: "e61"
+    type: "rrect"
+    x: 226
+    y: 330
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e62"
+    type: "circle"
+    x: 236
+    y: 334
+    w: 18
+    h: 18
+    fill: "#5A6B4F"
+  - id: "e63"
+    type: "text"
+    x: 239
+    y: 337
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "5"
+  - id: "e64"
+    type: "text"
+    x: 260
+    y: 336
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "价值度量"
+  - id: "e65"
+    type: "text"
+    x: 260
+    y: 350
+    size: 9
+    color: "#5A6478"
+    text: "建立量化指标体系，跟踪进展并持续优化"
+  - id: "e66"
+    type: "rrect"
+    x: 428
+    y: 202
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e67"
+    type: "circle"
+    x: 438
+    y: 206
+    w: 18
+    h: 18
+    fill: "#4A5568"
+  - id: "e68"
+    type: "text"
+    x: 441
+    y: 209
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "1"
+  - id: "e69"
+    type: "text"
+    x: 462
+    y: 208
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "治理框架"
+  - id: "e70"
+    type: "text"
+    x: 462
+    y: 222
+    size: 9
+    color: "#5A6478"
+    text: "明确治理原则、组织架构与决策机制"
+  - id: "e71"
+    type: "rrect"
+    x: 428
+    y: 234
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e72"
+    type: "circle"
+    x: 438
+    y: 238
+    w: 18
+    h: 18
+    fill: "#4A5568"
+  - id: "e73"
+    type: "text"
+    x: 441
+    y: 241
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "2"
+  - id: "e74"
+    type: "text"
+    x: 462
+    y: 240
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "风险管理"
+  - id: "e75"
+    type: "text"
+    x: 462
+    y: 254
+    size: 9
+    color: "#5A6478"
+    text: "覆盖数据安全、模型风险、合规与伦理"
+  - id: "e76"
+    type: "rrect"
+    x: 428
+    y: 266
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e77"
+    type: "circle"
+    x: 438
+    y: 270
+    w: 18
+    h: 18
+    fill: "#4A5568"
+  - id: "e78"
+    type: "text"
+    x: 441
+    y: 273
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "3"
+  - id: "e79"
+    type: "text"
+    x: 462
+    y: 272
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "政策与标准"
+  - id: "e80"
+    type: "text"
+    x: 462
+    y: 286
+    size: 9
+    color: "#5A6478"
+    text: "制定AI相关政策、流程与技术标准"
+  - id: "e81"
+    type: "rrect"
+    x: 428
+    y: 298
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e82"
+    type: "circle"
+    x: 438
+    y: 302
+    w: 18
+    h: 18
+    fill: "#4A5568"
+  - id: "e83"
+    type: "text"
+    x: 441
+    y: 305
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "4"
+  - id: "e84"
+    type: "text"
+    x: 462
+    y: 304
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "监控与审计"
+  - id: "e85"
+    type: "text"
+    x: 462
+    y: 318
+    size: 9
+    color: "#5A6478"
+    text: "建立全生命周期监控、审计与问责机制"
+  - id: "e86"
+    type: "rrect"
+    x: 428
+    y: 330
+    w: 196
+    h: 26
+    fill: "#EEF1F5"
+    radius: 6
+  - id: "e87"
+    type: "circle"
+    x: 438
+    y: 334
+    w: 18
+    h: 18
+    fill: "#4A5568"
+  - id: "e88"
+    type: "text"
+    x: 441
+    y: 337
+    size: 11
+    weight: 700
+    color: "#FFFFFF"
+    text: "5"
+  - id: "e89"
+    type: "text"
+    x: 462
+    y: 336
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "文化与人才"
+  - id: "e90"
+    type: "text"
+    x: 462
+    y: 350
+    size: 9
+    color: "#5A6478"
+    text: "推动负责任的AI文化，提升员工意识与专业能力"
+  - id: "e91"
+    type: "rrect"
+    x: 640
+    y: 100
+    w: 90
+    h: 130
+    fill: "#C9D4E4"
+    radius: 10
+  - id: "e92"
+    type: "text"
+    x: 652
+    y: 150
+    size: 24
+    weight: 700
+    color: "#2A3A5C"
+    text: "AI"
+  - id: "e93"
+    type: "text"
+    x: 620
+    y: 66
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "云与基础设施"
+  - id: "e94"
+    type: "text"
+    x: 620
+    y: 82
+    size: 9
+    color: "#5A6478"
+    text: "算力 | 存储 | 平台"
+  - id: "e95"
+    type: "text"
+    x: 788
+    y: 120
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "数据层"
+  - id: "e96"
+    type: "text"
+    x: 776
+    y: 136
+    size: 9
+    color: "#5A6478"
+    text: "数据治理 | 数据安全"
+  - id: "e97"
+    type: "text"
+    x: 776
+    y: 148
+    size: 9
+    color: "#5A6478"
+    text: "数据资产 | 高质量数据"
+  - id: "e98"
+    type: "text"
+    x: 608
+    y: 172
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "模型与技术层"
+  - id: "e99"
+    type: "text"
+    x: 608
+    y: 188
+    size: 9
+    color: "#5A6478"
+    text: "基础模型 | 行业模型"
+  - id: "e100"
+    type: "text"
+    x: 608
+    y: 200
+    size: 9
+    color: "#5A6478"
+    text: "工具链 | MLOps"
+  - id: "e101"
+    type: "text"
+    x: 806
+    y: 226
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "应用层"
+  - id: "e102"
+    type: "text"
+    x: 806
+    y: 242
+    size: 9
+    color: "#5A6478"
+    text: "业务场景 | 智能体"
+  - id: "e103"
+    type: "text"
+    x: 806
+    y: 254
+    size: 9
+    color: "#5A6478"
+    text: "产品与服务"
+  - id: "e104"
+    type: "text"
+    x: 612
+    y: 352
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "组织与人才"
+  - id: "e105"
+    type: "text"
+    x: 612
+    y: 368
+    size: 9
+    color: "#5A6478"
+    text: "组织架构 | 人才能力"
+  - id: "e106"
+    type: "text"
+    x: 612
+    y: 380
+    size: 9
+    color: "#5A6478"
+    text: "文化变革"
+  - id: "e107"
+    type: "text"
+    x: 700
+    y: 398
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "治理与合规"
+  - id: "e108"
+    type: "text"
+    x: 688
+    y: 414
+    size: 9
+    color: "#5A6478"
+    text: "政策标准 | 风险管理"
+  - id: "e109"
+    type: "text"
+    x: 688
+    y: 426
+    size: 9
+    color: "#5A6478"
+    text: "监控审计 | 伦理责任"
+  - id: "e110"
+    type: "text"
+    x: 812
+    y: 368
+    size: 11
+    weight: 700
+    color: "#1A2B4C"
+    text: "业务价值"
+  - id: "e111"
+    type: "text"
+    x: 806
+    y: 384
+    size: 9
+    color: "#5A6478"
+    text: "效率提升 | 创新增长"
+  - id: "e112"
+    type: "text"
+    x: 806
+    y: 396
+    size: 9
+    color: "#5A6478"
+    text: "客户体验 | 社会价值"
+  - id: "e113"
+    type: "line"
+    x1: 640
+    y1: 78
+    x2: 676
+    y2: 100
+    stroke: "#9AA8BC"
+    stroke_w: 1
+  - id: "e114"
+    type: "line"
+    x1: 780
+    y1: 110
+    x2: 730
+    y2: 140
+    stroke: "#9AA8BC"
+    stroke_w: 1
+  - id: "e115"
+    type: "line"
+    x1: 800
+    y1: 230
+    x2: 732
+    y2: 200
+    stroke: "#9AA8BC"
+    stroke_w: 1
+  - id: "e116"
+    type: "line"
+    x1: 810
+    y1: 368
+    x2: 736
+    y2: 250
+    stroke: "#9AA8BC"
+    stroke_w: 1
+  - id: "e117"
+    type: "line"
+    x1: 700
+    y1: 396
+    x2: 698
+    y2: 250
+    stroke: "#9AA8BC"
+    stroke_w: 1
+  - id: "e118"
+    type: "text"
+    x: 24
+    y: 480
+    size: 9
+    color: "#8A97A8"
+    text: "基于德勤公开资料独立研究。"
