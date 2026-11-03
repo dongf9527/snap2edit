@@ -22,6 +22,7 @@
 - [`WEB_PIPELINE.md`](WEB_PIPELINE.md) —— 在线管线：双产物预览与自动回询迭代（架构 / JSON.parse 根治 / E2E 实测）
 - [`COLLABORATION.md`](COLLABORATION.md) —— 仓库协作规则（同步方式 / 提交规范 / 禁止事项）
 - [`AI_SPEC_MODEL.md`](AI_SPEC_MODEL.md) —— AI 规格书生成选型分析：需要接入多大的视觉模型
+- [`ROTATE.md`](ROTATE.md) —— 倾斜元素全链路：引擎 rotate 字段 / studio 旋转读出气泡 / VLM 倾斜抽取（含测试矩阵与真实 VLM 探针）
 - [`workbench/`](workbench/) —— 引擎化之前的过程脚本与对比证据（历史存档）
 
 > 约定：**以仓库为准**。新案例按「一个源图片一个子目录」归档，

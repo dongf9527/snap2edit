@@ -118,6 +118,27 @@ export function normalizeSpec(spec: Record<string, unknown>): {
   }
   if (splitCount > 0) notes.push(`已将多行文本拆分为独立单行元素（新增 ${splitCount} 行）`);
 
+  // 1.5) rotate 归一化（与引擎 spec.py 同源：度/顺时针，[0,360)；
+  //      线段/箭头几何完全由端点承载，rotate 键剔除；非法值保留，交由校验器报错回询）
+  let rotDropped = 0;
+  let rotNormed = 0;
+  for (const el of out) {
+    if (!("rotate" in el)) continue;
+    if (el.type === "line" || el.type === "arrow") {
+      delete el.rotate;
+      rotDropped += 1;
+      continue;
+    }
+    const r = el.rotate;
+    if (typeof r !== "number" || !Number.isFinite(r)) continue;
+    const n = Math.round((((r % 360) + 360) % 360) * 10) / 10;
+    if (n === 0) delete el.rotate;
+    else if (n !== r) el.rotate = n;
+    if (n !== r) rotNormed += 1;
+  }
+  if (rotDropped > 0) notes.push(`已剔除 ${rotDropped} 处线段/箭头的 rotate 键（倾斜由端点坐标表达）`);
+  if (rotNormed > 0) notes.push(`已将 ${rotNormed} 处 rotate 归一化到 [0,360)`);
+
   // 2) texts 清单对齐
   const rawTexts = Array.isArray(spec.texts)
     ? (spec.texts as unknown[]).filter((t): t is string => typeof t === "string")
@@ -186,12 +207,14 @@ export function buildSystemPrompt(): string {
     "- id 全局唯一，依次 e1、e2、e3……",
     "- 禁止出现：XXX、TODO、待补充、【、undefined、NaN。",
     "- 箭头用 type:arrow（x1,y1 → x2,y2），不要拆成线段+三角形。",
+    "- 图中倾斜/旋转的元素（斜置卡片、斜标签、斜排文字、斜色带）必须估出顺时针角度写入可选字段 rotate：",
+    "  数值（度），范围 [0,360)，可带一位小数；水平或垂直元素不要写 rotate。",
     "",
     "元素几何字段：",
-    "- rect / rrect / pill : x,y,w,h（rrect 可加 radius；pill 为胶囊形）",
-    "- circle : x,y,w,h（圆形/圆点/椭圆的外接框；圆即 w=h）",
-    "- text  : x,y（w 可选），另有 size、color、weight(400/700)、text，可加 align、line_h",
-    "- line / arrow : x1,y1,x2,y2；line 另有 stroke、stroke_w，arrow 另有 color、stroke_w",
+    "- rect / rrect / pill : x,y,w,h（rrect 可加 radius；pill 为胶囊形；均可加可选 rotate 表示倾斜角度，绕自身中心顺时针）",
+    "- circle : x,y,w,h（圆形/圆点/椭圆的外接框；圆即 w=h；可加可选 rotate）",
+    "- text  : x,y（w 可选），另有 size、color、weight(400/700)、text，可加 align、line_h、rotate（斜排文字绕锚点顺时针）",
+    "- line / arrow : x1,y1,x2,y2；line 另有 stroke、stroke_w，arrow 另有 color、stroke_w；倾斜由端点坐标表达，不要写 rotate",
     "",
     "JSON 结构模板（数值与文字替换为实际内容；不要保留 <> 占位）：",
     `{`,
@@ -210,7 +233,7 @@ export function buildSystemPrompt(): string {
     `}`,
     "",
     "复杂度取舍：优先保证 ①全部文字逐字转录完整 ②分区/卡片结构正确 ③主色准确；",
-    "个别文字坐标允许 ±8px 误差，后续由四道校验门与人工微调兜底。",
+    "个别文字坐标允许 ±8px 误差，倾斜角度允许 ±5° 误差，后续由四道校验门与人工微调兜底。",
   ].join("\n");
 }
 
@@ -233,7 +256,7 @@ export function buildFixPrompt(failures: string[], specYaml: string): string {
     ...failures.map((f, i) => `${i + 1}. ${f}`),
     "",
     "请逐条修正这些错误（常见修法：文案缺失→把缺失文字补为对应 text 元素并同步 texts 清单；",
-    "文本溢出→缩小该元素 size 或加大 w；占位符→替换为真实文案），",
+    "文本溢出→缩小该元素 size 或加大 w；占位符→替换为真实文案；rotate 非法→改为 0-360 的数字或删除该键），",
     "其余正确的部分保持原样。",
     "",
     "当前规格（YAML，仅作参考；你的输出仍必须是 JSON）：",
@@ -338,6 +361,16 @@ export function validateSpecYaml(raw: string): SpecValidation & { fixedYaml?: st
         const outX = xs.some((v) => isNum(v) && (v < -2 || v > W + 2));
         const outY = ys.some((v) => isNum(v) && (v < -2 || v > H + 2));
         if (outX || outY) warnings.push(`${label} 坐标可能越出画布`);
+      }
+      // rotate（与引擎 spec.py 同源：度/顺时针；线段/箭头剔除只告警，非法值报错，越界归一化只告警）
+      if ("rotate" in el) {
+        if (type === "line" || type === "arrow") {
+          warnings.push(`${label}（${type}）不支持 rotate，引擎将忽略该键`);
+        } else if (!isNum(el.rotate)) {
+          errors.push(`${label}（${type}）rotate 必须是数字（度，顺时针）`);
+        } else if ((el.rotate as number) < 0 || (el.rotate as number) >= 360) {
+          warnings.push(`${label} rotate=${el.rotate} 越界，引擎将归一化到 [0,360)`);
+        }
       }
       if (type === "text") {
         textCount += 1;
