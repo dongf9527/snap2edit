@@ -3,7 +3,7 @@
 | 项 | 内容 |
 |---|---|
 | 产品名称 | Snap2Edit（截图复刻引擎） |
-| 文档版本 | v0.2 |
+| 文档版本 | v0.4 |
 | 状态 | 已评审定稿（随仓库维护，以仓库为准） |
 | 作者 | Snap2Edit Contributors |
 | 日期 | 2026-11-03 |
@@ -131,18 +131,25 @@
 
 - **验收**：`check` 输出 `build/report.md`，任一项失败退出码非 0（CI 可断言）。
 
-### F5 CLI（P0，已实现 / P1 部分）
+### F5 CLI（P0，已实现 / P1 已实现）
 
-- `new <dir>`：生成 spec 模板（P0）；
-- `build <dir>`：双渲染到 `<dir>/build/`（P0）；
-- `check <dir> [--original IMG] [--no-shot]`：四道门 + 报告（P0）；
-- `loop <dir> [--max-iters N]`：build+check 自动迭代直至收敛（P1）。
+- `new <dir>`：生成 spec 模板（P0，已实现）；
+- `build <dir>`：双渲染到 `<dir>/build/`（P0，已实现）；
+- `check <dir> [--original IMG] [--no-shot]`：四道门 + 报告（P0，已实现）；
+- `loop <dir> [--max-iters N] [--fix CMD] [--json]`（P1，已实现）：build+check 自动迭代直至收敛；
+  未通过时以环境变量（`SNAP2EDIT_DIR/SPEC/ITER/REPORT/FAILURES`）注入上下文后执行外接修正命令
+  （命令自行改写 spec.yaml，与 web 层 refine 闭环同构）；每轮失败快照存 `<dir>/loop/`，
+  未收敛时保留最少失败轮的 `best-spec.yaml`；退出码 0=收敛 / 2=未收敛，`--json` 输出结构化汇总（供 Agent/CI）。
 
-### F6 组件库扩充（P1）
+### F6 组件库扩充（P1，已实现）
 
-- 在 v0 六种元素上新增：`cube`（立方体）、`matrix-cell`（矩阵格子）、`flow-box`（流程框）、`icon`（图标库：brain/chart/network/sparkle 等，移植自历史 svg_lib）；
-- 组件一律参数化 `(id, 位置, 尺寸, 颜色)`，双产线各给实现；
-- **验收**：每个组件在 demo 画廊页双产线渲染一致。
+- 在 v0 七种元素上新增：`cube`（立方体）、`matrix-cell`（矩阵格子）、`flow-box`（流程框）、
+  `icon`（图标库：brain/chart/network/sparkle/lightning/gear/doc/user/check/target 十种，
+  全部为直线段多边形，PPTX 侧以原生 Freeform 渲染，维持 Picture=0）；
+- 几何与配色统一在 `src/snap2edit/components.py` 定义（唯一事实源），双产线各给原生实现；
+  web 侧 `lib/canvas.ts` 与 VLM 提示词三处镜像同步；
+- 组件一律参数化 `(id, 位置, 尺寸, 颜色)`；复合组件不支持 rotate（键剔除，与线段/箭头同策略）；
+- **验收**：`examples/gallery/` 画廊页双产线四道门全过，soffice 渲染与 HTML 截图逐组件视觉一致（已实测）。
 
 ### F7 可视化报告（P1）
 
@@ -228,9 +235,9 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 | 版本 | 范围 | 状态 |
 |---|---|---|
 | v0.1 | 引擎骨架：F1–F5(P0) + demo + 冒烟测试 | ✅ 已完成（本仓库初始提交） |
-| v0.5 | F5 loop、F6 组件库、F7 可视化报告 | 规划中 |
-| v1.0 | 测试覆盖 ≥ 80%、文档站、PyPI 发布 | 规划中 |
-| v2.0 | F8 AI 规格书、F9 Web UI、F10 批量/CI | 愿景 |
+| v0.5 | F5 loop、F6 组件库、F7 可视化报告 | 🔶 部分完成：F5 loop 与 F6 组件库已随 v0.4 交付（含画廊验收）；F7 可视化报告待做 |
+| v1.0 | 测试覆盖 ≥ 80%（已达 100%）、文档站、PyPI 发布 | 🔶 测试覆盖已达成，其余规划中 |
+| v2.0 | F8 AI 规格书、F9 Web UI、F10 批量/CI | 愿景（F8/F9 部分能力已提前落地：/api/spec VLM 抽取、/studio 编辑器） |
 
 ## 10. 风险与对策
 
@@ -245,8 +252,8 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 ## 11. 开放问题
 
 1. 包名 `snap2edit` 是否需要在 v0.5 前做 PyPI 占位？
-2. 组件库（F6）优先级排序：立方体 / 矩阵格子 / 流程框 / 图标，哪个先行？（建议以真实项目需求牵引）
-3. `report.md` 是否需要机读版本（JSON）供 Agent 流水线消费？
+2. ~~组件库（F6）优先级排序~~ 已解决：四类组件（cube / matrix-cell / flow-box / icon）已全部随 v0.4 实现，图标集以直线段多边形优先保证 PPTX 原生 Freeform 可渲染；曲线型图标待后续扩展。
+3. `report.md` 是否需要机读版本（JSON）供 Agent 流水线消费？（`check --json` 与 `loop --json` 已提供结构化输出，HTML 可视化报告待 F7）
 4. 双许可（MIT + 商业）是否保留单一 MIT？
 
 ## 12. 附录
@@ -260,8 +267,12 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 | slide |  | `preset: "16:9"` 或显式 `emu_w/emu_h` |
 | font |  | `name / fallback / pptx_name` |
 | palette |  | `primary / accent / card / muted` 等语义色 |
-| texts | 建议 | 终检文案清单（缺省自动收集） |
-| elements | ✅ | 见 README 元素速查表 |
+| texts | 建议 | 终检文案清单（缺省自动收集，含组件库文字：矩阵逐格、流程框标题+正文） |
+| elements | ✅ | 见 README 元素速查表（v0 七种基础类型 + F6 组件库四类） |
+| cube.depth |  | 立方体深度 px（缺省 min(w,h)*0.2，钳制 ≤ min(w,h)/2） |
+| matrix-cell.rows/cols | 组件内✅ | 行列数（≥1 整数）；gap 格间距；texts 逐格文字（行优先，≤ rows×cols） |
+| flow-box.title/band |  | 色带标题与带高占比（0–1，缺省 0.30）；title/text/lines 至少一项 |
+| icon.name | 组件内✅ | 图标名：brain/chart/network/sparkle/lightning/gear/doc/user/check/target |
 
 ### B. 命令速查
 

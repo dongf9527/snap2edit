@@ -2,9 +2,9 @@
 
 | 项 | 内容 |
 |---|---|
-| 文档版本 | v1.0（首版） |
-| 系统版本 | v0.3.0（以 `pyproject.toml` 为准） |
-| 日期 | 2026-11-03（内容截至仓库提交 `9bae757`） |
+| 文档版本 | v1.3（首版 v1.0） |
+| 系统版本 | v0.4.0（以 `pyproject.toml` 为准） |
+| 日期 | 2026-11-03（内容截至 v0.4.0 交付提交） |
 | 状态 | 随仓库维护，以仓库为准 |
 | 视图模型 | 4+1 视图（逻辑 / 进程 / 部署 / 数据 / 场景）+ C4 容器-组件分层 |
 | 关联文档 | 见 §14-C「关联文档索引」 |
@@ -281,28 +281,29 @@ AI 是可替换的外部组件（vlm.ts 单点接入），不是引擎的一部�
 
 ## 4. 逻辑视图（模块划分）
 
-### 4.1 Python 引擎（`src/snap2edit`，8 文件 947 行）
+### 4.1 Python 引擎（`src/snap2edit`，9 文件 1629 行）
 
 | 模块 | 行数 | 职责 | 关键 API |
 |---|---|---|---|
-| `spec.py` | 160 | 规格书加载、结构校验、项目名消毒、颜色规范化 | `load` / `validate` / `safe_project` / `norm_color` / `texts_of` / `SpecError` |
+| `spec.py` | 239 | 规格书加载、结构校验（含组件库四类）、项目名消毒、颜色规范化 | `load` / `validate` / `safe_project` / `norm_color` / `texts_of` / `text_tag_count` / `SpecError` |
 | `geometry.py` | 37 | 坐标系映射（px ⇄ EMU ⇄ pt）与幻灯片 EMU 解析 | `Mapper` / `resolve_slide_emu` |
-| `svgout.py` | 149 | 产线①：spec → HTML+SVG（全真实 `<text>`，零内部依赖） | `render_html` / `render_element` |
-| `pptxout.py` | 200 | 产线②：spec → 原生 PPTX（文本框/形状/连接线） | `render_pptx` |
-| `verify.py` | 274 | 四道校验门 + 结构化报告 + 截图/量宽/块差异 | `collect_checks` / `run_checks` / `check_html` / `check_pptx` / `check_bounds` / `screenshot` / `block_diff` / `text_width_px` |
-| `cli.py` | 114 | 子命令入口（`new` / `build` / `check`），函数内延迟导入 | `main` / `cmd_new` / `cmd_build` / `cmd_check` |
+| `components.py` | 171 | 组件库唯一事实源：颜色演算（shade/contrast）、cube/matrix 几何、10 种参数化图标 | `shade` / `contrast_text` / `cube_faces` / `matrix_cells` / `icon_parts` / `ICONS` |
+| `svgout.py` | 268 | 产线①：spec → HTML+SVG（全真实 `<text>`；组件拆为面片/格子/部件独立单元） | `render_html` / `render_element` |
+| `pptxout.py` | 339 | 产线②：spec → 原生 PPTX（文本框/形状/连接线/Freeform 多边形） | `render_pptx` |
+| `verify.py` | 307 | 四道校验门 + 结构化报告 + 截图/量宽/块差异 | `collect_checks` / `run_checks` / `check_html` / `check_pptx` / `check_bounds` / `screenshot` / `block_diff` / `text_width_px` |
+| `cli.py` | 255 | 子命令入口（`new` / `build` / `check` / `loop`），函数内延迟导入 | `main` / `cmd_new` / `cmd_build` / `cmd_check` / `cmd_loop` |
 | `__main__.py` | 8 | `python -m snap2edit` 入口 | 转发 `cli.main` |
 | `__init__.py` | 5 | 包版本号 | `__version__` |
 
-### 4.2 Web 服务端（`web/lib`，6 模块 1358 行）
+### 4.2 Web 服务端（`web/lib`，6 模块 1668 行）
 
 | 模块 | 行数 | 职责 | 关键 API |
 |---|---|---|---|
-| `spec.ts` | 465 | VLM 提示词构建、JSON→YAML 序列化、normalizeSpec、TS 侧校验器、骨架兜底 | `buildSystemPrompt` / `buildUserPrompt` / `buildFixPrompt` / `normalizeSpec` / `dumpSpecYaml` / `validateSpecYaml` / `buildSkeletonYaml` / `parseSpecJson` |
+| `spec.ts` | 515 | VLM 提示词构建（含组件库指引）、JSON→YAML 序列化、normalizeSpec、TS 侧校验器、骨架兜底 | `buildSystemPrompt` / `buildUserPrompt` / `buildFixPrompt` / `normalizeSpec` / `dumpSpecYaml` / `validateSpecYaml` / `buildSkeletonYaml` / `parseSpecJson` |
 | `engine.ts` | 217 | 引擎子进程解析与调用、任务目录（UUID）、产物白名单解析、PPTX→PDF | `resolveEngine` / `runEngine` / `createJob` / `resolveArtifact` / `pptxToPdf`（90s 超时） |
 | `pipeline.ts` | 110 | build+check 编排、NDJSON 流式包装、心跳、spec 预校验 | `buildAndCheck` / `streamEvents` / `startHeartbeat`（15s）/ `prevalidate` / `finalizePdf` |
 | `api.ts` | 118 | 浏览器侧 fetch 辅助与事件/报告类型（三层防线之客户端层） | `readApiJson` / `streamApi` |
-| `canvas.ts` | 393 | 客户端 SVG 画布渲染（svgout.py 的 TS 镜像，仅供预览）、吸附、bbox、texts 同步 | `renderSpecSvg` / `computeSnap` / `elBBox` / `regenTexts` / `syncTextOnEdit` |
+| `canvas.ts` | 653 | 客户端 SVG 画布渲染（svgout.py 的 TS 镜像，含组件库几何/图标同源移植）、吸附、bbox、texts 同步 | `renderSpecSvg` / `computeSnap` / `elBBox` / `regenTexts` / `syncTextOnEdit` / `ICONS` / `cubeFaces` / `matrixCells` |
 | `vlm.ts` | 55 | 视觉模型客户端（z-ai-web-dev-sdk 按需动态导入）、超时包装 | `getVLM` / `withTimeout`（150s）/ `vlmUnavailableMsg` |
 
 ### 4.3 Web 应用层（`web/app`）
@@ -310,7 +311,7 @@ AI 是可替换的外部组件（vlm.ts 单点接入），不是引擎的一部�
 | 组件/路由 | 行数 | 职责 |
 |---|---|---|
 | `workbench.tsx` | 622 | 全链路工作台：上传 → spec 编辑 → 构建预览 → 自动迭代 |
-| `studio/editor.tsx` | 1529 | 可视化编辑器：元素列表 / SVG 画布（点选·拖拽·框选·手柄变换·读出气泡）/ 属性面板 / YAML 双向同步 / 构建出口 |
+| `studio/editor.tsx` | 1650 | 可视化编辑器：元素列表 / SVG 画布（点选·拖拽·框选·手柄变换·读出气泡）/ 属性面板（含组件库字段）/ YAML 双向同步 / 构建出口 |
 | `api/spec/route.ts` | 171 | POST：VLM 抽取 → normalize → 校验 → 兜底 |
 | `api/build/route.ts` | 58 | POST：双渲染 + 四道门（NDJSON） |
 | `api/refine/route.ts` | 197 | POST：自动回询迭代闭环（NDJSON） |
@@ -321,15 +322,17 @@ AI 是可替换的外部组件（vlm.ts 单点接入），不是引擎的一部�
 
 ```
 cli（入口；cmd_* 函数内延迟导入，保证 --version 等轻量路径秒回）
- ├──▶ spec      仅依赖 PyYAML（+re），是引擎最底层
- ├──▶ svgout    零内部依赖（viewBox 与画布 1:1，无需坐标换算）
- ├──▶ pptxout ──▶ geometry（EMU/pt/px 映射；目前仅产线②需要）
- └──▶ verify ───▶ spec（texts_of 收集文案清单）
+ ├──▶ spec ─────▶ components（图标名清单；spec 侧其余仅依赖 PyYAML+re）
+ ├──▶ svgout ───▶ components（几何/配色/图标唯一事实源）
+ ├──▶ pptxout ──▶ geometry（EMU/pt/px 映射） + components
+ └──▶ verify ───▶ spec（texts_of / text_tag_count） + components（门3 组件边界）
 ```
 
-依赖为**单向无环**：spec 与 geometry 是底座，两条产线互不依赖，
+依赖为**单向无环**：components 与 geometry 是底座，两条产线互不依赖，
 verify 横切两条产线的产物，cli 是唯一入口。svgout 不依赖 geometry 是有意为之：
 产线① 的 viewBox 与画布 1:1，根本不需要换算；这也意味着产线① 天然免疫换算类 bug。
+组件库（F6）落位为独立底座 `components.py`：几何/配色/图标数据只写一遍，
+两条产线各自把同一份定义翻译为原生单元（SVG polygon/polyline ⇄ PPTX Freeform）。
 
 ### 4.5 Web 与引擎的边界约束
 
@@ -337,9 +340,9 @@ verify 横切两条产线的产物，cli 是唯一入口。svgout 不依赖 geom
 
 | 镜像对 | 同语义内容 | 漂移防线 |
 |---|---|---|
-| `web/lib/canvas.ts` ⇄ `src/snap2edit/svgout.py` | 坐标/圆角/文本基线/箭头三角/rotate 的 SVG 表达 | 两侧行为均有单测锚定（canvas.spec.test.ts 等） |
-| `web/lib/spec.ts` 校验规则 ⇄ `src/snap2edit/spec.py` | 元素类型白名单、几何字段、rotate 分级规则 | 双端校验：TS 预检（编辑器即时反馈）+ Python 终检（build 前兜底） |
-| `web/lib/spec.ts` ELEMENT_TYPES ⇄ 引擎元素表 | 7 种元素类型及其几何字段 | 类型常量集中定义一处 |
+| `web/lib/canvas.ts` ⇄ `src/snap2edit/svgout.py` | 坐标/圆角/文本基线/箭头三角/rotate 及组件库（cube 面片/matrix 格子/flow-box 色带/icon 部件）的 SVG 表达 | 两侧行为均有单测锚定（canvas.spec.test.ts / components.spec.test.ts 等） |
+| `web/lib/spec.ts` 校验规则 ⇄ `src/snap2edit/spec.py` | 元素类型白名单、几何字段、rotate 分级规则、组件库约束（rows/cols/icon 名/flow-box 内容） | 双端校验：TS 预检（编辑器即时反馈）+ Python 终检（build 前兜底） |
+| `web/lib/spec.ts` ELEMENT_TYPES ⇄ 引擎元素表 | 11 种元素类型及其几何字段 | 类型常量集中定义一处 |
 
 这是架构上**已知且有意的重复**：TS 侧校验让编辑器获得毫秒级反馈，Python 终检
 保证任何绕过前端的调用（curl / Agent）同样被拦截。漂移风险由「两侧规则都有
@@ -812,12 +815,13 @@ greenlet 并发追踪，保证门 4 异步截图路径计入覆盖）。studio �
 |---|---|---|
 | v0.1 | 引擎骨架：F1–F5(P0) + demo + 冒烟测试 | ✅ |
 | v0.2 | docs 案例库 + workbench 存档 + web/ 框架骨架 | ✅ |
-| v0.3（当前） | Web 在线管线（/api/spec·build·refine·artifacts）+ JSON.parse 三层根治 + studio 可视化编辑器（框选/吸附/手柄/读出气泡）+ rotate 全链路 + 覆盖率补全（引擎 33 项 99% / web 44 项 100%） | ✅ |
-| v0.5 | `loop` 自动迭代命令、组件库（cube/matrix-cell/flow-box/icon）、HTML 可视化报告 | 规划 |
+| v0.3 | Web 在线管线（/api/spec·build·refine·artifacts）+ JSON.parse 三层根治 + studio 可视化编辑器（框选/吸附/手柄/读出气泡）+ rotate 全链路 + 覆盖率补全（引擎 33 项 99% / web 44 项 100%） | ✅ |
+| v0.4（当前） | F5 `loop` 自动迭代命令（--fix 外接修正器 / 快照与最优保留 / --json）+ F6 组件库（cube/matrix-cell/flow-box/icon×10，双产线原生 + 三处镜像同步 + 画廊验收）+ 引擎测试 57 项 100% 覆盖 | ✅ |
+| v0.5 | F7 HTML 可视化报告（并排图 / diff 热力图 / 状态灯） | 规划 |
 | v1.0 | 文档站、PyPI 发布（覆盖率目标 ≥80% 已超前达成） | 规划 |
 | v2.0 | AI 规格书增强（多模型/增量修正）、批量模式、CI 示例工作流 | 愿景 |
 
-> 注：根 README 的版本行（v0.2.0）滞后于 `pyproject.toml`（0.3.0），以 pyproject 为准。
+> 注：根 README、`pyproject.toml` 与包内 `__version__` 已统一为 v0.4.0。
 
 ### 13.2 已知边界
 
@@ -881,7 +885,7 @@ rotate 归一化 = round((((deg % 360) + 360) % 360) × 10) / 10  # 双端同式
 
 | 文档 | 内容 |
 |---|---|
-| `docs/PRD.md` | 产品需求文档 v0.2（F1–F10 / D1–D6 / NFR / 里程碑） |
+| `docs/PRD.md` | 产品需求文档 v0.4（F1–F10 / D1–D6 / NFR / 里程碑） |
 | `docs/WORKFLOW.md` | 六步标准流程方法论（架构的流程源头） |
 | `docs/WEB_PIPELINE.md` | 在线管线架构 / JSON.parse 根治 / E2E 实测记录 |
 | `docs/ROTATE.md` | 倾斜元素全链路（引擎字段 / studio 读出气泡 / VLM 抽取） |
@@ -897,3 +901,4 @@ rotate 归一化 = round((((deg % 360) + 360) % 360) × 10) / 10  # 双端同式
 | v1.0 | 2026-11-03 | 首版：按 4+1 视图 + C4 组织，覆盖 v0.3.0 全部已实现机制（截至提交 9bae757） |
 | v1.1 | 2026-11-03 | §3.2 增补 Mermaid 版容器图（与 ASCII 图同构）；§1.4 同步图表约定 |
 | v1.2 | 2026-11-03 | §3.3 / §5.4 增补 Mermaid 时序图（与 ASCII 流程同构）；§1.4 图表约定更新 |
+| v1.3 | 2026-11-03 | 同步 v0.4.0（F5 loop 命令 + F6 组件库）：§4.1 模块表新增 components.py 并更新行数；§4.4 依赖图纳入 components 底座；§4.5 镜像表补组件库同源内容 |

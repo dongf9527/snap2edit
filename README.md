@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| 版本 | v0.2.0（引擎 + 案例库 + Web 框架骨架） |
+| 版本 | v0.4.0（引擎 + 案例库 + Web 全链路 + studio 编辑器 + 组件库 + loop） |
 | 语言 | Python ≥ 3.9 |
 | 协议 | MIT |
 | 状态 | 活跃开发（PRD 见 `docs/PRD.md`） |
@@ -33,8 +33,10 @@
   ② 100% 原生文本框+形状（Picture=0）的 PPTX；
 - ✅ **四道校验门**：文案覆盖 / 无位图 / 无 Picture / 文本边界实测防溢出 / 截图非空白；
 - 🧩 **组件化元素**：`rect / rrect / pill / text / line / arrow`，箭头自动拆为线段+三角独立单元；
+  组件库（F6）：`cube` 立方体 / `matrix-cell` 矩阵格子 / `flow-box` 流程框 / `icon` 图标（10 种参数化图标），
+  几何与配色统一在 `components.py` 定义，双产线各给原生实现（Freeform 任意多边形，仍 Picture=0）；
 - 🀄 **中文双保险**：自动补 `a:ea`/`a:cs` 东亚字体、PIL 实测字宽、坐标/字号换算公式内置；
-- 🖥️ **一条命令**：`build` 双渲染，`check` 出校验报告（Markdown）。
+- 🖥️ **一条命令**：`build` 双渲染，`check` 出校验报告（Markdown），`loop` 自动迭代直至收敛。
 
 ## 快速开始
 
@@ -50,6 +52,8 @@ snap2edit new my-project
 snap2edit build my-project
 # 3) 四道校验门 + 报告
 snap2edit check my-project [--original 原图.png]
+# 4) build+check 自动迭代直至收敛（可外接 --fix 修正命令，上下文经环境变量注入）
+snap2edit loop my-project --max-iters 3 --fix "python3 my_fixer.py" [--json]
 ```
 
 ## 测试与覆盖率
@@ -57,7 +61,7 @@ snap2edit check my-project [--original 原图.png]
 ```bash
 # 引擎（pytest + coverage，Playwright 截图门真实执行）
 python -m coverage run -m pytest tests/ -q
-python -m coverage report          # 当前 ≈99%（.coveragerc 开启 greenlet 并发追踪）
+python -m coverage report          # 当前 100%（.coveragerc 开启 greenlet 并发追踪）
 
 # Web 纯逻辑单测（Node ≥24 原生跑 TS，无需编译）
 cd web && npm test                 # node --test tests/*.test.ts
@@ -130,10 +134,17 @@ flowchart TB
 | `text` | x y (w 可选) | size / bold / color / align / lines / line_height / rotate | 自由文本 |
 | `line` | x1 y1 x2 y2 | stroke / stroke_width | 直线 |
 | `arrow` | x1 y1 x2 y2 | stroke / stroke_width / head | 箭头（线段+三角两个单元） |
+| `cube` | x y w h | fill / depth / text | 立方体：顶面提亮+侧面加深+正面本色，色块自动演算 |
+| `matrix-cell` | x y w h | rows / cols / gap / texts / rx | 矩阵格子：逐格独立可编辑，文字自动对比色 |
+| `flow-box` | x y w h | title / band / band_fill / text / lines | 流程框：色带标题（自动对比色）+ 正文区 |
+| `icon` | x y w h | name（10 种）/ fill / stroke_width | 参数化图标：brain/chart/network/sparkle/lightning/gear/doc/user/check/target |
 
-带 `text`+`size` 的盒子类型会自动渲染居中文字（PPTX 侧为独立文本框）。
-`rotate`（v0.2.1+，可选）：度、顺时针；盒子绕自身中心、自由文本绕锚点，双产线同语义
-（SVG `transform=rotate` ⇄ PPTX `rotation` + 文本框重定位）；线段/箭头由端点承载几何，rotate 键被忽略剔除。
+带 `text`+`size` 的盒子类型会自动渲染居中文字（PPTX 侧为独立文本框）；矩阵格子文字逐格独立、
+流程框标题/正文分区域居中，组件文字自动进终检文案清单。
+`rotate`（可选）：度、顺时针；盒子绕自身中心、自由文本绕锚点，双产线同语义
+（SVG `transform=rotate` ⇄ PPTX `rotation` + 文本框重定位）；线段/箭头由端点承载几何、
+复合组件（cube/matrix-cell/flow-box/icon）多单元旋转易漂移——rotate 键均被忽略剔除。
+组件库几何/配色/图标定义见 `src/snap2edit/components.py`（唯一事实源），画廊示例见 `examples/gallery/`。
 
 ## 目录结构
 
@@ -157,9 +168,12 @@ snap2edit/
 ## 路线图
 
 - **v0.1**：引擎骨架 + 双产线 + 四道校验门 + demo
-- **v0.2**（当前）：docs 案例库（5 案例：源图片 + 双产物 + 预览）+ workbench 过程存档 + `web/` Next.js 基础框架
-- **v0.5**：组件库扩充（立方体/矩阵格子/流程框/图标库）、`loop` 自动迭代、HTML 可视化报告
-- **v1.0**：完整测试覆盖、文档站、PyPI 发布
+- **v0.2**：docs 案例库（5 案例：源图片 + 双产物 + 预览）+ workbench 过程存档 + `web/` Next.js 基础框架
+- **v0.3**：`rotate` 旋转端到端（引擎双产线 + studio 变换手柄/读出气泡 + VLM 倾斜抽取）
+- **v0.4**（当前）：F5 `loop` 自动迭代命令（可外接 `--fix` 修正器）+ F6 组件库
+  （cube / matrix-cell / flow-box / icon×10，双产线原生实现，三处镜像同步）
+- **v0.5**：F7 可视化 HTML 报告（并排图 / diff 热力图 / 状态灯）
+- **v1.0**：文档站、PyPI 发布
 - **v2.0**：AI 规格书生成（看图写 spec）、Web UI 完整版（`web/` 基础框架已就绪）、批量模式
 
 ## 命名
