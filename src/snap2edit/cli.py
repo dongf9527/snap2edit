@@ -151,8 +151,9 @@ def cmd_loop(args):
                                          do_shot=not args.no_shot, log=None)
             ok, failures = data["ok"], data["failures"]
             report_path = data["report_md"]
+            report_html = data.get("report_html")
         else:
-            ok, failures, report_path = False, [f"spec 解析失败：{build_err}"], None
+            ok, failures, report_path, report_html = False, [f"spec 解析失败：{build_err}"], None, None
         history.append({"iter": it, "ok": ok, "failures": failures})
 
         print(f"[iter {it}/{args.max_iters}] " + ("✓ 收敛" if ok else f"✗ {len(failures)} 项未通过"))
@@ -163,11 +164,16 @@ def cmd_loop(args):
 
         if ok:
             summary = {"ok": True, "converged": True, "iterations": it,
-                       "history": history, "artifacts": {"report": report_path}}
+                       "history": history,
+                       "artifacts": {"report": report_path,
+                                     "report_html": report_html}}
             if args.json:
                 print(json.dumps(summary, ensure_ascii=False))
             else:
-                print(f"✓ loop 收敛于第 {it} 轮，报告: {report_path}")
+                msg = f"✓ loop 收敛于第 {it} 轮，报告: {report_path}"
+                if report_html:
+                    msg += f"（可视化: {os.path.basename(report_html)}）"
+                print(msg)
             return 0
 
         # --- 失败快照（spec.yaml 不被改动）---
@@ -181,6 +187,11 @@ def cmd_loop(args):
             with open(report_path, encoding="utf-8") as f:
                 rep = f.read()
             with open(os.path.join(loop_dir, f"report-iter{it}.md"), "w", encoding="utf-8") as f:
+                f.write(rep)
+        if report_html and os.path.exists(report_html):  # F7 可视化报告逐轮快照（调试用）
+            with open(report_html, encoding="utf-8") as f:
+                rep = f.read()
+            with open(os.path.join(loop_dir, f"report-iter{it}.html"), "w", encoding="utf-8") as f:
                 f.write(rep)
 
         if it == args.max_iters:

@@ -192,6 +192,27 @@ def block_diff(original_png, rendered_png, block=16, top=15):
     return float(d.mean()), scores[:top]
 
 
+def block_diff_grid(original_png, rendered_png, block=16):
+    """与原图的 16px 块差异全网格（F7 热力图数据源，report.py 消费）。
+
+    返回 (总平均差异, 网格分数 rows×cols)：行为 y、列为 x，
+    分数与 block_diff 同口径（RGB 三通道绝对差之和的块均值，765 色阶）。
+    边缘不足一块的残余像素并入最后一块。"""
+    from PIL import Image
+    import numpy as np
+    a = Image.open(original_png).convert("RGB")
+    b = Image.open(rendered_png).convert("RGB").resize(a.size)
+    d = np.abs(np.array(a, dtype=int) - np.array(b, dtype=int)).sum(axis=2)
+    H, W = d.shape
+    gh, gw = (H + block - 1) // block, (W + block - 1) // block
+    grid = [[0.0] * gw for _ in range(gh)]
+    for gy in range(gh):
+        for gx in range(gw):
+            cell = d[gy * block:(gy + 1) * block, gx * block:(gx + 1) * block]
+            grid[gy][gx] = float(cell.mean())
+    return float(d.mean()), grid
+
+
 # ---------------- 汇总执行 ----------------
 
 def collect_checks(project_dir, spec, original=None, do_shot=True, log=None):
@@ -287,7 +308,7 @@ def collect_checks(project_dir, spec, original=None, do_shot=True, log=None):
     with open(rep_path, "w", encoding="utf-8") as f:
         f.write("\n".join(rep) + "\n")
 
-    return {
+    data = {
         "ok": ok,
         "project": name,
         "gates": gates,
@@ -296,12 +317,25 @@ def collect_checks(project_dir, spec, original=None, do_shot=True, log=None):
         "report_md": rep_path,
     }
 
+    # F7 可视化报告（单文件 HTML，四要素：状态灯/并排图/热力图/溢出标注）；
+    # 属报告层而非校验门，生成失败不阻断校验结论，仅记日志。
+    try:
+        from .report import write_html  # 延迟导入：report 顶部依赖 verify，避免成环
+        data["report_html"] = write_html(build, data, spec, original=original)
+    except Exception as e:  # noqa: BLE001
+        data["report_html"] = None
+        say(f"! HTML 可视化报告生成失败: {e}")
+
+    return data
+
 
 def run_checks(project_dir, spec, original=None, do_shot=True, log=print):
     """CLI 入口：打印过程日志与结论，返回布尔（0/2 退出码）。"""
     from .spec import safe_project
 
     data = collect_checks(project_dir, spec, original=original, do_shot=do_shot, log=log)
-    log(("\n✓ 全部校验通过" if data["ok"] else "\n✗ 存在未通过项")
-        + f"，报告: {data['report_md']}")
+    msg = ("\n✓ 全部校验通过" if data["ok"] else "\n✗ 存在未通过项") + f"，报告: {data['report_md']}"
+    if data.get("report_html"):
+        msg += f"（可视化: {os.path.basename(data['report_html'])}）"
+    log(msg)
     return data["ok"]

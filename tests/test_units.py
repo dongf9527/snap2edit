@@ -716,3 +716,224 @@ def test_loop_json_converged(tmp_path, capsys):
     rc = cli.main(["loop", str(tmp_path), "--no-shot", "--json"])
     data = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
     assert rc == 0 and data["converged"] is True and data["iterations"] == 1
+
+
+# ---------------- F7 可视化报告（report.py） ----------------
+
+def test_report_node_status_mapping():
+    """状态灯映射：门1→N2、门4(+附加)→N3、门2→N4、门3→N5、全绿→N6；缺席=skip。"""
+    from snap2edit import report
+
+    def gate(name, *passed):
+        return {"gate": name, "title": "t",
+                "items": [{"label": "x", "passed": p, "detail": ""} for p in passed]}
+
+    g = [gate("门1 交付物① HTML+SVG", True), gate("门2 交付物② PPTX", True),
+         gate("门3 文本边界", True), gate("门4 渲染截图", True)]
+    assert report.node_status(g) == {"N2": "pass", "N3": "pass", "N4": "pass",
+                                     "N5": "pass", "N6": "pass"}
+    g.append(gate("附加 与原图差异", False))
+    st = report.node_status(g)
+    assert st["N3"] == "fail" and st["N6"] == "fail" and st["N2"] == "pass"
+    st = report.node_status([g[0], g[1], g[2]])          # 门4 缺席（--no-shot）
+    assert st["N3"] == "skip" and st["N6"] == "skip" and st["N5"] == "pass"
+    st = report.node_status([gate("门1 交付物① HTML+SVG", False), g[1], g[2], g[3]])
+    assert st["N2"] == "fail" and st["N6"] == "fail"
+    assert all(v == "skip" for v in report.node_status([]).values())
+    assert all(v == "skip" for v in report.node_status(None).values())
+
+
+def test_report_overflow_marks_and_svg():
+    """溢出项回映射画布坐标：matrix-cell 子项 id→格子框；SVG 红色高亮＋id 标签。"""
+    from snap2edit import report
+
+    long_txt = "这是一个远超格子宽度的超长文本"
+    sp = specmod.validate({
+        "project": "溢出标注", "canvas": {"width": 800, "height": 600},
+        "palette": {"primary": "#111111", "accent": "#2B6CB0", "card": "#FFFFFF", "bg": "#FFFFFF"},
+        "texts": [long_txt],
+        "elements": [
+            {"id": "mx", "type": "matrix-cell", "x": 40, "y": 40, "w": 200, "h": 100,
+             "rows": 2, "cols": 2, "size": 14, "texts": [long_txt, "", "", ""]},
+            {"id": "fb", "type": "flow-box", "x": 300, "y": 40, "w": 160, "h": 80,
+             "size": 13, "title": "流程", "text": "正文"},
+        ],
+    })
+    marks = report.overflow_marks(sp)
+    assert marks and marks[0]["id"] == "mx-r1c1" and marks[0]["box"] is not None
+    boxes = report.elem_boxes(sp)
+    assert boxes["fb-title"] == boxes["fb"] == boxes["fb-text"]
+    svg = report.canvas_svg(sp, marks)
+    assert 'stroke="#dc2626"' in svg and "mx-r1c1" in svg
+    # 无溢出 spec：零标注，SVG 仅底稿
+    ok_sp = specmod.load(DEMO)
+    assert report.overflow_marks(ok_sp) == []
+
+
+def test_report_heatmap_png(tmp_path):
+    """热力图：同色图差异≈0；异色图差异>0 且输出 PNG 非空。"""
+    from PIL import Image
+
+    from snap2edit import report, verify
+
+    a = os.path.join(str(tmp_path), "a.png")
+    b = os.path.join(str(tmp_path), "b.png")
+    rendered = os.path.join(str(tmp_path), "rendered.png")
+    out = os.path.join(str(tmp_path), "heat.png")
+    Image.new("RGB", (70, 50), "#aa0000").save(a)   # 非 16 倍数 → 含残余边缘块
+    Image.new("RGB", (80, 40), "#00aa00").save(b)   # 与 rendered 同色 → 热力图均值对齐
+    Image.new("RGB", (80, 40), "#00aa00").save(rendered)
+    mean, grid = verify.block_diff_grid(a, b)
+    assert len(grid) == 4 and len(grid[0]) == 5     # ceil(50/16) x ceil(70/16)
+    assert report.heatmap_png(a, rendered, out) == pytest.approx(mean, abs=1e-6)
+    assert os.path.exists(out) and os.path.getsize(out) > 0
+    same = report.heatmap_png(a, a, out)
+    assert same == pytest.approx(0.0, abs=1e-6)
+
+
+def test_report_write_html_contains_four_elements(tmp_path):
+    """单文件 HTML 四要素：状态灯 / 并排图 / 热力图 / 溢出标注；转义安全；无外链。"""
+    from snap2edit import report
+
+    tricky = "A<b>&\"引号\"文"
+    sp = specmod.validate({
+        "project": "报告四要素", "canvas": {"width": 640, "height": 360},
+        "palette": {"primary": "#111111", "accent": "#2B6CB0", "card": "#FFFFFF", "bg": "#FFFFFF"},
+        "texts": [tricky],
+        "elements": [
+            # 窄容器强制门3溢出 → 敏感字符进入溢出表，同时验证转义
+            {"id": "t1", "type": "rect", "x": 40, "y": 40, "w": 30, "h": 20,
+             "fill": "#2B6CB0", "text": tricky, "size": 16},
+        ],
+    })
+    build = os.path.join(str(tmp_path), "build")
+    os.makedirs(build)
+    data = {"ok": True, "project": "报告四要素",
+            "gates": [{"gate": "门1 交付物① HTML+SVG", "title": "HTML 检查",
+                       "items": [{"label": "含<b>与&的标签文本", "passed": True,
+                                  "detail": "d<1>"}]}],
+            "failures": [], "artifacts": {"html": os.path.join(build, "x.html"),
+                                          "pptx": None, "shot": None},
+            "report_md": os.path.join(build, "report.md")}
+    path = report.write_html(build, data, sp, original=None)
+    assert os.path.abspath(path) == os.path.join(os.path.abspath(build), "report.html")
+    html = open(path, encoding="utf-8").read()
+    assert "结点状态灯" in html and "N6" in html and "并排图" in html
+    assert "diff 热力图" in html and "文本溢出标注" in html and "四道门明细" in html
+    assert "A&lt;b&gt;&amp;&quot;引号&quot;文" in html and "A<b>" not in html
+    assert "d&lt;1&gt;" in html
+    assert "未执行截图" in html and "未提供原图" in html      # 无 shot/原图 → 跳过说明
+    assert 'src="http' not in html and 'href="http' not in html  # 单文件无外链资源（xmlns 除外）
+
+
+def test_report_escape_in_overflow_table():
+    """溢出表内文本含 HTML 敏感字符时转义（门3 溢出路径）。"""
+    from snap2edit import report
+
+    sp = specmod.validate({
+        "project": "转义", "canvas": {"width": 200, "height": 100},
+        "palette": {"primary": "#111111", "accent": "#2B6CB0", "card": "#FFFFFF", "bg": "#FFFFFF"},
+        "texts": ["<i>宽</i>"],
+        "elements": [
+            {"id": "t", "type": "rect", "x": 10, "y": 10, "w": 20, "h": 20,
+             "fill": "#2B6CB0", "text": "<i>宽</i>", "size": 14},
+        ],
+    })
+    doc = report.render_html({"ok": False, "project": "转义", "gates": [],
+                              "failures": [], "artifacts": {}, "report_md": None},
+                             sp, original=None)
+    assert "<i>宽</i>" not in doc.replace("&lt;i&gt;宽&lt;/i&gt;", "")
+    assert "&lt;i&gt;宽&lt;/i&gt;" in doc
+
+
+def test_collect_checks_writes_report_html(tmp_path):
+    """collect_checks 集成：落盘 report.html 且与 report.md 并存；状态灯 N3=skip（无截图）。"""
+    with tempfile.TemporaryDirectory() as td:
+        sp = specmod.load(DEMO)
+        name = specmod.safe_project(sp)
+        build = os.path.join(td, "build")
+        os.makedirs(build)
+        with open(os.path.join(build, f"{name}.html"), "w", encoding="utf-8") as f:
+            f.write(svgout.render_html(sp))
+        pptxout.render_pptx(sp, os.path.join(build, f"{name}.pptx"))
+        data = verify.collect_checks(td, sp, do_shot=False, log=None)
+        assert data["report_html"] and os.path.exists(data["report_html"])
+        assert os.path.exists(data["report_md"])
+        html = open(data["report_html"], encoding="utf-8").read()
+        assert "结点状态灯" in html and "四道门明细" in html
+        assert "未执行截图" in html  # --no-shot 时并排图/热力图给出跳过说明
+
+
+def test_loop_snapshots_report_html(tmp_path, capsys, monkeypatch):
+    """loop 失败轮快照：report-iter{N}.html 与 report-iter{N}.md 并存。"""
+    from snap2edit import verify as verify_mod
+
+    _write_loop_project(str(tmp_path), dict(LOOP_OK_SPEC, texts=["标题文字", "缺失文案"]))
+    build = os.path.join(str(tmp_path), "build")
+    os.makedirs(build)
+    md = os.path.join(build, "report.md")
+    htm = os.path.join(build, "report.html")
+    with open(md, "w", encoding="utf-8") as f:
+        f.write("# md 报告")
+    with open(htm, "w", encoding="utf-8") as f:
+        f.write("<html>F7 报告</html>")
+    fake = {"ok": False, "failures": ["a"], "report_md": md, "report_html": htm}
+    monkeypatch.setattr(verify_mod, "collect_checks", lambda *a, **k: fake)
+    rc = cli.main(["loop", str(tmp_path), "--no-shot", "--max-iters", "1"])
+    assert rc == 2
+    snap = os.path.join(str(tmp_path), "loop", "report-iter1.html")
+    assert os.path.exists(snap) and "F7 报告" in open(snap, encoding="utf-8").read()
+    assert os.path.exists(os.path.join(str(tmp_path), "loop", "report-iter1.md"))
+
+
+def test_loop_tolerates_missing_report_html(tmp_path, capsys, monkeypatch):
+    """旧结构 fake（无 report_html 键）→ loop 不报错（.get 兜底）。"""
+    from snap2edit import verify as verify_mod
+
+    _write_loop_project(str(tmp_path), LOOP_OK_SPEC)
+    fake = {"ok": True, "failures": [], "report_md": None}
+    monkeypatch.setattr(verify_mod, "collect_checks", lambda *a, **k: fake)
+    rc = cli.main(["loop", str(tmp_path), "--no-shot", "--json"])
+    data = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
+    assert rc == 0 and data["artifacts"]["report_html"] is None
+
+
+def test_report_elem_boxes_skips_invalid_and_unmapped_marks():
+    """防御分支：坐标缺失/非法元素静默跳过；无坐标的溢出记录不入 SVG。"""
+    from snap2edit import report
+
+    boxes = report.elem_boxes({
+        "canvas": {"width": 100, "height": 100},
+        "elements": [
+            {"id": "bad1", "type": "rect", "y": 5, "w": 3, "h": 3},           # 缺 x
+            {"id": "bad2", "type": "rect", "x": "x", "y": 0, "w": 3, "h": 3},  # x 非数字
+            {"id": "bad3", "type": "circle", "x": 0, "y": 0, "w": 10, "h": None},  # h None
+        ],
+    })
+    assert boxes == {}
+    svg = report.canvas_svg(specmod.load(DEMO),
+                            [{"id": "ghost", "text": "t", "need": 9, "avail": 1, "box": None}])
+    assert 'stroke="#dc2626"' not in svg  # 未定位 → 不画红框（仍会进明细表）
+
+
+def test_collect_checks_report_failure_is_non_blocking(monkeypatch):
+    """F7 报告生成失败 → 不阻断校验结论：report_html=None 且记日志。"""
+    import snap2edit.report as report_mod
+
+    with tempfile.TemporaryDirectory() as td:
+        sp = specmod.load(DEMO)
+        name = specmod.safe_project(sp)
+        build = os.path.join(td, "build")
+        os.makedirs(build)
+        with open(os.path.join(build, f"{name}.html"), "w", encoding="utf-8") as f:
+            f.write(svgout.render_html(sp))
+        pptxout.render_pptx(sp, os.path.join(build, f"{name}.pptx"))
+        logs = []
+
+        def boom(*a, **k):
+            raise RuntimeError("boom")
+
+        monkeypatch.setattr(report_mod, "write_html", boom)
+        data = verify.collect_checks(td, sp, do_shot=False, log=logs.append)
+        assert data["ok"] is True and data["report_html"] is None
+        assert any("HTML 可视化报告生成失败" in m for m in logs)
