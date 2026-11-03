@@ -17,8 +17,8 @@
 
 ## 其他目录
 
-- [`PRD.md`](PRD.md) —— 产品需求文档 v0.2
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) —— 系统架构文档（4+1 视图 / C4 容器-组件 / 核心机制 / ADR / 测试与安全）
+- [`PRD.md`](PRD.md) —— 产品需求文档 v0.5（F7 可视化报告已交付，v0.5 里程碑完成）
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) —— 系统架构文档 v1.4（4+1 视图 / C4 容器-组件 / 核心机制 / ADR / 测试与安全）
 - [`WORKFLOW.md`](WORKFLOW.md) —— 六步标准流程方法论
 - [`WEB_PIPELINE.md`](WEB_PIPELINE.md) —— 在线管线：双产物预览与自动回询迭代（架构 / JSON.parse 根治 / E2E 实测）
 - [`COLLABORATION.md`](COLLABORATION.md) —— 仓库协作规则（同步方式 / 提交规范 / 禁止事项）

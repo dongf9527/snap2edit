@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| 版本 | v0.4.0（引擎 + 案例库 + Web 全链路 + studio 编辑器 + 组件库 + loop） |
+| 版本 | v0.5.0（引擎 + 案例库 + Web 全链路 + studio 编辑器 + 组件库 + loop + F7 可视化报告） |
 | 语言 | Python ≥ 3.9 |
 | 协议 | MIT |
 | 状态 | 活跃开发（PRD 见 `docs/PRD.md`） |
@@ -32,11 +32,13 @@
 - 🔁 **双产线同源渲染**：`spec.yaml` → ① 全真实文本、带 id 独立单元、零位图的 HTML+SVG；
   ② 100% 原生文本框+形状（Picture=0）的 PPTX；
 - ✅ **四道校验门**：文案覆盖 / 无位图 / 无 Picture / 文本边界实测防溢出 / 截图非空白；
+- 📊 **可视化报告（F7）**：`build/report.html` 单文件（零外链可分发）：结点 N2–N6 状态灯、
+  原图×渲染并排图、16px 块差异热力图、溢出项回映射画布标注（SVG+明细表），与 `report.md` / `check --json` 同一数据源；
 - 🧩 **组件化元素**：`rect / rrect / pill / text / line / arrow`，箭头自动拆为线段+三角独立单元；
   组件库（F6）：`cube` 立方体 / `matrix-cell` 矩阵格子 / `flow-box` 流程框 / `icon` 图标（10 种参数化图标），
   几何与配色统一在 `components.py` 定义，双产线各给原生实现（Freeform 任意多边形，仍 Picture=0）；
 - 🀄 **中文双保险**：自动补 `a:ea`/`a:cs` 东亚字体、PIL 实测字宽、坐标/字号换算公式内置；
-- 🖥️ **一条命令**：`build` 双渲染，`check` 出校验报告（Markdown），`loop` 自动迭代直至收敛。
+- 🖥️ **一条命令**：`build` 双渲染，`check` 出校验报告（Markdown + 可视化 HTML），`loop` 自动迭代直至收敛。
 
 ## 快速开始
 
@@ -75,7 +77,7 @@ python -m snap2edit build examples/demo
 python -m snap2edit check examples/demo
 ```
 
-产出：`examples/demo/build/snap2edit-demo.html`、`snap2edit-demo.pptx`、`shot.png`、`report.md`。
+产出：`examples/demo/build/snap2edit-demo.html`、`snap2edit-demo.pptx`、`shot.png`、`report.md`、`report.html`（F7 可视化报告）。
 
 ## 工作原理
 
@@ -97,7 +99,8 @@ python -m snap2edit check examples/demo
    │ 门3 字宽实测防溢出 · 门4 Playwright截图(+原图diff)│
    └────────────────────┬────────────────────────────┘
                         ▼
-              build/report.md（全 ✓ 才算交付）
+      build/report.md ＋ report.html（F7 可视化报告：
+      状态灯 / 并排图 / diff 热力图 / 溢出标注；全 ✓ 才算交付）
 ```
 
 **Mermaid 版**（GitHub 原生渲染；与上图同构，供交互式查看与复制改画）：
@@ -109,7 +112,7 @@ flowchart TB
     VAL --> L2["产线② pptxout<br/>原生文本框 + 形状<br/>Picture = 0"]
     L1 --> VFY["verify 四道校验门<br/>门1 文案覆盖 / 无位图 · 门2 尺寸 / Picture=0 / 文案<br/>门3 字宽实测防溢出 · 门4 Playwright 截图（+原图 diff）"]
     L2 --> VFY
-    VFY --> RPT["build/report.md（全 ✓ 才算交付）"]
+    VFY --> RPT["build/report.md ＋ report.html<br/>F7 可视化报告：状态灯 / 并排图 / 热力图 / 溢出标注<br/>（全 ✓ 才算交付）"]
 ```
 
 ## 与六步标准流程的映射
@@ -121,7 +124,7 @@ flowchart TB
 | N3 截图对比收敛 | `check` 门4（截图/非空白/可选原图块差异） |
 | N4 PPTX 原生生成 | `snap2edit build` 产线②，结点校验进入门2 |
 | N5 版式校验 | 门3 文本边界实测（ soffice 渲染留作 CI 扩展） |
-| N6 终检 | 门1/门2 的文案清单、占位符黑名单断言 + `report.md` |
+| N6 终检 | 门1/门2 的文案清单、占位符黑名单断言 + `report.md`；可视化报告 `report.html` 状态灯全绿 |
 
 ## 元素类型速查（v0）
 
@@ -170,9 +173,10 @@ snap2edit/
 - **v0.1**：引擎骨架 + 双产线 + 四道校验门 + demo
 - **v0.2**：docs 案例库（5 案例：源图片 + 双产物 + 预览）+ workbench 过程存档 + `web/` Next.js 基础框架
 - **v0.3**：`rotate` 旋转端到端（引擎双产线 + studio 变换手柄/读出气泡 + VLM 倾斜抽取）
-- **v0.4**（当前）：F5 `loop` 自动迭代命令（可外接 `--fix` 修正器）+ F6 组件库
+- **v0.4**：F5 `loop` 自动迭代命令（可外接 `--fix` 修正器）+ F6 组件库
   （cube / matrix-cell / flow-box / icon×10，双产线原生实现，三处镜像同步）
-- **v0.5**：F7 可视化 HTML 报告（并排图 / diff 热力图 / 状态灯）
+- **v0.5**（当前）：F7 可视化 HTML 报告（结点 N2–N6 状态灯 / 并排图 / diff 热力图 /
+  溢出标注，单文件零外链；web 端产物白名单同步开放）
 - **v1.0**：文档站、PyPI 发布
 - **v2.0**：AI 规格书生成（看图写 spec）、Web UI 完整版（`web/` 基础框架已就绪）、批量模式
 

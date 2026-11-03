@@ -3,7 +3,7 @@
 | 项 | 内容 |
 |---|---|
 | 产品名称 | Snap2Edit（截图复刻引擎） |
-| 文档版本 | v0.4 |
+| 文档版本 | v0.5 |
 | 状态 | 已评审定稿（随仓库维护，以仓库为准） |
 | 作者 | Snap2Edit Contributors |
 | 日期 | 2026-11-03 |
@@ -151,9 +151,18 @@
 - 组件一律参数化 `(id, 位置, 尺寸, 颜色)`；复合组件不支持 rotate（键剔除，与线段/箭头同策略）；
 - **验收**：`examples/gallery/` 画廊页双产线四道门全过，soffice 渲染与 HTML 截图逐组件视觉一致（已实测）。
 
-### F7 可视化报告（P1）
+### F7 可视化报告（P1，已实现）
 
-- `report.md` 升级为单文件 HTML 报告：并排图、diff 热力图、溢出标注、结点 N2–N6 状态灯。
+- `report.md` 升级并新增单文件 HTML 报告 `build/report.html`（零外链可分发，图片 base64 内嵌）：
+  结点 N2–N6 状态灯、原图×渲染并排图、16px 块差异热力图（绿→红叠加在渲染截图上）、
+  溢出项回映射画布标注（SVG 红框高亮＋明细表）、四道门明细表；
+- 状态灯映射：门1→N2、门4(＋原图 diff)→N3、门2→N4、门3→N5、全绿→N6；缺席的门（如 `--no-shot`）记灰灯「未执行」；
+- 实现：引擎新增 `report.py`（状态灯映射 / 热力图绘制 / 溢出坐标回映射 / HTML 组装），
+  `verify.py` 新增 `block_diff_grid`（全网格差异）并在 `collect_checks` 末尾同落盘（生成失败不阻断校验结论）；
+  `report.md`（文本版，供 fixer/CI）保留；`loop` 逐轮快照 `report-iter{N}.html`；
+  web 端产物白名单同步开放 `report.html`（与 `html` kind 错位隔离），workbench / studio 增「可视化报告」出口；
+- **验收**：引擎 67 项单测覆盖 100%（含状态灯映射 / 四要素 / 转义 / 防御分支）；
+  demo 实跑全绿，带合成原图实跑可见热力图与红/绿状态灯；web 60 项单测、tsc、next build 全过。
 
 ### F8 AI 规格书生成（P2，v2 旗舰）
 
@@ -206,7 +215,7 @@
 spec.yaml ─▶ spec.validate ─┬─▶ svgout ──▶ <name>.html   ─┐
                             └─▶ pptxout ─▶ <name>.pptx   ─┤
                                                           ├─▶ verify.run_checks
-原图(可选) ───────────────────────────────────────────────┘        └▶ report.md / 退出码
+原图(可选) ───────────────────────────────────────────────┘        └▶ report.md / report.html / 退出码
 ```
 
 ### 8.2 核心公式（已内置 geometry.py）
@@ -235,7 +244,7 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 | 版本 | 范围 | 状态 |
 |---|---|---|
 | v0.1 | 引擎骨架：F1–F5(P0) + demo + 冒烟测试 | ✅ 已完成（本仓库初始提交） |
-| v0.5 | F5 loop、F6 组件库、F7 可视化报告 | 🔶 部分完成：F5 loop 与 F6 组件库已随 v0.4 交付（含画廊验收）；F7 可视化报告待做 |
+| v0.5 | F5 loop、F6 组件库、F7 可视化报告 | ✅ 全部完成：F5/F6 随 v0.4 交付（含画廊验收）；F7 可视化报告已交付（引擎 67 项单测 100%，demo 实跑验收） |
 | v1.0 | 测试覆盖 ≥ 80%（已达 100%）、文档站、PyPI 发布 | 🔶 测试覆盖已达成，其余规划中 |
 | v2.0 | F8 AI 规格书、F9 Web UI、F10 批量/CI | 愿景（F8/F9 部分能力已提前落地：/api/spec VLM 抽取、/studio 编辑器） |
 
@@ -253,7 +262,7 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 
 1. 包名 `snap2edit` 是否需要在 v0.5 前做 PyPI 占位？
 2. ~~组件库（F6）优先级排序~~ 已解决：四类组件（cube / matrix-cell / flow-box / icon）已全部随 v0.4 实现，图标集以直线段多边形优先保证 PPTX 原生 Freeform 可渲染；曲线型图标待后续扩展。
-3. `report.md` 是否需要机读版本（JSON）供 Agent 流水线消费？（`check --json` 与 `loop --json` 已提供结构化输出，HTML 可视化报告待 F7）
+3. ~~`report.md` 是否需要机读版本（JSON）供 Agent 流水线消费？~~ 已解决：机读即 `check --json` / `loop --json`（结构化 gates/failures）；F7 补齐人读可视化层 `report.html`（状态灯/并排图/热力图/溢出标注），`report.md` 文本版保留供 fixer/CI。
 4. 双许可（MIT + 商业）是否保留单一 MIT？
 
 ## 12. 附录
@@ -292,4 +301,4 @@ python -m snap2edit --version
 | N3 截图收敛 | 门4 截图 + 可选原图块差异 |
 | N4 PPTX 生成 | F3 产线②（门2 收口） |
 | N5 版式校验 | 门3 字宽实测（soffice 渲染留作 CI 扩展） |
-| N6 终检 | 门1/门2 文案与占位符断言 + report.md 存档 |
+| N6 终检 | 门1/门2 文案与占位符断言 + report.md 存档；report.html 可视化报告状态灯全绿 |

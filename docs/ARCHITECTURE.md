@@ -2,7 +2,7 @@
 
 | 项 | 内容 |
 |---|---|
-| 文档版本 | v1.3（首版 v1.0） |
+| 文档版本 | v1.4（首版 v1.0） |
 | 系统版本 | v0.4.0（以 `pyproject.toml` 为准） |
 | 日期 | 2026-11-03（内容截至 v0.4.0 交付提交） |
 | 状态 | 随仓库维护，以仓库为准 |
@@ -145,7 +145,7 @@ Snap2Edit 是**规格书驱动的截图复刻引擎**：输入一份 YAML 布局
 │ 文件系统产物       │        │ VLM（外部服务）  │  │ 系统工具（可选）     │
 │ <dir>/build/*.html│        │ glm-5.3-flash  │  │ soffice  PPTX→PDF  │
 │ *.pptx shot.png   │        │ z-ai-web-dev-  │  │ Playwright 截图门4  │
-│ report.md         │        │ sdk 动态导入    │  │ （chromium）        │
+│ report.md/.html   │        │ sdk 动态导入    │  │ （chromium）        │
 └──────────────────┘        └────────────────┘  └────────────────────┘
 ```
 
@@ -175,7 +175,7 @@ flowchart TB
         WLIB["lib/*<br/>spec.ts · pipeline.ts · engine.ts · vlm.ts<br/>canvas.ts 预览镜像 · api.ts"]
     end
 
-    ART[("build/ 产物<br/>*.html · *.pptx · *.pdf<br/>shot.png · report.md")]
+    ART[("build/ 产物<br/>*.html · *.pptx · *.pdf<br/>shot.png · report.md · report.html")]
     VLM["VLM 外部服务<br/>glm-5.3-flash<br/>z-ai-web-dev-sdk 动态导入"]
     SOF["soffice（可选）<br/>PPTX→PDF"]
     PW["Playwright chromium（可选）<br/>门4 截图"]
@@ -281,7 +281,7 @@ AI 是可替换的外部组件（vlm.ts 单点接入），不是引擎的一部�
 
 ## 4. 逻辑视图（模块划分）
 
-### 4.1 Python 引擎（`src/snap2edit`，9 文件 1629 行）
+### 4.1 Python 引擎（`src/snap2edit`，10 文件 2041 行）
 
 | 模块 | 行数 | 职责 | 关键 API |
 |---|---|---|---|
@@ -290,7 +290,8 @@ AI 是可替换的外部组件（vlm.ts 单点接入），不是引擎的一部�
 | `components.py` | 171 | 组件库唯一事实源：颜色演算（shade/contrast）、cube/matrix 几何、10 种参数化图标 | `shade` / `contrast_text` / `cube_faces` / `matrix_cells` / `icon_parts` / `ICONS` |
 | `svgout.py` | 268 | 产线①：spec → HTML+SVG（全真实 `<text>`；组件拆为面片/格子/部件独立单元） | `render_html` / `render_element` |
 | `pptxout.py` | 339 | 产线②：spec → 原生 PPTX（文本框/形状/连接线/Freeform 多边形） | `render_pptx` |
-| `verify.py` | 307 | 四道校验门 + 结构化报告 + 截图/量宽/块差异 | `collect_checks` / `run_checks` / `check_html` / `check_pptx` / `check_bounds` / `screenshot` / `block_diff` / `text_width_px` |
+| `verify.py` | 341 | 四道校验门 + 结构化报告 + 截图/量宽/块差异（含 F7 热力图数据源 `block_diff_grid`） | `collect_checks` / `run_checks` / `check_html` / `check_pptx` / `check_bounds` / `screenshot` / `block_diff` / `block_diff_grid` / `text_width_px` |
+| `report.py` | 367 | F7 可视化报告：状态灯映射 / 热力图绘制 / 溢出坐标回映射 / 单文件 HTML 组装 | `write_html` / `render_html` / `node_status` / `heatmap_png` / `overflow_marks` / `elem_boxes` / `canvas_svg` |
 | `cli.py` | 255 | 子命令入口（`new` / `build` / `check` / `loop`），函数内延迟导入 | `main` / `cmd_new` / `cmd_build` / `cmd_check` / `cmd_loop` |
 | `__main__.py` | 8 | `python -m snap2edit` 入口 | 转发 `cli.main` |
 | `__init__.py` | 5 | 包版本号 | `__version__` |
@@ -326,6 +327,7 @@ cli（入口；cmd_* 函数内延迟导入，保证 --version 等轻量路径秒
  ├──▶ svgout ───▶ components（几何/配色/图标唯一事实源）
  ├──▶ pptxout ──▶ geometry（EMU/pt/px 映射） + components
  └──▶ verify ───▶ spec（texts_of / text_tag_count） + components（门3 组件边界）
+            └─(延迟导入)─▶ report ───▶ verify（block_diff_grid/check_bounds） + components
 ```
 
 依赖为**单向无环**：components 与 geometry 是底座，两条产线互不依赖，
@@ -407,9 +409,10 @@ PowerPoint 中需要三处字体位才不回退宋体）；关闭继承阴影（
 
 ### 5.3 四道校验门
 
-校验是系统的质量中枢：CLI `check` 输出人读报告（report.md），`check --json`
-输出同一份结构化报告（供 Web 与 CI），两者同源（`collect_checks` 为实现，
-`run_checks` 为薄包装）。
+校验是系统的质量中枢：CLI `check` 输出人读报告（文本版 report.md ＋ F7 可视化
+report.html），`check --json` 输出同一份结构化报告（供 Web 与 CI），三者同源
+（`collect_checks` 为实现，`run_checks` 为薄包装）。可视化报告属报告层而非校验门：
+生成失败不阻断校验结论，仅记日志并将 `report_html` 置空。
 
 | 门 | 对象 | 检查项 | 失败语义 |
 |---|---|---|---|
@@ -430,7 +433,8 @@ PowerPoint 中需要三处字体位才不回退宋体）；关闭继承阴影（
   ],
   "failures": ["门1 · 文案覆盖：缺少: 卡片B"],
   "artifacts": { "html": "…", "pptx": "…", "shot": "…" },
-  "report_md": "…"
+  "report_md": "…",
+  "report_html": "…" | null
 }
 ```
 
@@ -564,7 +568,7 @@ snap2edit check <dir> [--original IMG] [--no-shot] [--json]
   其次 `python3 -m snap2edit.cli`；两者皆缺返回 null → API 给中文可读错误；
 - **任务目录**（`createJob`）：`/tmp/snap2edit-jobs/<uuid>/`，内含 spec.yaml 与
   build/ 产物；重启即清空，属预期设计（正式沉淀走仓库 docs/ 归档）；
-- **产物服务**（`resolveArtifact`）：kind 白名单 `html/pptx/pdf/shot.png/report.md`，
+- **产物服务**（`resolveArtifact`）：kind 白名单 `html/pptx/pdf/shot.png/report.md/report.html`（F7 后 build/ 内有两个 .html：`html` kind 排除 report.html、`report.html` kind 只命中报告本体，错位隔离），
   UUID 格式校验，`?dl=1` 切换下载形态；
 - **PPTX→PDF**（`pptxToPdf`）：soffice 无头转换，90s 超时，失败返回 null
   （前端 PDF 页签禁用，不阻断其余功能）。
@@ -625,12 +629,12 @@ snap2edit/
 ├── docs/                     # 文档与案例库（索引见 docs/README.md）
 │   ├── PRD.md WORKFLOW.md WEB_PIPELINE.md ROTATE.md ARCHITECTURE.md …
 │   └── <案例名>/             # 原图 + *.html + *.pptx + 预览 + README
-├── examples/demo/            # 引擎示例 spec + 构建产物（含 report.md）
+├── examples/demo/            # 引擎示例 spec + 构建产物（含 report.md / report.html）
 ├── src/snap2edit/            # Python 引擎（spec/geometry/svgout/pptxout/verify/cli）
 ├── tests/                    # pytest：test_units(27) + test_smoke(6)
 └── web/                      # Next.js 16（app/ + lib/ + tests/ 44 项）
 运行时：
-/tmp/snap2edit-jobs/<uuid>/   # spec.yaml + build/{*.html,*.pptx,*.pdf,shot.png,report.md}
+/tmp/snap2edit-jobs/<uuid>/   # spec.yaml + build/{*.html,*.pptx,*.pdf,shot.png,report.md,report.html}
 ```
 
 ---
@@ -643,7 +647,7 @@ snap2edit/
 |---|---|---|---|
 | `snap2edit new <dir>` | 目录 | `spec.yaml` 模板 | 0 / 1（已存在） |
 | `snap2edit build <dir>` | `<dir>/spec.yaml` | `<dir>/build/<project>.html` + `.pptx` | 0 |
-| `snap2edit check <dir> [--original IMG] [--no-shot]` | 项目目录 | `build/report.md` | 0 / 2 |
+| `snap2edit check <dir> [--original IMG] [--no-shot]` | 项目目录 | `build/report.md` ＋ `report.html` | 0 / 2 |
 | `snap2edit check <dir> --json` | 同上 | stdout 单行结构化 JSON（§8.4） | 0 / 2 |
 | `python -m snap2edit --version` | — | `snap2edit 0.3.0` | 0 |
 
@@ -712,6 +716,7 @@ snap2edit/
 | `build/<project>.pdf` | soffice 转换（可选） | PDF 预览 |
 | `build/shot.png` | 门 4 截图 | 预览、非空白断言 |
 | `build/report.md` | collect_checks | 预览、存档 |
+| `build/report.html` | collect_checks（F7） | 可视化报告：状态灯/并排图/热力图/溢出标注 |
 
 ### 9.4 数据一致性与生命周期
 
@@ -780,7 +785,7 @@ greenlet 并发追踪，保证门 4 异步截图路径计入覆盖）。studio �
 
 ### 11.4 可观测性
 
-- **人读**：`build/report.md`（四门逐项 ✓/✗ + 明细）；
+- **人读**：`build/report.md`（四门逐项 ✓/✗ + 明细）＋ `build/report.html`（F7 可视化：状态灯/并排图/热力图/溢出标注）；
 - **机读**：`check --json` 结构化报告（Web/CI 消费）；
 - **过程**：NDJSON 事件流（log/tick/round）——refine 案例已归档事件时间线
   （docs/refine自动回询闭环/事件时间线.txt），可完整还原一轮迭代；
@@ -902,3 +907,4 @@ rotate 归一化 = round((((deg % 360) + 360) % 360) × 10) / 10  # 双端同式
 | v1.1 | 2026-11-03 | §3.2 增补 Mermaid 版容器图（与 ASCII 图同构）；§1.4 同步图表约定 |
 | v1.2 | 2026-11-03 | §3.3 / §5.4 增补 Mermaid 时序图（与 ASCII 流程同构）；§1.4 图表约定更新 |
 | v1.3 | 2026-11-03 | 同步 v0.4.0（F5 loop 命令 + F6 组件库）：§4.1 模块表新增 components.py 并更新行数；§4.4 依赖图纳入 components 底座；§4.5 镜像表补组件库同源内容 |
+| v1.4 | 2026-11-03 | 同步 v0.5.0（F7 可视化报告）：§4.1 模块表新增 report.py 并更新 verify.py 行数；§4.4 依赖图纳入 report（延迟导入）；§5.3 补 report.html 报告层语义与 JSON 字段；§3.2 容器图、产物/CLI 表同步 |
