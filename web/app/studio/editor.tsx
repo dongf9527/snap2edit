@@ -88,7 +88,34 @@ interface BBox {
   h: number;
 }
 
+/** 旋转角度读出气泡状态：文案 + 画布坐标（跟随指针） */
+interface RotHud {
+  text: string;
+  px: number;
+  py: number;
+}
+
 const R1 = (v: number): number => Math.round(v * 10) / 10;
+
+/**
+ * 旋转读出气泡文案：
+ * 单选盒子/文本 → 归一化终角 ∠（与烘焙结果一致）+ 增量 Δ；
+ * 线段（rotate 键不生效）与多选（各元素终角不同）→ 只给增量 Δ；
+ * Shift 步进时附提示。
+ */
+function rotHudText(rr: RotateCtx, delta: number, shift: boolean): string {
+  const fmt = (d: number) => `${d > 0 ? "+" : d < 0 ? "-" : "±"}${R1(Math.abs(d))}°`;
+  const step = shift ? " · 15°步进" : "";
+  if (rr.ids.length === 1) {
+    const s = rr.snap[rr.ids[0]];
+    if (!isSegEl(s)) {
+      const total = R1((((Number(s.rotate ?? 0) + delta) % 360) + 360) % 360);
+      return `∠ ${total}°（Δ ${fmt(delta)}）${step}`;
+    }
+    return `Δ ${fmt(delta)}${step}`;
+  }
+  return `Δ ${fmt(delta)} · ${rr.ids.length}个${step}`;
+}
 
 function unionBBox(bs: BBox[]): BBox {
   const x = Math.min(...bs.map((b) => b.x));
@@ -128,6 +155,7 @@ export default function StudioEditor() {
   const [marquee, setMarquee] = useState<MarqueeState["rect"] | null>(null);
   const [guides, setGuides] = useState<SnapGuides>({ v: [], h: [] });
   const [snapT, setSnapT] = useState(8);
+  const [rotHud, setRotHud] = useState<RotHud | null>(null);
 
   // 构建与预览（复用 /api/build 与 /api/refine）
   const [buildBusy, setBuildBusy] = useState(false);
@@ -378,14 +406,17 @@ export default function StudioEditor() {
       setInteracting(true);
       if (kind === "rotate") {
         const c = rotCenterOf(snap, gb);
-        rotateRef.current = {
+        const rc: RotateCtx = {
           ids,
           cx: c.x,
           cy: c.y,
           a0: (Math.atan2(p.y - c.y, p.x - c.x) * 180) / Math.PI,
           snap,
         };
+        rotateRef.current = rc;
         rotDeltaRef.current = 0;
+        // 读出气泡随按下立即出现（Δ ±0°）
+        setRotHud({ text: rotHudText(rc, 0, false), px: p.x, py: p.y });
       } else if (kind === "pt-1" || kind === "pt-2") {
         ptRef.current = { id: ids[0], which: kind === "pt-1" ? 1 : 2 };
       } else {
@@ -549,6 +580,13 @@ export default function StudioEditor() {
         let delta = a - rr.a0;
         if (e.shiftKey) delta = Math.round(delta / 15) * 15;
         rotDeltaRef.current = delta;
+        // 角度实时读出：与烘焙同口径（Shift 量化后），指针动 ≥2px 或文案变化才重渲染
+        const text = rotHudText(rr, delta, e.shiftKey);
+        setRotHud((prev) =>
+          prev && prev.text === text && Math.abs(prev.px - p.x) < 2 && Math.abs(prev.py - p.y) < 2
+            ? prev
+            : { text, px: p.x, py: p.y }
+        );
         cancelAnimationFrame(rafRef.current);
         rafRef.current = requestAnimationFrame(() => {
           forEachNode(rr.ids, (node) => {
@@ -619,6 +657,7 @@ export default function StudioEditor() {
       setInteracting(false);
       setGuides({ v: [], h: [] });
       setMarquee(null);
+      setRotHud(null);
       cancelAnimationFrame(rafRef.current);
       if (rs) {
         clearNodeTransform(rs.ids);
@@ -1036,7 +1075,7 @@ export default function StudioEditor() {
         {/* 中：画布 */}
         <div className="card studio-canvas-card">
           <div className="canvas-head">
-            <h3>画布（点选 · 拖拽 · 框选多选 · 手柄缩放旋转 · Shift 转转 15° 步进）</h3>
+            <h3>画布（点选 · 拖拽 · 框选多选 · 缩放/旋转手柄 · 旋转角度实时读出 · Shift 15° 步进）</h3>
             <label className="snap-t" title="拖拽吸附触发距离（画布像素，0 为关闭）">
               吸附阈值
               <input
@@ -1094,6 +1133,19 @@ export default function StudioEditor() {
                     height: `${(marquee.h / canvasH) * 100}%`,
                   }}
                 />
+              )}
+              {/* 旋转角度实时读出气泡（跟随指针，松手消失） */}
+              {rotHud && (
+                <span
+                  className="rot-hud"
+                  data-testid="rot-hud"
+                  style={{
+                    left: `${(rotHud.px / canvasW) * 100}%`,
+                    top: `${(rotHud.py / canvasH) * 100}%`,
+                  }}
+                >
+                  {rotHud.text}
+                </span>
               )}
               {/* 变换手柄：单选 = 8 向缩放 + 旋转（线段为双端点）；多选 = 4 角等比缩放 + 组旋转 */}
               {!interacting && selEls.length > 0 && handleEls}
