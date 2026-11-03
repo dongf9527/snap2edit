@@ -1,0 +1,112 @@
+# Snap2Edit 文档站配置（MkDocs Material）
+# 本地构建：pip install -e ".[docs]" && mkdocs serve
+# 线上部署：push 到 main 后由 .github/workflows/docs.yml 自动发布到 GitHub Pages
+
+site_name: Snap2Edit · 截图复刻引擎
+site_description: >-
+  一份布局规格（YAML spec），同步产出全可编辑的 HTML+SVG 与原生 PPTX，
+  四道校验门自动把关 —— 截图复刻、方法论图重绘、规格书驱动双产线渲染。
+site_author: Snap2Edit Contributors
+site_url: https://dongf9527.github.io/snap2edit/
+repo_url: https://github.com/dongf9527/snap2edit
+repo_name: dongf9527/snap2edit
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Snap2Edit Contributors · MIT License
+
+docs_dir: docs
+site_dir: site
+
+# 案例归档目录（源图 + 交付物三件套）只进仓库、不上文档站：
+# 体量大（约 17MB 图片）且 URL 含中文目录名，站点导航保持纯文档。
+exclude_docs: |
+  README.md
+  AI技术体系对比图/
+  LLM推理全流程_图解/
+  refine自动回询闭环/
+  workbench/
+  企业AI落地_复刻/
+  德勤AI落地方法论拆解/
+  无图迭代闭环/
+  框架与实施工具/
+
+# 归档目录间的互链（含锚点）在站内不存在，降级为 info 以通过 --strict；
+# 其余失效链接仍按 warning 处理（strict 下会报错）。
+validation:
+  links:
+    not_found: info
+    anchors: info
+
+nav:
+  - 首页: index.md
+  - 产品:
+      - PRD · 产品需求文档: PRD.md
+      - 架构文档（4+1 视图）: ARCHITECTURE.md
+  - 方法与流程:
+      - 六步标准流程: WORKFLOW.md
+      - AI 规格书模型: AI_SPEC_MODEL.md
+      - Web 全链路: WEB_PIPELINE.md
+      - 旋转元素支持: ROTATE.md
+  - 协作与案例:
+      - 协作规则: COLLABORATION.md
+      - 案例库（GitHub · docs/）: https://github.com/dongf9527/snap2edit/tree/main/docs
+
+theme:
+  name: material
+  language: zh
+  palette:
+    # 括号外为默认（跟随系统时首选）；toggle 供读者手动切换
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色模式
+  font:
+    text: Noto Sans SC
+    code: JetBrains Mono
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.instant
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: "#"
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - def_list
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/dongf9527/snap2edit
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/snap2edit/
