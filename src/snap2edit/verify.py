@@ -10,7 +10,8 @@
 import os
 import re
 
-from .spec import texts_of
+from .components import cube_faces, matrix_cells
+from .spec import text_tag_count, texts_of
 
 FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/chinese/NotoSansSC-Regular.ttf",
@@ -48,7 +49,7 @@ def check_html(html, spec):
     res = []
     texts = texts_of(spec)
     n_have = len(re.findall(r"<text[^>]*>", html))
-    n_want = sum(1 for el in spec["elements"] if el["type"] == "text" or el.get("text"))
+    n_want = text_tag_count(spec)  # 含组件库文字（矩阵逐格、流程框标题+正文）
     res.append(("HTML <text> 元素数量覆盖", n_have >= n_want, f"{n_have}/{n_want}"))
     no_bitmap = ("<image" not in html) and ("data:image" not in html)
     res.append(("无位图（<image>/data:image 零命中）", no_bitmap, ""))
@@ -95,7 +96,8 @@ def check_bounds(spec):
     cw = spec["canvas"]["width"]
     over = []
     for el in spec["elements"]:
-        if el["type"] == "text":
+        t = el["type"]
+        if t == "text":
             lines = el.get("lines") or [str(el.get("text", ""))]
             for ln in lines:
                 need = text_width_px(ln, float(el["size"]))
@@ -104,10 +106,41 @@ def check_bounds(spec):
                     avail = cw - el["x"]
                 if avail and need > avail:
                     over.append((el["id"], ln, round(need, 1), round(avail, 1)))
-        elif el.get("text") and el["type"] in ("rect", "rrect", "pill", "circle"):
+        elif t in ("rect", "rrect", "pill", "circle") and el.get("text"):
             need = text_width_px(str(el["text"]), float(el["size"]))
             if need > el["w"] - 8:
                 over.append((el["id"], el["text"], round(need, 1), el["w"]))
+        elif t == "cube" and el.get("text"):
+            # 立方体文字在正面面片内，可用宽度 = 正面宽
+            fw = cube_faces(el["x"], el["y"], el["w"], el["h"],
+                            el.get("depth"))["front"][2]
+            need = text_width_px(str(el["text"]), float(el["size"]))
+            if need > fw - 8:
+                over.append((el["id"], el["text"], round(need, 1), round(fw, 1)))
+        elif t == "matrix-cell" and el.get("texts"):
+            cells = matrix_cells(el["x"], el["y"], el["w"], el["h"],
+                                 el["rows"], el["cols"], el.get("gap", 0))
+            for k, txt in enumerate(el["texts"]):
+                _cx, _cy, cwid, _ch = cells[k]
+                r, c = divmod(k, el["cols"])
+                need = text_width_px(str(txt), float(el["size"]))
+                if need > cwid - 8:
+                    over.append((f'{el["id"]}-r{r + 1}c{c + 1}', txt,
+                                 round(need, 1), round(cwid, 1)))
+        elif t == "flow-box":
+            bh = el["h"] * float(el.get("band", 0.30)) if el.get("title") else 0.0
+            if el.get("title"):
+                need = text_width_px(str(el["title"]),
+                                     float(el.get("title_size", el["size"])))
+                if need > el["w"] - 8:
+                    over.append((f'{el["id"]}-title', el["title"],
+                                 round(need, 1), el["w"]))
+            if el.get("lines") or el.get("text"):
+                for ln in (el.get("lines") or [str(el["text"])]):
+                    need = text_width_px(str(ln), float(el["size"]))
+                    if need > el["w"] - 8:
+                        over.append((f'{el["id"]}-text', ln,
+                                     round(need, 1), el["w"]))
     return over
 
 

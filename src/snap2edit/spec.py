@@ -2,19 +2,34 @@
 """规格书（spec）加载与校验 —— 两条产线的唯一事实源。
 
 规格书是一份 YAML：画布、幻灯片、字体、色板、文案清单（终检用）、
-以及带 id 的元素列表。元素类型（v0）：
+以及带 id 的元素列表。元素类型：
 
     rect / rrect / pill   矩形、圆角矩形、胶囊（可携带居中 text）
     circle                圆/椭圆（x,y,w,h 外接框；可携带居中 text）
     text                  自由文本（支持 lines 多行）
     line / arrow          直线、箭头（箭头渲染为 线段+三角 两个独立单元）
+
+组件库（F6，几何与配色见 components.py，双产线各给原生实现）：
+
+    cube                  立方体（depth 深度可选；可携带 text 于正面）
+    matrix-cell           矩阵格子（rows/cols 必填、gap 间隙、texts 逐格文字）
+    flow-box              流程框（title 色带标题 + text/lines 正文 + band 带高比例）
+    icon                  参数化图标（name 取自 components.ICON_NAMES）
+
+旋转（rotate）仅支持基础盒/文本类型；复合组件（cube/matrix-cell/
+flow-box/icon）的多单元旋转易在两产线间漂移，rotate 键剔除并忽略。
 """
 
 import re
 
 import yaml
 
-SUPPORTED_TYPES = {"rect", "rrect", "pill", "circle", "text", "line", "arrow"}
+from .components import ICON_NAMES
+
+SUPPORTED_TYPES = {"rect", "rrect", "pill", "circle", "text", "line", "arrow",
+                   "cube", "matrix-cell", "flow-box", "icon"}
+# 复合组件：多单元构成，rotate 不支持（键剔除，与线段/箭头同策略）
+_COMPOSITE_TYPES = {"cube", "matrix-cell", "flow-box", "icon"}
 _GEOM_BOX = ("x", "y", "w", "h")
 _GEOM_SEG = ("x1", "y1", "x2", "y2")
 PLACEHOLDER_BLACKLIST = ("XXX", "TODO", "待补充", "【", "undefined", "NaN")
@@ -112,9 +127,9 @@ def validate(spec):
             raise SpecError(f"{where}({eid}): 缺少几何字段 {missing}")
 
         # 旋转（可选）：度、顺时针；盒子绕自身中心，自由文本绕锚点；
-        # 线段/箭头几何完全由端点承载，rotate 键忽略并剔除
+        # 线段/箭头几何完全由端点承载，复合组件多单元旋转易漂移——均剔除
         if "rotate" in el:
-            if t in ("line", "arrow"):
+            if t in ("line", "arrow") or t in _COMPOSITE_TYPES:
                 el.pop("rotate", None)
             else:
                 r = el["rotate"]
@@ -122,10 +137,50 @@ def validate(spec):
                     raise SpecError(f"{where}({eid}): rotate 必须是数字（度，顺时针）")
                 el["rotate"] = round(float(r) % 360.0, 1)
 
+        # ---- 圆角半径（可选）：rrect / matrix-cell / flow-box 共用，需非负数字 ----
+        if t in ("rrect", "matrix-cell", "flow-box"):
+            rx = el.get("rx")
+            if rx is not None and (isinstance(rx, bool) or not isinstance(rx, (int, float)) or rx < 0):
+                raise SpecError(f"{where}({eid}): rx 必须是非负数字（px 圆角半径）")
+
+        # ---- 组件库类型约束（F6）----
+        if t == "cube":
+            d = el.get("depth")
+            if d is not None and (isinstance(d, bool) or not isinstance(d, (int, float)) or d < 0):
+                raise SpecError(f"{where}({eid}): depth 必须是非负数字（px，缺省 min(w,h)*0.2）")
+        elif t == "matrix-cell":
+            for k in ("rows", "cols"):
+                v = el.get(k)
+                if isinstance(v, bool) or not isinstance(v, int) or v < 1:
+                    raise SpecError(f"{where}({eid}): {k} 必须是 ≥1 的整数")
+            g = el.get("gap")
+            if g is not None and (isinstance(g, bool) or not isinstance(g, (int, float)) or g < 0):
+                raise SpecError(f"{where}({eid}): gap 必须是非负数字（px）")
+            txts = el.get("texts")
+            if txts is not None:
+                if not isinstance(txts, list) or any(not isinstance(x, str) for x in txts):
+                    raise SpecError(f"{where}({eid}): texts 必须是字符串列表（行优先）")
+                if len(txts) > el["rows"] * el["cols"]:
+                    raise SpecError(f"{where}({eid}): texts 共 {len(txts)} 条，超出格子数 "
+                                    f"{el['rows']}x{el['cols']}={el['rows'] * el['cols']}")
+                if txts and not el.get("size"):
+                    raise SpecError(f"{where}({eid}): 携带 texts 的矩阵格子需要 size")
+        elif t == "flow-box":
+            b = el.get("band")
+            if b is not None and (isinstance(b, bool) or not isinstance(b, (int, float))
+                                  or not (0 < b < 1)):
+                raise SpecError(f"{where}({eid}): band 必须是 0–1 之间的数字（色带高度占比）")
+            if not el.get("title") and not (el.get("text") or el.get("lines")):
+                raise SpecError(f"{where}({eid}): flow-box 需要 title 或 text/lines")
+        elif t == "icon":
+            if el.get("name") not in ICON_NAMES:
+                raise SpecError(f"{where}({eid}): 未知图标 {el.get('name')!r}"
+                                f"（可用: {', '.join(ICON_NAMES)}）")
+
         if t == "text":
             if not (el.get("text") or el.get("lines")):
                 raise SpecError(f"{where}({eid}): 文本元素需要 text 或 lines")
-        if el.get("text") and not el.get("size"):
+        if (el.get("text") or el.get("title")) and not el.get("size"):
             raise SpecError(f"{where}({eid}): 携带文字的元素需要 size")
 
     for bad in PLACEHOLDER_BLACKLIST:
@@ -141,20 +196,44 @@ def validate(spec):
                 continue
             try:
                 pal[k] = norm_color(f"palette.{k}", k, v, drop_none=True)
-            except SpecError as e:
+            except SpecError as e:  # pragma: no cover —— 防御：drop_none 路径不会抛错，保留双保险
                 raise SpecError(f"palette.{k} 颜色值非法：{v!r}（需 #RRGGBB）") from e
     return spec
 
 
 def texts_of(spec):
-    """终检文案清单：spec.texts 优先；否则自动收集全部文字。"""
+    """终检文案清单：spec.texts 优先；否则自动收集全部文字（含组件库文字）。"""
     listed = spec.get("texts")
     if listed:
         return [str(t) for t in listed]
     out = []
     for el in spec["elements"]:
+        if el.get("type") == "flow-box" and el.get("title"):
+            out.append(str(el["title"]))            # 流程框标题先于正文（与视觉顺序一致）
         if el.get("lines"):
             out.extend(str(x) for x in el["lines"])
         elif el.get("text"):
             out.append(str(el["text"]))
+        if el.get("type") == "matrix-cell" and el.get("texts"):
+            out.extend(str(x) for x in el["texts"])
     return out
+
+
+def text_tag_count(spec):
+    """产线① 将输出的 <text> 标签数（门1 数量覆盖的期望值）。
+
+    一个元素至多输出一个 <text>（多行用 tspan）；矩阵格子逐格一个。
+    """
+    n = 0
+    for el in spec["elements"]:
+        t = el["type"]
+        if t == "text":
+            n += 1
+        elif t in ("rect", "rrect", "pill", "circle", "cube") and el.get("text"):
+            n += 1
+        elif t == "matrix-cell":
+            n += len(el.get("texts") or [])
+        elif t == "flow-box":
+            n += (1 if el.get("title") else 0) + \
+                 (1 if (el.get("text") or el.get("lines")) else 0)
+    return n

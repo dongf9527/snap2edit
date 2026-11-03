@@ -6,7 +6,9 @@
   - 字号：px → pt；文本框统一 word_wrap=False、四边 margin=0；
   - 中文字体双保险：font.name 之外必须补 a:ea / a:cs 东亚字体；
   - 所有形状关闭继承阴影（shadow.inherit=False）；
-  - 箭头用连接线 + tailEnd 三角头，不用贴图。
+  - 箭头用连接线 + tailEnd 三角头，不用贴图；
+  - 组件库（F6）：cube 面片与 icon 部件用原生 Freeform 任意多边形，
+    matrix-cell 逐格圆角矩形，flow-box 主体+ROUND_2_SAME 色带，均无 Picture。
 """
 
 import math
@@ -18,6 +20,7 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.oxml.ns import qn
 from pptx.dml.color import RGBColor
 
+from .components import contrast_text, cube_faces, icon_parts, matrix_cells, shade
 from .geometry import Mapper, resolve_slide_emu
 
 _ALIGN = {"left": PP_ALIGN.LEFT, "center": PP_ALIGN.CENTER, "right": PP_ALIGN.RIGHT}
@@ -110,7 +113,7 @@ def _add_text(shapes, el, m, fname, pal, box=None, valign="top", rot=0.0, pivot=
     tf.word_wrap = False
     try:
         tf.auto_size = MSO_AUTO_SIZE.NONE
-    except Exception:
+    except Exception:  # pragma: no cover —— 防御：个别查看器/版本对 auto_size 属性缺失的容错
         pass
     tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
     tf.vertical_anchor = MSO_ANCHOR.MIDDLE if valign == "middle" else MSO_ANCHOR.TOP
@@ -122,6 +125,7 @@ def _add_text(shapes, el, m, fname, pal, box=None, valign="top", rot=0.0, pivot=
         r = p.add_run()
         r.text = str(ln)
         _cjk_font(r, fname, m.pt(size), _C(color), el.get("bold", False))
+    return tb
 
 
 def _add_line(shapes, el, m, pal, arrow):
@@ -140,6 +144,133 @@ def _add_line(shapes, el, m, pal, arrow):
         tail = ln.makeelement(qn("a:tailEnd"),
                               {"type": "triangle", "w": "med", "len": "med"})
         ln.append(tail)
+
+
+# ---------------- 组件库（F6）----------------
+
+def _freeform(shapes, el, m, suffix, pts, close=True):
+    """多边形 → 原生 Freeform（本地 px 坐标 + scale=EMU/px，位置自动落位）。"""
+    fb = shapes.build_freeform(float(pts[0][0]), float(pts[0][1]), scale=m.emu_px)
+    fb.add_line_segments([(float(px), float(py)) for px, py in pts[1:]], close=close)
+    sp = fb.convert_to_shape()
+    sp.name = f'{el["id"]}{suffix}'
+    _noshadow(sp)
+    return sp
+
+
+def _add_cube(shapes, el, m, fname, pal):
+    """立方体：顶面提亮 / 侧面加深 / 正面本色，三块独立面片 + 正面文字。"""
+    faces = cube_faces(el["x"], el["y"], el["w"], el["h"], el.get("depth"))
+    base = el.get("fill") or pal.get("accent", "#2B6CB0")
+    stroke, sw = el.get("stroke"), el.get("stroke_width", 1)
+    top = _freeform(shapes, el, m, "-top", faces["top"])
+    _fill(top, shade(base, 0.25))
+    _outline(top, stroke, sw, m)
+    side = _freeform(shapes, el, m, "-side", faces["side"])
+    _fill(side, shade(base, -0.22))
+    _outline(side, stroke, sw, m)
+    fx, fy, fw, fh = faces["front"]
+    sp = shapes.add_shape(MSO_SHAPE.RECTANGLE, Emu(m.emu(fx)), Emu(m.emu(fy)),
+                          Emu(m.emu(fw)), Emu(m.emu(fh)))
+    sp.name = el["id"]
+    _fill(sp, base)
+    _outline(sp, stroke, sw, m)
+    _noshadow(sp)
+    if el.get("text"):
+        el.setdefault("align", "center")
+        _add_text(shapes, el, m, fname, pal, box=faces["front"], valign="middle")
+
+
+def _add_matrix(shapes, el, m, fname, pal):
+    """矩阵格子：逐格独立圆角矩形 + 逐格文字框（id 后缀 -rRcC）。"""
+    cells = matrix_cells(el["x"], el["y"], el["w"], el["h"],
+                         el["rows"], el["cols"], el.get("gap", 0))
+    raw_fill = el.get("fill")
+    fill = None if (raw_fill is None and "fill" in el) else (raw_fill or pal.get("card") or "#FFFFFF")
+    stroke, sw = el.get("stroke"), el.get("stroke_width", 1)
+    tcolor = el.get("color") or (contrast_text(fill) if fill else pal.get("primary", "#1F2937"))
+    for k, (cx, cy, cw, ch) in enumerate(cells):
+        r, c = divmod(k, el["cols"])
+        sp = shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(m.emu(cx)), Emu(m.emu(cy)),
+                              Emu(m.emu(cw)), Emu(m.emu(ch)))
+        sp.name = f'{el["id"]}-r{r + 1}c{c + 1}'
+        try:
+            rx_v = el.get("rx", min(cw, ch) * 0.12)
+            sp.adjustments[0] = max(0.0, min(0.5, float(rx_v) / min(cw, ch)))
+        except Exception:
+            pass
+        _fill(sp, fill)
+        _outline(sp, stroke, sw, m)
+        _noshadow(sp)
+    for k, txt in enumerate(el.get("texts") or []):
+        cx, cy, cw, ch = cells[k]
+        r, c = divmod(k, el["cols"])
+        # 文本框 id 与 svgout 同名：{id}-rRcC-text，两产线单元一一对应
+        cell_el = dict(el, id=f'{el["id"]}-r{r + 1}c{c + 1}', text=str(txt),
+                       color=tcolor, align="center")
+        _add_text(shapes, cell_el, m, fname, pal, box=(cx, cy, cw, ch), valign="middle")
+
+
+def _add_flowbox(shapes, el, m, fname, pal):
+    """流程框：圆角主体 +（可选）ROUND_2_SAME 色带标题 + 正文区。"""
+    x, y, w, h = el["x"], el["y"], el["w"], el["h"]
+    raw_fill = el.get("fill")
+    base = None if (raw_fill is None and "fill" in el) else (raw_fill or pal.get("card") or "#FFFFFF")
+    stroke, sw = el.get("stroke"), el.get("stroke_width", 1)
+    rx_v = el.get("rx", min(w, h) * 0.1)
+    body = shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(m.emu(x)), Emu(m.emu(y)),
+                            Emu(m.emu(w)), Emu(m.emu(h)))
+    body.name = el["id"]
+    try:
+        body.adjustments[0] = max(0.0, min(0.5, float(rx_v) / min(w, h)))
+    except Exception:
+        pass
+    _fill(body, base)
+    _outline(body, stroke, sw, m)
+    _noshadow(body)
+    bh = h * float(el.get("band", 0.30)) if el.get("title") else 0.0
+    if bh:
+        band_fill = el.get("band_fill") or shade(base if base else "#94A3B8", -0.18)
+        band = shapes.add_shape(MSO_SHAPE.ROUND_2_SAME_RECTANGLE, Emu(m.emu(x)), Emu(m.emu(y)),
+                                Emu(m.emu(w)), Emu(m.emu(bh)))
+        band.name = f'{el["id"]}-band'
+        try:
+            band.adjustments[0] = max(0.0, min(0.5, min(float(rx_v), bh) / min(w, bh)))
+        except Exception:
+            pass
+        _fill(band, band_fill)
+        band.line.fill.background()
+        _noshadow(band)
+        tcolor = el.get("title_color") or contrast_text(band_fill)
+        title_el = {"id": el["id"], "text": str(el["title"]), "align": "center",
+                    "size": el.get("title_size", el["size"]), "color": tcolor, "bold": True}
+        tb = _add_text(shapes, title_el, m, fname, pal, box=(x, y, w, bh), valign="middle")
+        tb.name = f'{el["id"]}-title'
+    if el.get("text") or el.get("lines"):
+        el.setdefault("align", "center")
+        _add_text(shapes, el, m, fname, pal, box=(x, y + bh, w, h - bh), valign="middle")
+
+
+def _add_icon(shapes, el, m, pal):
+    """参数化图标：fill 实心 / ring 空心描边 / stroke 开放折线 → 原生 Freeform。"""
+    color = el.get("fill") or pal.get("accent", "#2B6CB0")
+    scale = min(el["w"], el["h"]) / 100.0
+    sw = el.get("stroke_width") or max(1.0, 4.0 * scale)
+    for i, (kind, pts) in enumerate(icon_parts(el["name"], el["x"], el["y"], el["w"], el["h"])):
+        if kind == "fill":
+            sp = _freeform(shapes, el, m, f"-{i}", pts)
+            _fill(sp, color)
+            sp.line.fill.background()
+        elif kind == "ring":
+            sp = _freeform(shapes, el, m, f"-{i}", pts)
+            sp.fill.background()
+            sp.line.color.rgb = _C(color)
+            sp.line.width = Emu(m.emu(sw))
+        else:  # stroke 开放折线
+            sp = _freeform(shapes, el, m, f"-{i}", pts, close=False)
+            sp.fill.background()
+            sp.line.color.rgb = _C(color)
+            sp.line.width = Emu(m.emu(sw))
 
 
 def render_pptx(spec, out_path):
@@ -193,6 +324,14 @@ def render_pptx(spec, out_path):
             _add_text(shapes, el, m, fname, pal, rot=_rot(el), pivot=(el["x"], el["y"]))
         elif t in ("line", "arrow"):
             _add_line(shapes, el, m, pal, arrow=(t == "arrow"))
+        elif t == "cube":
+            _add_cube(shapes, el, m, fname, pal)
+        elif t == "matrix-cell":
+            _add_matrix(shapes, el, m, fname, pal)
+        elif t == "flow-box":
+            _add_flowbox(shapes, el, m, fname, pal)
+        elif t == "icon":
+            _add_icon(shapes, el, m, pal)
         else:
             raise ValueError(f"未知元素类型: {t}")
 

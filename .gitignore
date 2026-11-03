@@ -7,10 +7,12 @@ __pycache__/
 .pytest_cache/
 .venv/
 
-# 构建产物默认忽略（demo 产物保留作为示例）
+# 构建产物默认忽略（demo 与 gallery 产物保留作为示例/验收记录）
 build/
 !examples/demo/build/
 !examples/demo/build/**
+!examples/gallery/build/
+!examples/gallery/build/**
 
 # 编辑器 / 系统
 .idea/

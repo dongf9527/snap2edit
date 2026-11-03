@@ -1,0 +1,86 @@
+# Snap2Edit 组件库画廊（F6 验收页）—— 双产线渲染一致性验收
+project: gallery
+canvas: {width: 1280, height: 720}
+slide: {preset: "16:9"}
+font: {name: "Noto Sans SC", fallback: "Microsoft YaHei", pptx_name: "Microsoft YaHei"}
+palette:
+  primary: "#1F2937"
+  accent: "#2B6CB0"
+  card: "#FFFFFF"
+  muted: "#8A97A8"
+texts:
+  - "组件库画廊"
+  - "F6 · 双产线渲染一致性验收页"
+  - "cube 立方体"
+  - "洞察"
+  - "增长"
+  - "matrix-cell 矩阵格子"
+  - "洞见"
+  - "数据"
+  - "方法"
+  - "结论"
+  - "建议"
+  - "行动"
+  - "flow-box 流程框"
+  - "第一步 · 解析规格"
+  - "输入截图，产出布局规格"
+  - "无标题流程框"
+  - "深底流程框"
+  - "正文自动对比色"
+  - "icon 图标库"
+  - "brain"
+  - "chart"
+  - "network"
+  - "sparkle"
+  - "lightning"
+  - "gear"
+  - "doc"
+  - "user"
+  - "check"
+  - "target"
+elements:
+  - {id: bg, type: rect, x: 0, y: 0, w: 1280, h: 720, fill: "#F8FAFC"}
+  - {id: title, type: text, x: 64, y: 40, size: 30, bold: true, text: "组件库画廊"}
+  - {id: subtitle, type: text, x: 64, y: 88, size: 14, color: "#8A97A8", text: "F6 · 双产线渲染一致性验收页"}
+
+  # ---- A. cube 立方体 ----
+  - {id: label-cube, type: text, x: 64, y: 140, size: 15, bold: true, text: "cube 立方体"}
+  - {id: cube-a, type: cube, x: 64, y: 176, w: 140, h: 120, fill: "#2B6CB0", depth: 26, text: "洞察", size: 15, color: "#FFFFFF"}
+  - {id: cube-b, type: cube, x: 240, y: 176, w: 140, h: 120, fill: "#2F855A", text: "增长", size: 15, color: "#FFFFFF"}
+  - {id: cube-c, type: cube, x: 64, y: 330, w: 140, h: 120, fill: "#DD6B20", depth: 40}
+  - {id: cube-a-note, type: text, x: 240, y: 316, size: 12, color: "#8A97A8", text: "depth 缺省 = min(w,h)*0.2"}
+
+  # ---- B. matrix-cell 矩阵格子 ----
+  - {id: label-matrix, type: text, x: 480, y: 140, size: 15, bold: true, text: "matrix-cell 矩阵格子"}
+  - {id: mx, type: matrix-cell, x: 480, y: 176, w: 300, h: 180, rows: 2, cols: 3, gap: 8, fill: "#2B6CB0", texts: ["洞见", "数据", "方法", "结论", "建议", "行动"], size: 14}
+  - {id: mx2, type: matrix-cell, x: 480, y: 384, w: 300, h: 88, rows: 1, cols: 2, gap: 10, fill: "#FFFFFF", stroke: "#CBD5E0"}
+
+  # ---- C. flow-box 流程框 ----
+  - {id: label-flow, type: text, x: 840, y: 140, size: 15, bold: true, text: "flow-box 流程框"}
+  - {id: fb1, type: flow-box, x: 840, y: 176, w: 340, h: 110, fill: "#EFF6FF", stroke: "#2B6CB0", band: 0.34, title: "第一步 · 解析规格", text: "输入截图，产出布局规格", size: 13, title_size: 15}
+  - {id: flow-arrow, type: arrow, x1: 1010, y1: 288, x2: 1010, y2: 316}
+  - {id: fb2, type: flow-box, x: 840, y: 318, w: 340, h: 80, fill: "#FFFFFF", stroke: "#CBD5E0", text: "无标题流程框", size: 14}
+  - {id: fb3, type: flow-box, x: 840, y: 430, w: 340, h: 100, fill: "#2B6CB0", color: "#FFFFFF", title: "深底流程框", text: "正文自动对比色", size: 13, title_size: 15}
+
+  # ---- D. icon 图标库 ----
+  - {id: label-icon, type: text, x: 64, y: 512, size: 15, bold: true, text: "icon 图标库"}
+  - {id: ic-brain, type: icon, x: 64, y: 550, w: 72, h: 72, name: "brain", fill: "#2B6CB0"}
+  - {id: ic-chart, type: icon, x: 184, y: 550, w: 72, h: 72, name: "chart", fill: "#2B6CB0"}
+  - {id: ic-network, type: icon, x: 304, y: 550, w: 72, h: 72, name: "network", fill: "#2B6CB0"}
+  - {id: ic-sparkle, type: icon, x: 424, y: 550, w: 72, h: 72, name: "sparkle", fill: "#DD6B20"}
+  - {id: ic-lightning, type: icon, x: 544, y: 550, w: 72, h: 72, name: "lightning", fill: "#DD6B20"}
+  - {id: ic-gear, type: icon, x: 664, y: 550, w: 72, h: 72, name: "gear", fill: "#2F855A"}
+  - {id: ic-doc, type: icon, x: 784, y: 550, w: 72, h: 72, name: "doc", fill: "#2F855A"}
+  - {id: ic-user, type: icon, x: 904, y: 550, w: 72, h: 72, name: "user", fill: "#6B46C1"}
+  - {id: ic-check, type: icon, x: 1024, y: 550, w: 72, h: 72, name: "check", fill: "#2F855A"}
+  - {id: ic-target, type: icon, x: 1144, y: 550, w: 72, h: 72, name: "target", fill: "#6B46C1"}
+  - {id: ic-brain-label, type: text, x: 100, y: 634, size: 12, align: center, w: 72, text: "brain"}
+  - {id: ic-chart-label, type: text, x: 220, y: 634, size: 12, align: center, w: 72, text: "chart"}
+  - {id: ic-network-label, type: text, x: 340, y: 634, size: 12, align: center, w: 72, text: "network"}
+  - {id: ic-sparkle-label, type: text, x: 460, y: 634, size: 12, align: center, w: 72, text: "sparkle"}
+  - {id: ic-lightning-label, type: text, x: 580, y: 634, size: 12, align: center, w: 72, text: "lightning"}
+  - {id: ic-gear-label, type: text, x: 700, y: 634, size: 12, align: center, w: 72, text: "gear"}
+  - {id: ic-doc-label, type: text, x: 820, y: 634, size: 12, align: center, w: 72, text: "doc"}
+  - {id: ic-user-label, type: text, x: 940, y: 634, size: 12, align: center, w: 72, text: "user"}
+  - {id: ic-check-label, type: text, x: 1060, y: 634, size: 12, align: center, w: 72, text: "check"}
+  - {id: ic-target-label, type: text, x: 1180, y: 634, size: 12, align: center, w: 72, text: "target"}
