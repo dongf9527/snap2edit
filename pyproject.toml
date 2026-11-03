@@ -1,25 +1,52 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "snap2edit"
-version = "0.5.0"
+version = "1.0.0"
 description = "Snap2Edit 截图复刻引擎 —— 一份布局规格，同步产出全可编辑的 HTML+SVG 与原生 PPTX"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Snap2Edit Contributors" }]
-keywords = ["svg", "pptx", "chart", "diagram", "reconstruction", "html", "editable"]
+keywords = ["svg", "pptx", "chart", "diagram", "reconstruction", "html", "editable",
+            "information-graphics", "specification-driven", "powerpoint", "consulting"]
 dependencies = [
   "python-pptx>=0.6.21",
   "Pillow>=9.0",
   "numpy>=1.21",
   "PyYAML>=5.4",
 ]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Information Technology",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+  "Topic :: Office/Business :: Office Suites",
+  "Topic :: Software Development :: Documentation",
+  "Natural Language :: Chinese (Simplified)",
+]
+
+[project.urls]
+Homepage = "https://github.com/dongf9527/snap2edit"
+Documentation = "https://dongf9527.github.io/snap2edit/"
+Repository = "https://github.com/dongf9527/snap2edit"
+Issues = "https://github.com/dongf9527/snap2edit/issues"
+Changelog = "https://github.com/dongf9527/snap2edit/releases"
 
 [project.optional-dependencies]
 verify = ["playwright>=1.30"]
+docs = ["mkdocs>=1.6", "mkdocs-material>=9.5"]
 
 [project.scripts]
 snap2edit = "snap2edit.cli:main"

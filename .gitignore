@@ -18,3 +18,6 @@ build/
 .idea/
 .vscode/
 .DS_Store
+# 文档站 / 打包构建产物（CI 生成，不入库）
+site/
+dist/
