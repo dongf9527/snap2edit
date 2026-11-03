@@ -48,7 +48,8 @@ Web REST API、数据流与数据模型、测试架构、安全设计、演进�
 - 参照 IEEE 42010（架构描述标准）的思想组织章节，采用 **4+1 视图**
   （逻辑视图=§4、进程视图=§6、部署视图=§7、数据视图=§9、场景=§3.3 数据流）
   与 **C4 容器/组件两档粒度**（§3.2 容器、§4 组件）；
-- 全文图表统一使用 ASCII 字符画（与仓库其他文档一致，纯文本、可 diff、可审阅）；
+- 图表以 ASCII 字符画为主（与仓库其他文档一致，纯文本、可 diff、可审阅）；
+  §3.2 容器图另附 Mermaid 版（GitHub 原生渲染，与 ASCII 图同构、内容一致）；
 - 术语首用即释（§2.4 术语表集中汇总）；
 - 所有数字（行数、超时、覆盖率、阈值）均可在仓库中复核，标注了出处。
 
@@ -145,6 +146,53 @@ Snap2Edit 是**规格书驱动的截图复刻引擎**：输入一份 YAML 布局
 │ *.pptx shot.png   │        │ z-ai-web-dev-  │  │ Playwright 截图门4  │
 │ report.md         │        │ sdk 动态导入    │  │ （chromium）        │
 └──────────────────┘        └────────────────┘  └────────────────────┘
+```
+
+**Mermaid 版容器图**（GitHub 原生渲染；与上图同构，供交互式查看与复制改画）：
+
+```mermaid
+flowchart TB
+    subgraph ENTRY["入口（两种）"]
+        direction LR
+        CLI["终端 / CI / Agent<br/>snap2edit new · build · check"]
+        BR["浏览器<br/>工作台 workbench.tsx ＋ 编辑器 /studio"]
+    end
+
+    subgraph ENG["Python 引擎 src/snap2edit —— 渲染与校验的唯一权威"]
+        direction LR
+        ECLI["cli<br/>子命令入口"]
+        ESPEC["spec<br/>加载·校验·消毒"]
+        ESVG["svgout<br/>产线① HTML+SVG"]
+        EPPTX["pptxout<br/>产线② 原生 PPTX"]
+        EVFY["verify<br/>四道校验门"]
+        EGEO["geometry<br/>EMU·pt·px 映射"]
+    end
+
+    subgraph WEB["Next.js 服务端 web/ —— 编排层"]
+        direction LR
+        WROUTE["app/api ×4<br/>spec · build · refine · artifacts"]
+        WLIB["lib/*<br/>spec.ts · pipeline.ts · engine.ts · vlm.ts<br/>canvas.ts 预览镜像 · api.ts"]
+    end
+
+    ART[("build/ 产物<br/>*.html · *.pptx · *.pdf<br/>shot.png · report.md")]
+    VLM["VLM 外部服务<br/>glm-5.3-flash<br/>z-ai-web-dev-sdk 动态导入"]
+    SOF["soffice（可选）<br/>PPTX→PDF"]
+    PW["Playwright chromium（可选）<br/>门4 截图"]
+
+    CLI -->|"直接进程"| ECLI
+    BR -->|"HTTP：JSON / NDJSON"| WROUTE
+    ECLI --> ESPEC
+    ECLI --> ESVG
+    ECLI --> EPPTX
+    ECLI --> EVFY
+    EPPTX --> EGEO
+    EVFY --> ESPEC
+    WROUTE --> WLIB
+    WLIB -->|"子进程 runEngine：build / check --json"| ECLI
+    WROUTE -.->|"GET /api/artifacts 读取"| ART
+    WLIB -->|"spec 抽取 / refine 回询"| VLM
+    WLIB -->|"pptxToPdf"| SOF
+    EVFY -.->|"截图门 4"| PW
 ```
 
 两个入口共享**同一个引擎核心**：CLI 直接进程内调用；Web 通过子进程
@@ -776,3 +824,4 @@ rotate 归一化 = round((((deg % 360) + 360) % 360) × 10) / 10  # 双端同式
 | 版本 | 日期 | 说明 |
 |---|---|---|
 | v1.0 | 2026-11-03 | 首版：按 4+1 视图 + C4 组织，覆盖 v0.3.0 全部已实现机制（截至提交 9bae757） |
+| v1.1 | 2026-11-03 | §3.2 增补 Mermaid 版容器图（与 ASCII 图同构）；§1.4 同步图表约定 |
