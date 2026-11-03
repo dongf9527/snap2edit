@@ -1,0 +1,55 @@
+# Snap2Edit Demo —— 一份 spec，双产线同步产出
+project: snap2edit-demo
+canvas: {width: 1280, height: 720}
+slide: {preset: "16:9"}
+font:
+  name: "Noto Sans SC"          # HTML/SVG 侧字体
+  fallback: "Microsoft YaHei"
+  pptx_name: "Microsoft YaHei"  # PPTX 侧字体（面向 PowerPoint/WPS 环境）
+palette:
+  bg: "#F7F9FC"
+  card: "#FFFFFF"
+  card_border: "#D8E0EA"
+  primary: "#16233B"
+  body: "#3A4A5E"
+  muted: "#8A97A8"
+  accent: "#2B6CB0"
+texts:
+  - "企业AI落地四步法（Demo 示例）"
+  - "Snap2Edit 规格书驱动双渲染 · 一份 spec 同步产出 HTML+SVG 与原生 PPTX"
+  - "诊断"
+  - "试点"
+  - "扩围"
+  - "摸清家底"
+  - "小步快跑"
+  - "规模复制"
+  - "盘点数据、场景与人才，"
+  - "对齐经营目标，输出"
+  - "目标树与组合清单。"
+  - "选择高价值低风险场景"
+  - "先行验证，沉淀可复用的"
+  - "数据与交付基线。"
+  - "向更多业务与场景复制，"
+  - "建立治理与价值评估的"
+  - "长期机制。"
+  - "来源：Snap2Edit Demo —— 由 spec.yaml 一键生成，HTML 与 PPTX 同源同步。"
+elements:
+  - {id: bg, type: rect, x: 0, y: 0, w: 1280, h: 720, fill: "#F7F9FC"}
+  - {id: title, type: text, x: 64, y: 44, size: 32, bold: true, color: "#16233B", text: "企业AI落地四步法（Demo 示例）"}
+  - {id: subtitle, type: text, x: 64, y: 92, size: 15, color: "#8A97A8", text: "Snap2Edit 规格书驱动双渲染 · 一份 spec 同步产出 HTML+SVG 与原生 PPTX"}
+  - {id: card-1, type: rrect, x: 64, y: 150, w: 352, h: 380, rx: 14, fill: "#FFFFFF", stroke: "#D8E0EA", stroke_width: 1.5}
+  - {id: pill-1, type: pill, x: 88, y: 176, w: 112, h: 34, fill: "#2B6CB0", text: "诊断", size: 15, bold: true, color: "#FFFFFF"}
+  - {id: card1-title, type: text, x: 88, y: 236, size: 20, bold: true, color: "#16233B", text: "摸清家底"}
+  - {id: card1-body, type: text, x: 88, y: 278, size: 14, w: 304, color: "#3A4A5E", line_height: 1.8, lines: ["盘点数据、场景与人才，", "对齐经营目标，输出", "目标树与组合清单。"]}
+  - {id: arrow-1, type: arrow, x1: 424, y1: 340, x2: 456, y2: 340, stroke: "#8A97A8", stroke_width: 2.5}
+  - {id: card-2, type: rrect, x: 464, y: 150, w: 352, h: 380, rx: 14, fill: "#FFFFFF", stroke: "#D8E0EA", stroke_width: 1.5}
+  - {id: pill-2, type: pill, x: 488, y: 176, w: 112, h: 34, fill: "#2B6CB0", text: "试点", size: 15, bold: true, color: "#FFFFFF"}
+  - {id: card2-title, type: text, x: 488, y: 236, size: 20, bold: true, color: "#16233B", text: "小步快跑"}
+  - {id: card2-body, type: text, x: 488, y: 278, size: 14, w: 304, color: "#3A4A5E", line_height: 1.8, lines: ["选择高价值低风险场景", "先行验证，沉淀可复用的", "数据与交付基线。"]}
+  - {id: arrow-2, type: arrow, x1: 824, y1: 340, x2: 856, y2: 340, stroke: "#8A97A8", stroke_width: 2.5}
+  - {id: card-3, type: rrect, x: 864, y: 150, w: 352, h: 380, rx: 14, fill: "#FFFFFF", stroke: "#D8E0EA", stroke_width: 1.5}
+  - {id: pill-3, type: pill, x: 888, y: 176, w: 112, h: 34, fill: "#2B6CB0", text: "扩围", size: 15, bold: true, color: "#FFFFFF"}
+  - {id: card3-title, type: text, x: 888, y: 236, size: 20, bold: true, color: "#16233B", text: "规模复制"}
+  - {id: card3-body, type: text, x: 888, y: 278, size: 14, w: 304, color: "#3A4A5E", line_height: 1.8, lines: ["向更多业务与场景复制，", "建立治理与价值评估的", "长期机制。"]}
+  - {id: footer-line, type: line, x1: 64, y1: 600, x2: 1216, y2: 600, stroke: "#E2E8F0", stroke_width: 1}
+  - {id: footer, type: text, x: 64, y: 622, size: 13, color: "#8A97A8", text: "来源：Snap2Edit Demo —— 由 spec.yaml 一键生成，HTML 与 PPTX 同源同步。"}

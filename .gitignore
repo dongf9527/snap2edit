@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.venv/
+
+# 构建产物默认忽略（demo 产物保留作为示例）
+build/
+!examples/demo/build/
+!examples/demo/build/**
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store
