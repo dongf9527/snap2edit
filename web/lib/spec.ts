@@ -7,7 +7,7 @@
 
 import { parse as yamlParse, stringify as yamlDump } from "yaml";
 
-export const ELEMENT_TYPES = ["rect", "rrect", "pill", "text", "line", "arrow"] as const;
+export const ELEMENT_TYPES = ["rect", "rrect", "pill", "circle", "text", "line", "arrow"] as const;
 export type ElementType = (typeof ELEMENT_TYPES)[number];
 
 export interface ImageMeta {
@@ -38,6 +38,21 @@ export interface SpecResult {
 /** base64 dataURL 上限（约 8MB 原始字节） */
 export const MAX_IMAGE_CHARS = 11_000_000;
 
+/** 客户端 meta 的服务端规范化（越界字段剔除，类型收紧） */
+export function normalizeImageMeta(m: unknown): ImageMeta {
+  const o = (m ?? {}) as Record<string, unknown>;
+  return {
+    width: typeof o.width === "number" && o.width > 0 ? Math.round(o.width) : 0,
+    height: typeof o.height === "number" && o.height > 0 ? Math.round(o.height) : 0,
+    filename: typeof o.filename === "string" ? o.filename.slice(0, 120) : undefined,
+    palette: Array.isArray(o.palette)
+      ? o.palette
+          .filter((c): c is string => typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c))
+          .slice(0, 8)
+      : undefined,
+  };
+}
+
 /** 引擎同源占位符黑名单（与 src/snap2edit/spec.py 保持一致） */
 const PLACEHOLDER_BLACKLIST = ["XXX", "TODO", "待补充", "【", "undefined", "NaN"];
 
@@ -45,6 +60,7 @@ const GEOM_FIELDS: Record<ElementType, string[]> = {
   rect: ["x", "y", "w", "h"],
   rrect: ["x", "y", "w", "h"],
   pill: ["x", "y", "w", "h"],
+  circle: ["x", "y", "w", "h"],
   text: ["x", "y"],
   line: ["x1", "y1", "x2", "y2"],
   arrow: ["x1", "y1", "x2", "y2"],
@@ -52,9 +68,16 @@ const GEOM_FIELDS: Record<ElementType, string[]> = {
 
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 
-/** 统一序列化：双引号风格，避免 PyYAML(YAML 1.1) 把 "16:9" 等无引号标量误读为六十进制整数 */
+/**
+ * 统一序列化：值为双引号风格（避免 PyYAML(YAML 1.1) 把 "16:9" 等无引号标量误读为六十进制整数），
+ * key 保持朴素风格（可读性）；lineWidth=0 禁止长文案折行（折行合法但难以阅读且易被误编辑）。
+ */
 export function dumpSpecYaml(spec: unknown): string {
-  return yamlDump(spec, { defaultStringType: "QUOTE_DOUBLE" });
+  return yamlDump(spec, {
+    defaultStringType: "QUOTE_DOUBLE",
+    defaultKeyType: "PLAIN",
+    lineWidth: 0,
+  });
 }
 
 /**
@@ -166,6 +189,7 @@ export function buildSystemPrompt(): string {
     "",
     "元素几何字段：",
     "- rect / rrect / pill : x,y,w,h（rrect 可加 radius；pill 为胶囊形）",
+    "- circle : x,y,w,h（圆形/圆点/椭圆的外接框；圆即 w=h）",
     "- text  : x,y（w 可选），另有 size、color、weight(400/700)、text，可加 align、line_h",
     "- line / arrow : x1,y1,x2,y2；line 另有 stroke、stroke_w，arrow 另有 color、stroke_w",
     "",
@@ -180,6 +204,7 @@ export function buildSystemPrompt(): string {
     `  "elements": [`,
     `    {"id": "e1", "type": "rect", "x": 0, "y": 0, "w": 1280, "h": 720, "fill": "#FFFFFF"},`,
     `    {"id": "e2", "type": "rrect", "x": 40, "y": 120, "w": 380, "h": 220, "fill": "#F7F9FC", "radius": 10},`,
+    `    {"id": "e4", "type": "circle", "x": 60, "y": 60, "w": 36, "h": 36, "fill": "#2B6CB0"},`,
     `    {"id": "e3", "type": "text", "x": 64, "y": 140, "size": 22, "weight": 700, "color": "#1F2937", "text": "卡片标题"}`,
     `  ]`,
     `}`,
@@ -199,6 +224,25 @@ export function buildUserPrompt(meta: ImageMeta): string {
     "请分析这张图并输出布局规格 JSON（遵守系统规则，只输出 JSON 本体）。",
   ];
   return parts.filter(Boolean).join("\n");
+}
+
+/** 渲染报告自动回询：把引擎校验失败项反馈给 VLM，要求输出修正后的完整 JSON */
+export function buildFixPrompt(failures: string[], specYaml: string): string {
+  return [
+    "你之前给出的布局规格在 Snap2Edit 引擎四道校验门中未全部通过，错误清单如下：",
+    ...failures.map((f, i) => `${i + 1}. ${f}`),
+    "",
+    "请逐条修正这些错误（常见修法：文案缺失→把缺失文字补为对应 text 元素并同步 texts 清单；",
+    "文本溢出→缩小该元素 size 或加大 w；占位符→替换为真实文案），",
+    "其余正确的部分保持原样。",
+    "",
+    "当前规格（YAML，仅作参考；你的输出仍必须是 JSON）：",
+    "```yaml",
+    specYaml.slice(0, 12000),
+    "```",
+    "",
+    "输出要求与最初一致：只输出修正后的完整 JSON 本体，不要围栏、不要解释。",
+  ].join("\n");
 }
 
 /** 剥离可能的 markdown 围栏 */
@@ -297,10 +341,18 @@ export function validateSpecYaml(raw: string): SpecValidation & { fixedYaml?: st
       }
       if (type === "text") {
         textCount += 1;
-        if (typeof el.text !== "string" || !el.text.trim()) {
-          errors.push(`${label} text 元素缺少文字内容`);
+        // 与引擎 spec.py 同源规则：text 元素允许 text 字符串 或 lines 多行数组
+        const hasText = typeof el.text === "string" && el.text.trim().length > 0;
+        const hasLines =
+          Array.isArray(el.lines) &&
+          el.lines.length > 0 &&
+          el.lines.every((x) => typeof x === "string" && x.trim().length > 0);
+        if (!hasText && !hasLines) {
+          errors.push(`${label} text 元素缺少文字内容（需要 text 或 lines）`);
+        } else if (hasText) {
+          textStrings.push(el.text as string);
         } else {
-          textStrings.push(el.text);
+          textStrings.push(...(el.lines as string[]));
         }
         if (!isNum(el.size)) warnings.push(`${label} text 缺少 size，渲染将回退默认字号`);
       }

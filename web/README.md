@@ -1,8 +1,8 @@
-# Snap2Edit Web（Next.js 基础框架）
+# Snap2Edit Web（Next.js）
 
-Snap2Edit 的 Web UI，对应 PRD F9（v2 路线）。当前已实现首个交互功能
-**「上传图片 → 生成 spec」**：上传图表截图，视觉模型抽取布局/坐标/色板/全部文字，
-产出可编辑的 `spec.yaml`，下载后交由 Python 引擎双渲染。
+Snap2Edit 的 Web UI，对应 PRD F9（v2 路线）。已实现从截图到可编辑双产物的**全链路在线工作台**：
+上传图片 → 视觉模型生成 `spec.yaml` → 一键调用 Python 引擎双渲染 → 在线预览 HTML+SVG 与
+PPTX（PDF 形态）→ 校验未通过时自动把渲染报告回询视觉模型迭代修正。
 技术栈：Next.js 16（App Router）+ React 19 + TypeScript，无额外 UI 框架依赖。
 
 ## 启动
@@ -10,55 +10,83 @@ Snap2Edit 的 Web UI，对应 PRD F9（v2 路线）。当前已实现首个交�
 ```bash
 cd web
 npm install
-npm run dev        # http://localhost:3000
+npm run dev                  # http://localhost:3000
 npm run build && npm start   # 生产模式
 ```
 
-## 「上传图片 → 生成 spec」工作台
+前置：引擎需可被服务端解析（优先 `snap2edit` CLI，其次 `python3 -m snap2edit.cli`，
+仓库根执行 `pip install -e .` 即可）；PPTX→PDF 预览依赖 `soffice`（LibreOffice），
+缺失时 PDF 页签自动禁用，不影响下载 PPTX。
+
+## 全链路工作台
 
 ```
 浏览器上传图片（限尺 ≤2000px / canvas 取色）
   → POST /api/spec（dataURL + meta）
-    → 视觉模型抽取规格 JSON（系统提示词约束 schema）
-    → normalizeSpec：多行拆分 / 截断回填 / texts 对齐 / id 重编号
-    → dumpSpecYaml：双引号风格序列化（规避 PyYAML 1.1 六十进制陷阱）
-    → validateSpecYaml：结构校验（失败带错误回询重试一次）
-    → 兜底：VLM 不可用时返回骨架模板（mode: skeleton）
-  → 页面展示可编辑 YAML，支持复制 / 下载 spec.yaml
+      视觉模型抽取规格 JSON → normalizeSpec → dumpSpecYaml → validateSpecYaml
+      （失败带错误回询重试一次；VLM 不可用回退骨架模板 mode:skeleton）
+  → 页面展示可编辑 YAML，支持复制 / 下载
+  → POST /api/build { spec }                       （NDJSON 流式）
+      写任务目录 → snap2edit build → snap2edit check --json → PPTX 转 PDF
+  → GET /api/artifacts/<jobId>/<html|pptx|pdf|shot.png|report.md>
+      HTML iframe 在线预览 / PDF 预览 / 下载
+  → POST /api/refine { image, meta, spec, maxRounds }   （NDJSON 流式）
+      build → check → 未通过则把报告 failures 回询 VLM 修正 spec → 重建复检
+      循环 maxRounds 轮，全程推送 round/report/spec/tick 事件
 ```
 
-实测（1280×720 复杂信息图）：一遍通过结构校验，129 元素 / 92 条文字，
-spec 直接通过 `snap2edit build` + `snap2edit check` 四道门全绿。
+## API 一览
 
-## 模型接入
+| 路由 | 方法 | 输入 | 输出 | 说明 |
+|---|---|---|---|---|
+| `/api/spec` | POST | `{ image: dataURL, meta }` | JSON `SpecResult` | 视觉模型抽取规格（失败骨架兜底） |
+| `/api/build` | POST | `{ spec: YAML }` | NDJSON 事件流 | 双渲染 + 四道门 + PPTX→PDF |
+| `/api/refine` | POST | `{ image, meta, spec, maxRounds? }` | NDJSON 事件流 | 自动回询迭代闭环 |
+| `/api/artifacts/<id>/<file>` | GET | UUID + `html/pptx/pdf/shot.png/report.md` | 文件（MIME 正确） | 产物服务；`?dl=1` 强制下载 |
 
-- 服务端通过 [`z-ai-web-dev-sdk`](https://www.npmjs.com/package/z-ai-web-dev-sdk)
-  调用视觉模型（仅限后端）。SDK 从 `.z-ai-config`（项目根 / `~` / `/etc`）读取配置。
-- 可用环境变量 `SNAP2EDIT_VISION_MODEL` 覆盖默认视觉模型。
-- 未配置 SDK/模型时功能不中断：自动回退骨架模板模式。
-- 模型规格选型分析见 [`docs/AI_SPEC_MODEL.md`](../docs/AI_SPEC_MODEL.md)。
+NDJSON 事件类型：`log`（过程日志）/ `tick`（长静默保活心跳）/ `round`（迭代轮次与阶段）/
+`report`（引擎 `check --json` 结构化四道门报告）/ `spec`（修正后的 spec 文本）/
+`done`（jobId、ok、hasPdf、rounds、spec、warnings、elapsedMs）/ `error`（任何异常）。
+**约定：所有路由的所有分支（含 400/404/413/500）只返回 JSON，绝不返回 HTML/纯文本错误页。**
+
+## 健壮性设计（JSON.parse 报错的根治）
+
+预览网关在长请求（VLM 30–150s）下可能掐断连接并返回 HTML 错误页；旧版前端直接
+`res.json()`，HTML 首字符 `<` 即抛出难以理解的
+`JSON.parse: unexpected character at line 1 column 1 of the JSON data`。三层根治：
+
+1. **服务端**：每个 handler 全量 try/catch，任何未预期异常都转 `NextResponse.json()`；
+   引擎缺失/崩溃/超时给出中文可读错误。
+2. **协议**：长任务一律 NDJSON 流式（`application/x-ndjson`），边跑边有字节流动，
+   期间周期发送 `tick` 心跳，避免网关因静默掐断连接。
+3. **客户端**：`readApiJson()` 先查 Content-Type 再解析，非 JSON 一律转为可读错误；
+   `streamApi()` 逐行解析事件，混入的非 JSON 行（代理注入提示等）直接忽略。
 
 ## 结构
 
 ```
 web/
 ├── app/
-│   ├── layout.tsx        # 根布局（zh-CN，元信息）
-│   ├── page.tsx          # 首页：工作台 + 流水线 + 案例索引
-│   ├── workbench.tsx     # 「上传图片 → 生成 spec」客户端组件
-│   ├── globals.css       # 全局样式（无 UI 框架依赖）
-│   └── api/spec/route.ts # POST /api/spec：VLM 抽取 → 规范化 → 校验 → 兜底
+│   ├── layout.tsx              # 根布局（zh-CN，元信息）
+│   ├── page.tsx                # 首页：工作台 + 流水线 + 案例索引
+│   ├── workbench.tsx           # 全链路工作台客户端组件
+│   ├── globals.css             # 全局样式（无 UI 框架依赖）
+│   └── api/
+│       ├── spec/route.ts       # POST /api/spec：VLM 抽取 → 校验 → 兜底
+│       ├── build/route.ts      # POST /api/build：双渲染 + 四道门（NDJSON）
+│       ├── refine/route.ts     # POST /api/refine：自动回询迭代（NDJSON）
+│       └── artifacts/[id]/[file]/route.ts  # GET 产物服务（双白名单防穿越）
 ├── lib/
-│   └── spec.ts           # 提示词 / JSON→YAML / 校验器 / 规范化 / 骨架（与引擎同源规则）
+│   ├── spec.ts                 # 提示词 / JSON→YAML / 校验器 / 骨架（与引擎同源规则）
+│   ├── api.ts                  # 浏览器侧 fetch 辅助 + 事件/报告类型
+│   ├── engine.ts               # 服务端：引擎子进程 / 任务目录 / 产物解析 / PPTX→PDF
+│   ├── pipeline.ts             # 服务端：build+check 管线 / NDJSON 流式包装
+│   └── vlm.ts                  # 服务端：视觉模型客户端（按需动态导入）
 ├── next.config.ts
 ├── package.json
 └── tsconfig.json
 ```
 
-## 规划（对接 Python 引擎）
-
-1. `app/api/build/route.ts` —— 触发双渲染，返回 HTML 与 PPTX
-2. `app/api/check/route.ts` —— 四道校验门结果 JSON 化
-3. `app/studio/` —— 规格书在线编辑器 + 双产物预览
-
-> 引擎侧保持单一事实源：Web 只做编排与展示，渲染逻辑一律复用 `src/snap2edit/`。
+> 引擎侧保持单一事实源：Web 只做编排与展示，渲染与校验逻辑一律复用 `src/snap2edit/`；
+> 四道门结构化报告由引擎 `snap2edit check <dir> --json`（`verify.collect_checks`）输出。
+> 架构细节与端到端实测记录见 [`docs/WEB_PIPELINE.md`](../docs/WEB_PIPELINE.md)。
