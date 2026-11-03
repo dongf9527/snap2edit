@@ -1,0 +1,15 @@
+[round] 第1轮 · build · 构建当前 spec
+[log]   第 1 次构建：引擎 build + 四道校验门…
+[report]第1次校验 ok=False failures=2项
+        - 门1 交付物① HTML+SVG · HTML 检查 · 文案清单全部在场（缺失: ['这条文案在渲染中不存在，必须新增一个text元素']）
+        - 门2 交付物② PPTX · PPTX 检查 · 文本框文案清单全部在场（缺失: ['这条文案在渲染中不存在，必须新增一个text元素']）
+[log]   第 1 次构建校验：✗ 2 项未通过
+[round] 第1轮 · vlm · 2 项错误回询修正
+[spec]  第1轮修正 spec 已产出（784 字符）
+[log]   第 1 轮修正完成，开始重建验证…
+[round] 第2轮 · build · 构建修正后的 spec
+[log]   第 2 次构建：引擎 build + 四道校验门…
+[report]第2次校验 ok=True failures=0项
+[log]   第 2 次构建校验：✓ 全部通过
+[log]   转换最终 PPTX → PDF（在线预览用）…
+[done]  jobId=6ce7d95e-d6da-4a8e-928d-042cc6760f16 ok=True rounds=1 elapsedMs=9389 warnings=[]

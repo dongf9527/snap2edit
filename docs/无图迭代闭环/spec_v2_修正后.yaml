@@ -1,0 +1,51 @@
+project: "徽标探针"
+canvas:
+  width: 1280
+  height: 720
+slide:
+  preset: "16:9"
+font:
+  name: "Noto Sans SC"
+  fallback: "Microsoft YaHei"
+  pptx_name: "Microsoft YaHei"
+palette:
+  primary: "#1F2937"
+  accent: "#2B6CB0"
+  card: "#FFFFFF"
+  muted: "#8A97A8"
+  bg: "#FFFFFF"
+texts:
+  - "标题A"
+  - "只有元素有我"
+  - "这条文案在渲染中不存在，必须新增一个text元素"
+elements:
+  - id: "e1"
+    type: "rect"
+    x: 0
+    y: 0
+    w: 1280
+    h: 720
+    fill: "#FFFFFF"
+  - id: "e2"
+    type: "text"
+    x: 48
+    y: 48
+    size: 30
+    weight: 700
+    color: "#1F2937"
+    text: "标题A"
+  - id: "e3"
+    type: "text"
+    x: 48
+    y: 120
+    size: 20
+    color: "#1F2937"
+    text: "只有元素有我"
+  - id: "e4"
+    type: "text"
+    x: 48
+    y: 180
+    w: 600
+    size: 20
+    color: "#1F2937"
+    text: "这条文案在渲染中不存在，必须新增一个text元素"
