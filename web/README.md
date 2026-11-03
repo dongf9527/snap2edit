@@ -3,7 +3,7 @@
 Snap2Edit 的 Web UI，对应 PRD F9（v2 路线）。已实现从截图到可编辑双产物的**全链路在线工作台**：
 上传图片 → 视觉模型生成 `spec.yaml` → 一键调用 Python 引擎双渲染 → 在线预览 HTML+SVG 与
 PPTX（PDF 形态）→ 校验未通过时自动把渲染报告回询视觉模型迭代修正；
-另附 **spec 可视化编辑器（/studio）**：框选多选、手柄缩放旋转（角度实时读出气泡）、可调吸附，YAML 实时双向同步；编辑结果可直通 /api/refine 自动迭代；/api/spec 抽取支持倾斜元素 rotate 识别。
+另附 **spec 可视化编辑器（/studio）**：框选多选、手柄缩放旋转（角度实时读出气泡）、可调吸附，YAML 实时双向同步；编辑结果可直通 /api/refine 自动迭代；/api/spec 抽取支持倾斜元素 rotate 识别，并可产出组件库元素（cube / matrix-cell / flow-box / icon，复合组件不带旋转手柄，与引擎 rotate 语义一致）。
 技术栈：Next.js 16（App Router）+ React 19 + TypeScript，无额外 UI 框架依赖。
 
 ## 启动

@@ -19,6 +19,7 @@ import {
   blankSpec,
   computeSnap,
   elText,
+  ICON_NAMES,
   regenTexts,
   renderSpecSvg,
   syncTextOnEdit,
@@ -36,6 +37,12 @@ const SNAP_T_KEY = "snap2edit.studio.snapT";
 
 const BOX_TYPES = ["rect", "rrect", "pill", "circle"] as const;
 const SEG_TYPES = ["line", "arrow"] as const;
+/** 可旋转类型：复合组件多单元旋转在两产线间易漂移，引擎不支持（与 spec.py 同源） */
+const ROTATABLE_TYPES = [...BOX_TYPES, "text"] as const;
+const isBoxEl = (el: SpecEl) =>
+  ["rect", "rrect", "pill", "circle", "cube", "matrix-cell", "flow-box", "icon"].includes(String(el.type));
+const isRotatableEl = (el: SpecEl) =>
+  (ROTATABLE_TYPES as readonly string[]).includes(String(el.type));
 
 interface Artifacts {
   jobId: string;
@@ -128,7 +135,6 @@ function unionBBox(bs: BBox[]): BBox {
   };
 }
 
-const isBoxEl = (el: SpecEl) => ["rect", "rrect", "pill", "circle"].includes(String(el.type));
 const isSegEl = (el: SpecEl) => el.type === "line" || el.type === "arrow";
 
 /** 深拷贝（spec 均为 JSON 安全结构） */
@@ -333,6 +339,24 @@ export default function StudioEditor() {
           el = { id: nid, type, x: Math.round(cw * 0.15), y: Math.round(ch * 0.2), w: 240, h: 120, fill: "#F7F9FC" };
           if (type === "rrect") el.rx = 10;
           if (type === "circle") { el.w = 120; el.h = 120; }
+          if (type === "cube") {
+            el = { id: nid, type, x: el.x, y: el.y, w: 180, h: 150, fill: "#2B6CB0", text: "立方体", size: 15, color: "#FFFFFF" };
+          }
+          if (type === "matrix-cell") {
+            el = {
+              id: nid, type, x: el.x, y: el.y, w: 300, h: 160, rows: 2, cols: 3, gap: 8,
+              fill: "#2B6CB0", texts: ["格子一", "格子二", "格子三"], size: 14,
+            };
+          }
+          if (type === "flow-box") {
+            el = {
+              id: nid, type, x: el.x, y: el.y, w: 260, h: 110, fill: "#EFF6FF", stroke: "#2B6CB0",
+              band: 0.32, title: "流程标题", text: "流程正文", size: 13,
+            };
+          }
+          if (type === "icon") {
+            el = { id: nid, type, x: el.x, y: el.y, w: 80, h: 80, name: "chart", fill: "#2B6CB0" };
+          }
         }
         d.elements = [...(d.elements ?? []), el];
       });
@@ -942,12 +966,14 @@ export default function StudioEditor() {
               style={{ left: pct(px, canvasW), top: pct(py, canvasH) }}
             />
           ))}
-          <span
-            data-handle="rotate"
-            className="hd hd-rot"
-            title="拖拽旋转（Shift 15° 步进）"
-            style={{ left: pct(b.x + b.w / 2, canvasW), top: pct(b.y - 28, canvasH) }}
-          />
+          {isRotatableEl(el) && (
+            <span
+              data-handle="rotate"
+              className="hd hd-rot"
+              title="拖拽旋转（Shift 15° 步进）"
+              style={{ left: pct(b.x + b.w / 2, canvasW), top: pct(b.y - 28, canvasH) }}
+            />
+          )}
         </>
       );
     } else if (isSegEl(el)) {
@@ -1211,7 +1237,7 @@ export default function StudioEditor() {
                 </label>
               </div>
 
-              {(isBoxEl(selectedEl) || selectedEl.type === "text") && (
+              {isRotatableEl(selectedEl) && (
                 <div className="prop-row">
                   <label>旋转°</label>
                   <input
@@ -1229,7 +1255,7 @@ export default function StudioEditor() {
                 </div>
               )}
 
-              {(BOX_TYPES as readonly string[]).includes(selectedEl.type) && (
+              {isBoxEl(selectedEl) && (
                 <>
                   <div className="prop-grid4">
                     {(["x", "y", "w", "h"] as const).map((k) => (
@@ -1274,7 +1300,7 @@ export default function StudioEditor() {
                       清除描边
                     </button>
                   </div>
-                  {selectedEl.type === "rrect" && (
+                  {(selectedEl.type === "rrect" || selectedEl.type === "matrix-cell" || selectedEl.type === "flow-box") && (
                     <div className="prop-row">
                       <label>圆角 rx</label>
                       <input
@@ -1284,17 +1310,112 @@ export default function StudioEditor() {
                       />
                     </div>
                   )}
-                  <label className="prop-full">
-                    内嵌文本（可空）
-                    <textarea
-                      rows={2}
-                      value={elText(selectedEl)}
-                      onChange={(e) => {
-                        const oldV = elText(selectedEl);
-                        patchEl(selectedEl.id, { text: e.target.value || undefined, lines: undefined }, oldV);
-                      }}
-                    />
-                  </label>
+                  {selectedEl.type === "cube" && (
+                    <div className="prop-row">
+                      <label>深度 depth</label>
+                      <input
+                        type="number"
+                        value={Number(selectedEl.depth ?? 0)}
+                        onChange={(e) => {
+                          const v = Math.max(0, Number(e.target.value) || 0);
+                          patchEl(selectedEl.id, { depth: v || undefined });
+                        }}
+                      />
+                    </div>
+                  )}
+                  {selectedEl.type === "icon" && (
+                    <div className="prop-row">
+                      <label>图标 name</label>
+                      <select
+                        value={String(selectedEl.name ?? "")}
+                        onChange={(e) => patchEl(selectedEl.id, { name: e.target.value })}
+                      >
+                        {ICON_NAMES.map((nm) => (
+                          <option key={nm} value={nm}>{nm}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {selectedEl.type === "flow-box" && (
+                    <>
+                      <label className="prop-full">
+                        色带标题 title（可空）
+                        <input
+                          type="text"
+                          value={String(selectedEl.title ?? "")}
+                          onChange={(e) => patchEl(selectedEl.id, { title: e.target.value || undefined })}
+                        />
+                      </label>
+                      <div className="prop-row">
+                        <label>色带高占比 band</label>
+                        <input
+                          type="number"
+                          step={0.05}
+                          min={0.05}
+                          max={0.9}
+                          value={Number(selectedEl.band ?? 0.3)}
+                          onChange={(e) => patchEl(selectedEl.id, { band: Math.min(0.9, Math.max(0.05, Number(e.target.value) || 0.3)) })}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {selectedEl.type === "matrix-cell" && (
+                    <>
+                      <div className="prop-grid4">
+                        <label>
+                          rows
+                          <input
+                            type="number"
+                            min={1}
+                            value={Number(selectedEl.rows ?? 1)}
+                            onChange={(e) => patchEl(selectedEl.id, { rows: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
+                          />
+                        </label>
+                        <label>
+                          cols
+                          <input
+                            type="number"
+                            min={1}
+                            value={Number(selectedEl.cols ?? 1)}
+                            onChange={(e) => patchEl(selectedEl.id, { cols: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
+                          />
+                        </label>
+                        <label>
+                          gap
+                          <input
+                            type="number"
+                            min={0}
+                            value={Number(selectedEl.gap ?? 0)}
+                            onChange={(e) => patchEl(selectedEl.id, { gap: Math.max(0, Number(e.target.value) || 0) })}
+                          />
+                        </label>
+                      </div>
+                      <label className="prop-full">
+                        格子文字 texts（逗号分隔，行优先；可少于格子数）
+                        <input
+                          type="text"
+                          value={(selectedEl.texts ?? []).join(",")}
+                          onChange={(e) => {
+                            const arr = e.target.value.split(",").map((s) => s.trim()).filter(Boolean);
+                            patchEl(selectedEl.id, { texts: arr.length ? arr : undefined });
+                          }}
+                        />
+                      </label>
+                    </>
+                  )}
+                  {selectedEl.type !== "matrix-cell" && selectedEl.type !== "icon" && (
+                    <label className="prop-full">
+                      内嵌文本（可空）
+                      <textarea
+                        rows={2}
+                        value={elText(selectedEl)}
+                        onChange={(e) => {
+                          const oldV = elText(selectedEl);
+                          patchEl(selectedEl.id, { text: e.target.value || undefined, lines: undefined }, oldV);
+                        }}
+                      />
+                    </label>
+                  )}
                 </>
               )}
 

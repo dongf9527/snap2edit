@@ -7,8 +7,14 @@
 
 import { parse as yamlParse, stringify as yamlDump } from "yaml";
 
-export const ELEMENT_TYPES = ["rect", "rrect", "pill", "circle", "text", "line", "arrow"] as const;
+export const ELEMENT_TYPES = [
+  "rect", "rrect", "pill", "circle", "text", "line", "arrow",
+  "cube", "matrix-cell", "flow-box", "icon",
+] as const;
 export type ElementType = (typeof ELEMENT_TYPES)[number];
+
+/** 复合组件：多单元构成，引擎不支持 rotate（键剔除）——与 spec.py _COMPOSITE_TYPES 同源 */
+export const COMPOSITE_TYPES = ["cube", "matrix-cell", "flow-box", "icon"] as const;
 
 export interface ImageMeta {
   width: number;
@@ -56,6 +62,9 @@ export function normalizeImageMeta(m: unknown): ImageMeta {
 /** 引擎同源占位符黑名单（与 src/snap2edit/spec.py 保持一致） */
 const PLACEHOLDER_BLACKLIST = ["XXX", "TODO", "待补充", "【", "undefined", "NaN"];
 
+/** 图标名清单（与 src/snap2edit/components.py ICONS 同源维护） */
+const ICON_NAME_LIST = "brain/chart/network/sparkle/lightning/gear/doc/user/check/target";
+
 const GEOM_FIELDS: Record<ElementType, string[]> = {
   rect: ["x", "y", "w", "h"],
   rrect: ["x", "y", "w", "h"],
@@ -64,6 +73,10 @@ const GEOM_FIELDS: Record<ElementType, string[]> = {
   text: ["x", "y"],
   line: ["x1", "y1", "x2", "y2"],
   arrow: ["x1", "y1", "x2", "y2"],
+  cube: ["x", "y", "w", "h"],
+  "matrix-cell": ["x", "y", "w", "h"],
+  "flow-box": ["x", "y", "w", "h"],
+  icon: ["x", "y", "w", "h"],
 };
 
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
@@ -215,6 +228,9 @@ export function buildSystemPrompt(): string {
     "- circle : x,y,w,h（圆形/圆点/椭圆的外接框；圆即 w=h；可加可选 rotate）",
     "- text  : x,y（w 可选），另有 size、color、weight(400/700)、text，可加 align、line_h、rotate（斜排文字绕锚点顺时针）",
     "- line / arrow : x1,y1,x2,y2；line 另有 stroke、stroke_w，arrow 另有 color、stroke_w；倾斜由端点坐标表达，不要写 rotate",
+    "- 组件库（可选，能明显提速）：cube 立方体（x,y,w,h,fill，可加 depth、text）；matrix-cell 矩阵格子（x,y,w,h,rows,cols,fill，texts 为按行优先的格子文字数组）；"
+    + "flow-box 流程框（x,y,w,h,fill，title 为色带标题、text 为正文）；icon 图标（x,y,w,h,fill，name 限：" + ICON_NAME_LIST + "）。",
+    "- cube/matrix-cell/flow-box/icon 为复合组件，不支持 rotate，不要写 rotate 键。",
     "",
     "JSON 结构模板（数值与文字替换为实际内容；不要保留 <> 占位）：",
     `{`,
@@ -362,15 +378,36 @@ export function validateSpecYaml(raw: string): SpecValidation & { fixedYaml?: st
         const outY = ys.some((v) => isNum(v) && (v < -2 || v > H + 2));
         if (outX || outY) warnings.push(`${label} 坐标可能越出画布`);
       }
-      // rotate（与引擎 spec.py 同源：度/顺时针；线段/箭头剔除只告警，非法值报错，越界归一化只告警）
+      // rotate（与引擎 spec.py 同源：度/顺时针；线段/箭头/复合组件剔除只告警，非法值报错，越界归一化只告警）
       if ("rotate" in el) {
-        if (type === "line" || type === "arrow") {
+        if (type === "line" || type === "arrow" || (COMPOSITE_TYPES as readonly string[]).includes(type)) {
           warnings.push(`${label}（${type}）不支持 rotate，引擎将忽略该键`);
         } else if (!isNum(el.rotate)) {
           errors.push(`${label}（${type}）rotate 必须是数字（度，顺时针）`);
         } else if ((el.rotate as number) < 0 || (el.rotate as number) >= 360) {
           warnings.push(`${label} rotate=${el.rotate} 越界，引擎将归一化到 [0,360)`);
         }
+      }
+      // 组件库（F6）轻量校验（与引擎 spec.py 同源；深度校验以引擎四道门为准）
+      if (type === "matrix-cell") {
+        if (!Number.isInteger(el.rows) || (el.rows as number) < 1)
+          errors.push(`${label}（matrix-cell）rows 必须是 ≥1 的整数`);
+        if (!Number.isInteger(el.cols) || (el.cols as number) < 1)
+          errors.push(`${label}（matrix-cell）cols 必须是 ≥1 的整数`);
+        if (Array.isArray(el.texts)) {
+          if (el.texts.some((x) => typeof x !== "string"))
+            errors.push(`${label}（matrix-cell）texts 必须是字符串列表（行优先）`);
+          else if (isNum(el.rows) && isNum(el.cols) && el.texts.length > (el.rows as number) * (el.cols as number))
+            errors.push(`${label}（matrix-cell）texts 共 ${el.texts.length} 条，超出格子数 ${(el.rows as number) * (el.cols as number)}`);
+        }
+      }
+      if (type === "icon" && typeof el.name !== "string") {
+        errors.push(`${label}（icon）缺少 name（可用：${ICON_NAME_LIST}）`);
+      } else if (type === "icon" && !(ICON_NAME_LIST.split("/").includes(el.name as string))) {
+        errors.push(`${label}（icon）未知图标 ${String(el.name)}（可用：${ICON_NAME_LIST}）`);
+      }
+      if (type === "flow-box" && !el.title && !el.text && !Array.isArray(el.lines)) {
+        errors.push(`${label}（flow-box）需要 title 或 text/lines`);
       }
       if (type === "text") {
         textCount += 1;
@@ -388,6 +425,19 @@ export function validateSpecYaml(raw: string): SpecValidation & { fixedYaml?: st
           textStrings.push(...(el.lines as string[]));
         }
         if (!isNum(el.size)) warnings.push(`${label} text 缺少 size，渲染将回退默认字号`);
+      }
+      // 组件库文字并入清单（与引擎 texts_of 同源：矩阵逐格、流程框标题+正文）
+      if (type === "matrix-cell" && Array.isArray(el.texts)) {
+        for (const t of el.texts) if (typeof t === "string") textStrings.push(t);
+        if (el.texts.length > 0 && !isNum(el.size))
+          warnings.push(`${label}（matrix-cell）携带 texts 但缺少 size`);
+      }
+      if (type === "flow-box") {
+        if (typeof el.title === "string" && el.title) textStrings.push(el.title);
+        if (typeof el.text === "string" && el.text) textStrings.push(el.text);
+        if (Array.isArray(el.lines)) for (const t of el.lines) if (typeof t === "string") textStrings.push(t);
+        if ((el.title || el.text || Array.isArray(el.lines)) && !isNum(el.size))
+          warnings.push(`${label}（flow-box）携带文字但缺少 size`);
       }
     });
   }
