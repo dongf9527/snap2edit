@@ -13,6 +13,7 @@ const CASES = [
   "企业AI落地_复刻",
   "AI技术体系对比图",
   "LLM推理全流程_图解",
+  "refine自动回询闭环",
 ];
 
 export default function Home() {
@@ -28,6 +29,10 @@ export default function Home() {
           四道校验门自动把关。引擎由 Python CLI（<code>src/snap2edit/</code>）提供，本页提供
           「上传图片 → 生成 spec」交互入口。
         </p>
+        <nav className="hero-nav" aria-label="页面导航">
+          <a className="btn primary" href="#workbench">上传图片 → 生成 spec</a>
+          <a className="btn ghost" href="/studio">打开可视化编辑器（Studio）</a>
+        </nav>
       </header>
 
       <Workbench />

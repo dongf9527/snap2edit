@@ -2,7 +2,8 @@
 
 Snap2Edit 的 Web UI，对应 PRD F9（v2 路线）。已实现从截图到可编辑双产物的**全链路在线工作台**：
 上传图片 → 视觉模型生成 `spec.yaml` → 一键调用 Python 引擎双渲染 → 在线预览 HTML+SVG 与
-PPTX（PDF 形态）→ 校验未通过时自动把渲染报告回询视觉模型迭代修正。
+PPTX（PDF 形态）→ 校验未通过时自动把渲染报告回询视觉模型迭代修正；
+另附 **spec 可视化编辑器（/studio）**：画布点选/拖拽/改属性，YAML 实时双向同步。
 技术栈：Next.js 16（App Router）+ React 19 + TypeScript，无额外 UI 框架依赖。
 
 ## 启动
@@ -34,6 +35,19 @@ npm run build && npm start   # 生产模式
       build → check → 未通过则把报告 failures 回询 VLM 修正 spec → 重建复检
       循环 maxRounds 轮，全程推送 round/report/spec/tick 事件
 ```
+
+## spec 可视化编辑器（/studio）
+
+```
+入口：首页「打开可视化编辑器」/ 工作台「在可视化编辑器中打开 →」（sessionStorage 交接 spec）
+布局：元素列表（选中/增删/上下移）｜SVG 画布（点选·拖拽·方向键微调·Delete 删除）｜属性面板
+同步：YAML 源码是唯一事实源 —— 属性编辑 → 重新序列化；源码编辑 → 画布重渲
+画布：web/lib/canvas.ts 与引擎 svgout.py 同语义（坐标/圆角/基线/箭头三角），预览 ≈ 产物
+安全网：结构校验实时提示；texts 清单自动同步 + 一键从元素重建（保证门1可过）
+出口：构建并预览（复用 /api/build，四道门 + iframe + 下载）/ 复制 / 下载 spec.yaml / 浏览器草稿
+```
+
+> 正式产物永远由 Python 引擎输出（单一事实源）；studio 只做编辑与预览，不做第二套渲染逻辑。
 
 ## API 一览
 
@@ -71,6 +85,9 @@ web/
 │   ├── page.tsx                # 首页：工作台 + 流水线 + 案例索引
 │   ├── workbench.tsx           # 全链路工作台客户端组件
 │   ├── globals.css             # 全局样式（无 UI 框架依赖）
+│   ├── studio/
+│   │   ├── page.tsx            # /studio 可视化编辑器路由
+│   │   └── editor.tsx          # 编辑器客户端组件（列表/画布/属性/YAML/构建）
 │   └── api/
 │       ├── spec/route.ts       # POST /api/spec：VLM 抽取 → 校验 → 兜底
 │       ├── build/route.ts      # POST /api/build：双渲染 + 四道门（NDJSON）
@@ -78,6 +95,7 @@ web/
 │       └── artifacts/[id]/[file]/route.ts  # GET 产物服务（双白名单防穿越）
 ├── lib/
 │   ├── spec.ts                 # 提示词 / JSON→YAML / 校验器 / 骨架（与引擎同源规则）
+│   ├── canvas.ts               # 客户端 SVG 画布渲染（svgout.py 的 TS 镜像）
 │   ├── api.ts                  # 浏览器侧 fetch 辅助 + 事件/报告类型
 │   ├── engine.ts               # 服务端：引擎子进程 / 任务目录 / 产物解析 / PPTX→PDF
 │   ├── pipeline.ts             # 服务端：build+check 管线 / NDJSON 流式包装

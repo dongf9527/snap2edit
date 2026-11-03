@@ -265,6 +265,13 @@ export default function Workbench() {
     URL.revokeObjectURL(url);
   }, [meta, specText]);
 
+  /** 带着当前 spec 跳转可视化编辑器（sessionStorage 交接） */
+  const openInStudio = useCallback(() => {
+    if (!specText.trim()) return;
+    sessionStorage.setItem("snap2edit.studio.spec", specText);
+    window.location.href = "/studio";
+  }, [specText]);
+
   const busy = phase === "generating";
   const pipelineBusy = buildBusy || refineBusy;
 
@@ -419,6 +426,9 @@ export default function Workbench() {
                 </button>
                 <button className="btn ghost" onClick={downloadSpec}>
                   下载 spec.yaml
+                </button>
+                <button className="btn primary" onClick={openInStudio}>
+                  在可视化编辑器中打开 →
                 </button>
               </div>
             </>

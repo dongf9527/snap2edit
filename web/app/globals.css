@@ -640,3 +640,345 @@ body {
   min-height: 120px;
   margin-top: 14px;
 }
+
+/* ================= Studio · spec 可视化编辑器 ================= */
+
+.hero-nav {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hero-nav .btn {
+  text-decoration: none;
+  min-height: 42px;
+}
+
+.studio-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.studio-notice {
+  color: var(--accent);
+  border: 1px dashed var(--accent);
+}
+
+.studio-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .studio-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* —— 左：元素列表 —— */
+.studio-list h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.studio-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.chip-add {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chip-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.studio-list ul {
+  list-style: none;
+  max-height: 560px;
+  overflow: auto;
+}
+
+.studio-list li {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.studio-list li.on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.studio-list .li-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: 12px;
+}
+
+.studio-list .li-type {
+  flex: none;
+  font-size: 10px;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 4px;
+}
+
+.studio-list .li-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.studio-list .li-ops {
+  flex: none;
+  display: flex;
+  align-items: center;
+}
+
+.studio-list .li-ops button {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+.studio-list .li-ops button:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.studio-list .li-ops button.danger:hover:not(:disabled) {
+  color: #c0392b;
+}
+
+/* —— 中：画布 —— */
+.studio-canvas-card h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.studio-canvas {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: repeating-conic-gradient(#f1f4f8 0% 25%, #ffffff 0% 50%) 0 0 / 24px 24px;
+  overflow: auto;
+  cursor: default;
+  user-select: none;
+  touch-action: none;
+}
+
+.studio-canvas svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.studio-canvas svg [id] {
+  cursor: pointer;
+}
+
+.studio-canvas svg .ov-sel {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.studio-canvas svg .ov-hov {
+  stroke: rgba(43, 108, 176, 0.45);
+  stroke-width: 1.5;
+}
+
+.studio-validate {
+  margin-top: 10px;
+}
+
+.studio-okline {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #1e7d46;
+}
+
+/* —— 右：属性面板 —— */
+.studio-props h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.prop-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prop-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.prop-row > label:first-child {
+  color: var(--muted);
+  min-width: 3.5em;
+}
+
+.prop-chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.prop-grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.prop-grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.prop-grid4 label,
+.prop-grid3 label,
+.prop-row label {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.prop-row > label {
+  flex-direction: row;
+  align-items: center;
+}
+
+.prop-form input[type="number"],
+.prop-form select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 5px 6px;
+  font-size: 13px;
+  color: var(--ink);
+  background: #fff;
+}
+
+.prop-form input[type="color"] {
+  width: 40px;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 2px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.prop-full {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.prop-full textarea {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--ink);
+  resize: vertical;
+}
+
+.prop-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+.btn.mini {
+  min-height: 28px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+
+.btn.mini.danger {
+  color: #c0392b;
+}
+
+.prop-texts {
+  margin-top: 14px;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.prop-texts small {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+/* —— YAML 源码 —— */
+.studio-yaml-card {
+  margin-top: 16px;
+}
+
+.studio-yaml-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studio-yaml-head h3 {
+  font-size: 14px;
+}
+
+.studio-yaml-card .spec-editor {
+  margin-top: 10px;
+  height: 260px;
+}
