@@ -1,0 +1,67 @@
+# CI · 引擎测试矩阵 + 打包校验 + Web 测试
+# 触发：push 到 main / 所有 PR
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 1) 引擎单测：Python 3.9 / 3.11 / 3.13 三档矩阵
+  #    门4 截图在单测中以 monkeypatch 模拟，无需真实浏览器（见 tests/test_units.py）
+  engine-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: 安装引擎 + 测试依赖
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[verify]" pytest pytest-cov
+      - name: 运行引擎测试（覆盖率门槛 ≥ 80%，PRD v1.0 验收线）
+        run: pytest tests/ --cov=snap2edit --cov-report=term --cov-fail-under=80
+
+  # 2) 打包校验：sdist + wheel 构建并过 twine check（发布前的门）
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 构建双制品
+        run: |
+          python -m pip install build twine
+          python -m build --sdist --wheel
+      - name: twine check
+        run: python -m twine check dist/*
+
+  # 3) Web 全链路：单测 + tsc + next build
+  web-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Web 单测
+        run: npm test
+      - name: 类型检查 + 构建
+        run: npm run build
