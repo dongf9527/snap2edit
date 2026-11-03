@@ -3,7 +3,7 @@
 Snap2Edit 的 Web UI，对应 PRD F9（v2 路线）。已实现从截图到可编辑双产物的**全链路在线工作台**：
 上传图片 → 视觉模型生成 `spec.yaml` → 一键调用 Python 引擎双渲染 → 在线预览 HTML+SVG 与
 PPTX（PDF 形态）→ 校验未通过时自动把渲染报告回询视觉模型迭代修正；
-另附 **spec 可视化编辑器（/studio）**：画布点选/拖拽/改属性，YAML 实时双向同步。
+另附 **spec 可视化编辑器（/studio）**：框选多选、对齐吸附、批量编辑，YAML 实时双向同步；编辑结果可直通 /api/refine 自动迭代。
 技术栈：Next.js 16（App Router）+ React 19 + TypeScript，无额外 UI 框架依赖。
 
 ## 启动
@@ -40,14 +40,21 @@ npm run build && npm start   # 生产模式
 
 ```
 入口：首页「打开可视化编辑器」/ 工作台「在可视化编辑器中打开 →」（sessionStorage 交接 spec）
-布局：元素列表（选中/增删/上下移）｜SVG 画布（点选·拖拽·方向键微调·Delete 删除）｜属性面板
-同步：YAML 源码是唯一事实源 —— 属性编辑 → 重新序列化；源码编辑 → 画布重渲
+布局：元素列表（Shift/Ctrl 加减选）｜SVG 画布（点选·拖拽·框选多选·方向键微调·Delete 删除）｜属性面板
+多选：空白处拖拽框选（Shift 从现有选区累加）；属性面板出现批量操作条（对齐六向 / 水平垂直等距 / 批量删除）
+吸附：拖拽时移动元素边缘/中线对齐静态元素边缘/中线与画布边缘/中线（阈值 8 画布 px），
+      触发时显示琥珀色吸附参考线；按住 Alt 拖拽可临时禁用吸附
+同步：YAML 源码是唯一事实源 —— 属性/批量操作 → 重新序列化；源码编辑 → 画布重渲
 画布：web/lib/canvas.ts 与引擎 svgout.py 同语义（坐标/圆角/基线/箭头三角），预览 ≈ 产物
 安全网：结构校验实时提示；texts 清单自动同步 + 一键从元素重建（保证门1可过）
-出口：构建并预览（复用 /api/build，四道门 + iframe + 下载）/ 复制 / 下载 spec.yaml / 浏览器草稿
+出口：① 构建并校验（/api/build 单次四道门 + iframe + 下载）
+     ② 构建并自动迭代（/api/refine，可选迭代轮次 1–3 与参考原图；
+        未通过时失败项回询 VLM 修正 spec 重建复检，最终 spec 自动写回编辑器）
+     ③ 复制 / 下载 spec.yaml / 浏览器草稿
 ```
 
 > 正式产物永远由 Python 引擎输出（单一事实源）；studio 只做编辑与预览，不做第二套渲染逻辑。
+> /api/refine 附原图时做「失败项 + 视觉比对」修正；不附原图（纯编辑器入口）时按报告纯文本修正。
 
 ## API 一览
 
@@ -55,7 +62,7 @@ npm run build && npm start   # 生产模式
 |---|---|---|---|---|
 | `/api/spec` | POST | `{ image: dataURL, meta }` | JSON `SpecResult` | 视觉模型抽取规格（失败骨架兜底） |
 | `/api/build` | POST | `{ spec: YAML }` | NDJSON 事件流 | 双渲染 + 四道门 + PPTX→PDF |
-| `/api/refine` | POST | `{ image, meta, spec, maxRounds? }` | NDJSON 事件流 | 自动回询迭代闭环 |
+| `/api/refine` | POST | `{ image?, meta?, spec, maxRounds? }` | NDJSON 事件流 | 自动回询迭代闭环（image 可选：无图时按报告纯文本修正） |
 | `/api/artifacts/<id>/<file>` | GET | UUID + `html/pptx/pdf/shot.png/report.md` | 文件（MIME 正确） | 产物服务；`?dl=1` 强制下载 |
 
 NDJSON 事件类型：`log`（过程日志）/ `tick`（长静默保活心跳）/ `round`（迭代轮次与阶段）/

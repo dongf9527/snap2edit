@@ -1,9 +1,10 @@
 "use client";
 
-// web/app/studio/editor.tsx —— spec 可视化编辑器（PRD F9 → v0.3 studio 页）。
-// 三栏布局：元素列表 / SVG 画布（点选·拖拽·方向键微调）/ 属性面板；
+// web/app/studio/editor.tsx —— spec 可视化编辑器（PRD F9 → v0.4 studio 页）。
+// 三栏布局：元素列表 / SVG 画布（点选·框选多选·拖拽吸附·方向键微调）/ 属性面板（含批量对齐/等距）；
 // YAML 源码为唯一事实源（双向同步：属性编辑 → 重新序列化；源码编辑 → 画布重渲）。
-// 画布渲染与引擎 svgout.py 同语义（web/lib/canvas.ts），正式产物仍由 Python 引擎输出。
+// 画布渲染与引擎 svgout.py 同语义（web/lib/canvas.ts），正式产物仍由 Python 引擎输出；
+// 构建出口双通道：/api/build 单次校验、/api/refine 自动回询迭代（最终 spec 写回编辑器）。
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -16,11 +17,14 @@ import {
 } from "@/lib/spec";
 import {
   blankSpec,
+  computeSnap,
   elText,
   regenTexts,
   renderSpecSvg,
   syncTextOnEdit,
   translateEl,
+  elBBox,
+  type SnapGuides,
   type SpecDoc,
   type SpecEl,
 } from "@/lib/canvas";
@@ -38,6 +42,18 @@ interface Artifacts {
   hasPdf: boolean;
 }
 
+interface MarqueeState {
+  ax: number;
+  ay: number;
+  base: string[];
+  rect: { x: number; y: number; w: number; h: number };
+}
+
+interface RefImage {
+  dataUrl: string;
+  meta: { width: number; height: number; filename?: string };
+}
+
 /** 深拷贝（spec 均为 JSON 安全结构） */
 function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
@@ -52,24 +68,34 @@ function nextId(doc: SpecDoc): string {
 
 export default function StudioEditor() {
   const [yaml, setYaml] = useState<string>("");
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selIds, setSelIds] = useState<string[]>([]);
   const [hover, setHover] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [showYaml, setShowYaml] = useState(true);
   const [copied, setCopied] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
-  const [dragId, setDragId] = useState<string | null>(null);
+  const [interacting, setInteracting] = useState(false);
+  const [marquee, setMarquee] = useState<MarqueeState["rect"] | null>(null);
+  const [guides, setGuides] = useState<SnapGuides>({ v: [], h: [] });
 
-  // 构建与预览（复用 /api/build）
+  // 构建与预览（复用 /api/build 与 /api/refine）
   const [buildBusy, setBuildBusy] = useState(false);
+  const [refineBusy, setRefineBusy] = useState(false);
+  const busy = buildBusy || refineBusy;
+  const [maxRounds, setMaxRounds] = useState(2);
+  const [refImg, setRefImg] = useState<RefImage | null>(null);
+  const [roundsDone, setRoundsDone] = useState<number | null>(null);
   const [buildLog, setBuildLog] = useState<string[]>([]);
   const [report, setReport] = useState<RenderReport | null>(null);
   const [art, setArt] = useState<Artifacts | null>(null);
   const [buildError, setBuildError] = useState<string | null>(null);
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLInputElement>(null);
   const svgWrapRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ id: string; sx: number; sy: number } | null>(null);
+  const dragRef = useRef<{ ids: string[]; sx: number; sy: number } | null>(null);
+  const marqueeRef = useRef<MarqueeState | null>(null);
+  const snapRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
   const rafRef = useRef(0);
 
   // —— 启动：工作台带入 / 草稿检测 ——
@@ -116,15 +142,16 @@ export default function StudioEditor() {
   const svg = useMemo(() => {
     if (!doc) return "";
     try {
-      return renderSpecSvg(doc, { selectedId: selected, hoverId: hover });
+      return renderSpecSvg(doc, { selectedIds: selIds, hoverId: hover });
     } catch {
       return "";
     }
-  }, [doc, selected, hover]);
+  }, [doc, selIds, hover]);
 
   const canvasW = Number(doc?.canvas?.width ?? 1280);
+  const canvasH = Number(doc?.canvas?.height ?? 720);
   const elements = doc?.elements ?? [];
-  const selectedEl = elements.find((e) => e.id === selected) ?? null;
+  const selectedEl = selIds.length === 1 ? (elements.find((e) => e.id === selIds[0]) ?? null) : null;
 
   /** 统一编辑入口：克隆 → 变更 → 重序列化（YAML 始终是唯一事实源） */
   const applyEdit = useCallback(
@@ -151,26 +178,34 @@ export default function StudioEditor() {
     [applyEdit]
   );
 
-  const nudge = useCallback(
-    (id: string, dx: number, dy: number) => {
+  /** 批量平移（拖拽提交 / 方向键微调整组共用，单次 applyEdit 避免闭包陣旧） */
+  const nudgeMany = useCallback(
+    (ids: string[], dx: number, dy: number) => {
+      if (!ids.length || (!dx && !dy)) return;
       applyEdit((d) => {
-        const el = (d.elements ?? []).find((e) => e.id === id);
-        if (el) translateEl(el, dx, dy);
+        for (const id of ids) {
+          const el = (d.elements ?? []).find((e) => e.id === id);
+          if (el) translateEl(el, dx, dy);
+        }
       });
     },
     [applyEdit]
   );
 
-  const removeEl = useCallback(
-    (id: string) => {
+  const removeMany = useCallback(
+    (ids: string[]) => {
+      if (!ids.length) return;
+      const s = new Set(ids);
       applyEdit((d) => {
-        d.elements = (d.elements ?? []).filter((e) => e.id !== id);
+        d.elements = (d.elements ?? []).filter((e) => !s.has(e.id));
         d.texts = regenTexts(d);
       });
-      setSelected(null);
+      setSelIds([]);
     },
     [applyEdit]
   );
+
+  const nudge = useCallback((id: string, dx: number, dy: number) => nudgeMany([id], dx, dy), [nudgeMany]);
 
   const moveEl = useCallback(
     (id: string, dir: -1 | 1) => {
@@ -187,100 +222,173 @@ export default function StudioEditor() {
 
   const addEl = useCallback(
     (type: ElementType) => {
+      if (!doc) return;
+      const nid = nextId(doc);
       applyEdit((d) => {
         const cw = Number(d.canvas?.width ?? 1280);
         const ch = Number(d.canvas?.height ?? 720);
-        const id = nextId(d);
         let el: SpecEl;
         if (type === "text") {
-          el = { id, type, x: Math.round(cw * 0.1), y: Math.round(ch * 0.1), size: 20, text: "新文本" };
+          el = { id: nid, type, x: Math.round(cw * 0.1), y: Math.round(ch * 0.1), size: 20, text: "新文本" };
         } else if ((SEG_TYPES as readonly string[]).includes(type)) {
           el = {
-            id, type,
+            id: nid, type,
             x1: Math.round(cw * 0.2), y1: Math.round(ch * 0.6),
             x2: Math.round(cw * 0.5), y2: Math.round(ch * 0.6),
           };
         } else {
-          el = { id, type, x: Math.round(cw * 0.15), y: Math.round(ch * 0.2), w: 240, h: 120, fill: "#F7F9FC" };
+          el = { id: nid, type, x: Math.round(cw * 0.15), y: Math.round(ch * 0.2), w: 240, h: 120, fill: "#F7F9FC" };
           if (type === "rrect") el.rx = 10;
           if (type === "circle") { el.w = 120; el.h = 120; }
         }
         d.elements = [...(d.elements ?? []), el];
       });
+      setSelIds([nid]);
       setNotice(`已新增 ${type} 元素`);
     },
-    [applyEdit]
+    [applyEdit, doc]
   );
 
-  // —— 画布交互：点选 / 拖拽 ——
-  const onSvgPointerDown = useCallback(
+  // —— 画布交互：点选 / 框选多选 / 拖拽吸附 ——
+  const canvasPoint = useCallback(
+    (clientX: number, clientY: number) => {
+      const r = svgWrapRef.current?.querySelector("svg")?.getBoundingClientRect();
+      const scale = canvasW / (r?.width || 1);
+      return { x: (clientX - (r?.left ?? 0)) * scale, y: (clientY - (r?.top ?? 0)) * scale };
+    },
+    [canvasW]
+  );
+
+  const applyTransform = useCallback((ids: string[], dx: number, dy: number) => {
+    const svgEl = svgWrapRef.current?.querySelector("svg");
+    if (!svgEl) return;
+    for (const id of ids) {
+      svgEl.querySelectorAll(`[id="${id}"],[id="${id}-text"],[id="${id}-head"]`).forEach((node) => {
+        (node as SVGElement).style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : "";
+      });
+    }
+  }, []);
+
+  const onCanvasPointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (!doc) return;
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+      const p = canvasPoint(e.clientX, e.clientY);
       const target = (e.target as SVGElement).closest("[id]");
       const raw = target?.getAttribute("id") ?? "";
-      if (!raw) {
-        setSelected(null);
+      const hitId = raw ? raw.replace(/-(text|head)$/, "") : "";
+      const hitOk = !!hitId && (doc.elements ?? []).some((x) => x.id === hitId);
+      if (hitOk) {
+        const extend = e.shiftKey || e.ctrlKey || e.metaKey;
+        if (extend) {
+          // Shift/Ctrl 加减选：只改选区，不启动拖拽
+          setSelIds((prev) =>
+            prev.includes(hitId) ? prev.filter((s) => s !== hitId) : [...prev, hitId]
+          );
+          return;
+        }
+        const ids = selIds.includes(hitId) ? selIds : [hitId];
+        if (!selIds.includes(hitId)) setSelIds(ids);
+        dragRef.current = { ids, sx: p.x, sy: p.y };
+        snapRef.current = { dx: 0, dy: 0 };
+        setInteracting(true);
+      } else {
+        // 空白处按下 → 框选（Shift 从现有选区累加）
+        const base = e.shiftKey ? selIds : [];
+        const rect = { x: p.x, y: p.y, w: 0, h: 0 };
+        marqueeRef.current = { ax: p.x, ay: p.y, base, rect };
+        if (!e.shiftKey) setSelIds([]);
+        setMarquee(rect);
+        setInteracting(true);
+      }
+    },
+    [doc, selIds, canvasPoint]
+  );
+
+  const onCanvasPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      const dr = dragRef.current;
+      const mr = marqueeRef.current;
+      if ((!dr && !mr) || !doc) return;
+      const p = canvasPoint(e.clientX, e.clientY);
+      if (dr) {
+        const rawDx = Math.round(p.x - dr.sx);
+        const rawDy = Math.round(p.y - dr.sy);
+        let dx = rawDx;
+        let dy = rawDy;
+        let g: SnapGuides = { v: [], h: [] };
+        if ((rawDx || rawDy) && !e.altKey) {
+          const moving = (doc.elements ?? []).filter((x) => dr.ids.includes(x.id));
+          const s = computeSnap(moving, dr.ids, doc.elements ?? [], { w: canvasW, h: canvasH }, rawDx, rawDy);
+          dx = s.dx;
+          dy = s.dy;
+          g = s.guides;
+        }
+        snapRef.current = { dx, dy };
+        setGuides((prev) => (prev.v.join() === g.v.join() && prev.h.join() === g.h.join() ? prev : g));
+        // 拖拽中：DOM transform 实时预览（不重渲 SVG），松手才提交 YAML
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => applyTransform(dr.ids, dx, dy));
+      } else if (mr) {
+        const rect = {
+          x: Math.min(mr.ax, p.x),
+          y: Math.min(mr.ay, p.y),
+          w: Math.abs(p.x - mr.ax),
+          h: Math.abs(p.y - mr.ay),
+        };
+        mr.rect = rect;
+        setMarquee(rect);
+      }
+    },
+    [doc, canvasPoint, canvasW, canvasH, applyTransform]
+  );
+
+  const onCanvasPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      const dr = dragRef.current;
+      const mr = marqueeRef.current;
+      dragRef.current = null;
+      marqueeRef.current = null;
+      setInteracting(false);
+      setGuides({ v: [], h: [] });
+      setMarquee(null);
+      if (dr) {
+        cancelAnimationFrame(rafRef.current);
+        applyTransform(dr.ids, 0, 0);
+        const { dx, dy } = snapRef.current;
+        snapRef.current = { dx: 0, dy: 0 };
+        if (dx || dy) nudgeMany(dr.ids, dx, dy);
         return;
       }
-      const id = raw.replace(/-(text|head)$/, "");
-      setSelected(id);
-      const svgRect = svgWrapRef.current?.querySelector("svg")?.getBoundingClientRect();
-      if (!svgRect || !(doc.elements ?? []).some((x) => x.id === id)) return;
-      const scale = Number(doc.canvas?.width ?? 1280) / svgRect.width;
-      dragRef.current = { id, sx: e.clientX * scale, sy: e.clientY * scale };
-      setDragId(id);
+      if (mr && doc) {
+        // 框选收口：与包围盒相交的元素全部入选；近乎点按（<4px）视为取消
+        const tiny = mr.rect.w < 4 && mr.rect.h < 4;
+        const hits = tiny
+          ? []
+          : (doc.elements ?? [])
+              .filter((el) => {
+                const b = elBBox(el);
+                return (
+                  b.x < mr.rect.x + mr.rect.w &&
+                  b.x + b.w > mr.rect.x &&
+                  b.y < mr.rect.y + mr.rect.h &&
+                  b.y + b.h > mr.rect.y
+                );
+              })
+              .map((el) => el.id);
+        setSelIds([...new Set([...mr.base, ...hits])]);
+        void e;
+      }
     },
-    [doc]
+    [doc, nudgeMany, applyTransform]
   );
 
-  const onSvgPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      const dr = dragRef.current;
-      if (!dr || !doc || !svgWrapRef.current) return;
-      const svgRect = svgWrapRef.current.querySelector("svg")?.getBoundingClientRect();
-      if (!svgRect) return;
-      const scale = Number(doc.canvas?.width ?? 1280) / svgRect.width;
-      const dx = Math.round(e.clientX * scale - dr.sx);
-      const dy = Math.round(e.clientY * scale - dr.sy);
-      // 拖拽中：直接改 DOM transform 做实时预览，松手才提交 YAML（避免高频重解析）
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        const svgEl = svgWrapRef.current?.querySelector("svg");
-        if (!svgEl) return;
-        svgEl.querySelectorAll(`[id="${dr.id}"],[id="${dr.id}-text"],[id="${dr.id}-head"]`).forEach((node) => {
-          (node as SVGElement).style.transform = `translate(${dx}px, ${dy}px)`;
-        });
-      });
-    },
-    [doc]
-  );
-
-  const onSvgPointerUp = useCallback(
-    (e: React.PointerEvent) => {
-      const dr = dragRef.current;
-      dragRef.current = null;
-      setDragId(null);
-      if (!dr || !doc || !svgWrapRef.current) return;
-      const svgRect = svgWrapRef.current.querySelector("svg")?.getBoundingClientRect();
-      cancelAnimationFrame(rafRef.current);
-      svgWrapRef.current
-        .querySelectorAll(`[id="${dr.id}"],[id="${dr.id}-text"],[id="${dr.id}-head"]`)
-        .forEach((node) => ((node as SVGElement).style.transform = ""));
-      if (!svgRect) return;
-      const scale = Number(doc.canvas?.width ?? 1280) / svgRect.width;
-      const dx = Math.round(e.clientX * scale - dr.sx);
-      const dy = Math.round(e.clientY * scale - dr.sy);
-      if (dx || dy) nudge(dr.id, dx, dy);
-    },
-    [doc, nudge]
-  );
-
-  // —— 键盘微调（方向键 1px / Shift 10px；Delete 删除）——
+  // —— 键盘微调（方向键 1px / Shift 10px，整组生效；Delete 删除所选）——
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (!selected) return;
+      if (!selIds.length) return;
       const step = e.shiftKey ? 10 : 1;
       const moves: Record<string, [number, number]> = {
         ArrowLeft: [-step, 0],
@@ -290,20 +398,73 @@ export default function StudioEditor() {
       };
       if (moves[e.key]) {
         e.preventDefault();
-        nudge(selected, moves[e.key][0], moves[e.key][1]);
-      } else if ((e.key === "Delete" || e.key === "Backspace") && !dragId) {
+        nudgeMany(selIds, moves[e.key][0], moves[e.key][1]);
+      } else if ((e.key === "Delete" || e.key === "Backspace") && !interacting) {
         e.preventDefault();
-        removeEl(selected);
+        removeMany(selIds);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selected, dragId, nudge, removeEl]);
+  }, [selIds, interacting, nudgeMany, removeMany]);
+
+  /** 多选对齐：按选区包围盒对齐（left/hcenter/right/top/vcenter/bottom） */
+  const alignSel = useCallback(
+    (mode: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") => {
+      if (selIds.length < 2) return;
+      applyEdit((d) => {
+        const items = (d.elements ?? [])
+          .filter((e) => selIds.includes(e.id))
+          .map((el) => ({ el, bb: elBBox(el) }));
+        if (items.length < 2) return;
+        const minX = Math.min(...items.map((i) => i.bb.x));
+        const maxX = Math.max(...items.map((i) => i.bb.x + i.bb.w));
+        const minY = Math.min(...items.map((i) => i.bb.y));
+        const maxY = Math.max(...items.map((i) => i.bb.y + i.bb.h));
+        for (const { el, bb } of items) {
+          let dx = 0;
+          let dy = 0;
+          if (mode === "left") dx = minX - bb.x;
+          else if (mode === "right") dx = maxX - (bb.x + bb.w);
+          else if (mode === "hcenter") dx = (minX + maxX) / 2 - (bb.x + bb.w / 2);
+          else if (mode === "top") dy = minY - bb.y;
+          else if (mode === "bottom") dy = maxY - (bb.y + bb.h);
+          else if (mode === "vcenter") dy = (minY + maxY) / 2 - (bb.y + bb.h / 2);
+          if (dx || dy) translateEl(el, Math.round(dx), Math.round(dy));
+        }
+      });
+    },
+    [applyEdit, selIds]
+  );
+
+  /** 多选等距分布（≥3 个生效）：首尾固定，中间按序均匀展开 */
+  const distributeSel = useCallback(
+    (axis: "h" | "v") => {
+      if (selIds.length < 3) return;
+      applyEdit((d) => {
+        const items = (d.elements ?? [])
+          .filter((e) => selIds.includes(e.id))
+          .map((el) => ({ el, bb: elBBox(el) }));
+        if (items.length < 3) return;
+        const key = axis === "h" ? (i: (typeof items)[number]) => i.bb.x : (i: (typeof items)[number]) => i.bb.y;
+        items.sort((a, b) => key(a) - key(b));
+        const first = key(items[0]);
+        const last = key(items[items.length - 1]);
+        const n = items.length;
+        for (let i = 1; i < n - 1; i++) {
+          const target = first + ((last - first) * i) / (n - 1);
+          const delta = Math.round(target - key(items[i]));
+          if (delta) translateEl(items[i].el, axis === "h" ? delta : 0, axis === "v" ? delta : 0);
+        }
+      });
+    },
+    [applyEdit, selIds]
+  );
 
   // —— 工具动作 ——
   const doNew = useCallback(() => {
     setYaml(dumpSpecYaml(blankSpec()));
-    setSelected(null);
+    setSelIds([]);
     setNotice("已新建空白模板");
   }, []);
 
@@ -312,7 +473,7 @@ export default function StudioEditor() {
     const fr = new FileReader();
     fr.onload = () => {
       setYaml(String(fr.result));
-      setSelected(null);
+      setSelIds([]);
       setNotice(`已导入 ${f.name}`);
     };
     fr.readAsText(f);
@@ -343,24 +504,25 @@ export default function StudioEditor() {
     const d = localStorage.getItem(DRAFT_KEY);
     if (d) {
       setYaml(d);
-      setSelected(null);
+      setSelIds([]);
       setNotice("已恢复浏览器草稿");
     }
   }, []);
 
-  // —— 构建（复用 /api/build NDJSON）——
+  // —— 构建出口①：/api/build 单次四门校验 ——
   const buildNow = useCallback(() => {
-    if (!yaml.trim() || buildBusy) return;
+    if (!yaml.trim() || busy) return;
     setBuildBusy(true);
     setBuildLog([]);
     setReport(null);
     setArt(null);
     setBuildError(null);
+    setRoundsDone(null);
     streamApi(
       "/api/build",
       { spec: yaml },
       (ev: BuildEvent) => {
-        if (ev.type === "log") setBuildLog((p) => [...p.slice(-5), ev.msg]);
+        if (ev.type === "log") setBuildLog((p) => [...p.slice(-6), ev.msg]);
         else if (ev.type === "report") setReport(ev.report);
         else if (ev.type === "done") setArt({ jobId: ev.jobId, ok: ev.ok, hasPdf: ev.hasPdf });
       },
@@ -368,7 +530,67 @@ export default function StudioEditor() {
     )
       .catch((e) => setBuildError(e instanceof Error ? e.message : String(e)))
       .finally(() => setBuildBusy(false));
-  }, [yaml, buildBusy]);
+  }, [yaml, busy]);
+
+  // —— 构建出口②：/api/refine 自动回询迭代（失败项回询 VLM 修正，最终 spec 写回编辑器）——
+  const onImgPick = useCallback((f: File | undefined | null) => {
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      const dataUrl = String(fr.result);
+      const im = new Image();
+      im.onload = () => {
+        setRefImg({ dataUrl, meta: { width: im.naturalWidth, height: im.naturalHeight, filename: f.name } });
+        setNotice(`已附加参考原图：${f.name}（${im.naturalWidth}×${im.naturalHeight}），迭代时将做视觉比对`);
+      };
+      im.onerror = () => setNotice("图片读取失败，请换一张");
+      im.src = dataUrl;
+    };
+    fr.readAsDataURL(f);
+  }, []);
+
+  const refineNow = useCallback(() => {
+    if (!yaml.trim() || busy) return;
+    setRefineBusy(true);
+    setBuildLog([]);
+    setReport(null);
+    setArt(null);
+    setBuildError(null);
+    setRoundsDone(null);
+    const payload: Record<string, unknown> = { spec: yaml, maxRounds };
+    if (refImg) {
+      payload.image = refImg.dataUrl;
+      payload.meta = refImg.meta;
+    }
+    streamApi(
+      "/api/refine",
+      payload,
+      (ev: BuildEvent) => {
+        if (ev.type === "log") setBuildLog((p) => [...p.slice(-8), ev.msg]);
+        else if (ev.type === "round")
+          setBuildLog((p) => [
+            ...p,
+            `▸ 第 ${ev.n} 轮 · ${ev.phase === "build" ? "构建校验" : ev.phase === "vlm" ? "AI 修正" : "复检"}${ev.note ? `：${ev.note}` : ""}`,
+          ]);
+        else if (ev.type === "report") setReport(ev.report);
+        else if (ev.type === "spec") setBuildLog((p) => [...p, `▸ 第 ${ev.n} 轮修正 spec 已产出`]);
+        else if (ev.type === "done") {
+          setArt({ jobId: ev.jobId, ok: ev.ok, hasPdf: ev.hasPdf });
+          setRoundsDone(ev.rounds ?? 0);
+          if (ev.spec) {
+            setYaml(ev.spec);
+            setSelIds([]);
+          }
+          setNotice(
+            `自动迭代完成：修正 ${ev.rounds ?? 0} 轮 · ${ev.ok ? "四道门全部通过 ✓" : "仍有未通过项 ✗"}，最终 spec 已写回编辑器`
+          );
+        }
+      },
+      "自动迭代失败"
+    )
+      .catch((e) => setBuildError(e instanceof Error ? e.message : String(e)))
+      .finally(() => setRefineBusy(false));
+  }, [yaml, busy, maxRounds, refImg]);
 
   const listText = (el: SpecEl) => {
     const t = elText(el);
@@ -381,7 +603,7 @@ export default function StudioEditor() {
     <section className="studio" aria-label="spec 可视化编辑器">
       <div className="wb-head">
         <span className="badge">Studio · spec 可视化编辑器（PRD F9 延伸）</span>
-        <h2>可视化编辑器：点选 · 拖拽 · 改属性，YAML 实时同步</h2>
+        <h2>可视化编辑器：点选 · 框选多选 · 吸附对齐 · AI 自动迭代</h2>
         <p>
           画布渲染与引擎产线①同语义（<code>web/lib/canvas.ts</code> 镜像 <code>svgout.py</code>），
           YAML 源码是唯一事实源；编辑结果交由 Python 引擎构建校验，
@@ -426,18 +648,31 @@ export default function StudioEditor() {
             {elements.map((el, i) => (
               <li
                 key={el.id}
-                className={el.id === selected ? "on" : ""}
+                className={selIds.includes(el.id) ? "on" : ""}
                 onMouseEnter={() => setHover(el.id)}
                 onMouseLeave={() => setHover(null)}
               >
-                <button className="li-main" onClick={() => setSelected(el.id)}>
+                <button
+                  className="li-main"
+                  onClick={(ev) => {
+                    const ext = ev.shiftKey || ev.ctrlKey || ev.metaKey;
+                    setSelIds((prev) =>
+                      ext
+                        ? prev.includes(el.id)
+                          ? prev.filter((s) => s !== el.id)
+                          : [...prev, el.id]
+                        : [el.id]
+                    );
+                  }}
+                  title="点击选中；Shift/Ctrl 加减选"
+                >
                   <span className="li-type">{el.type}</span>
                   <span className="li-txt">{listText(el) || "—"}</span>
                 </button>
                 <span className="li-ops">
                   <button title="上移一层" onClick={() => moveEl(el.id, -1)} disabled={i === 0}>↑</button>
                   <button title="下移一层" onClick={() => moveEl(el.id, 1)} disabled={i === elements.length - 1}>↓</button>
-                  <button title="删除" className="danger" onClick={() => removeEl(el.id)}>×</button>
+                  <button title="删除" className="danger" onClick={() => removeMany([el.id])}>×</button>
                 </span>
               </li>
             ))}
@@ -446,23 +681,44 @@ export default function StudioEditor() {
 
         {/* 中：画布 */}
         <div className="card studio-canvas-card">
-          <h3>画布（点选 · 拖拽 · 方向键微调 · Delete 删除）</h3>
+          <h3>画布（点选 · 拖拽移动 · 框选多选 · Shift 加选 · 方向键微调 · Delete 删除）</h3>
           {parseError ? (
             <p className="alert err" role="alert">YAML 解析失败：{parseError}（修正源码后画布恢复）</p>
           ) : (
-            <div
-              className="studio-canvas"
-              ref={svgWrapRef}
-              style={{
-                fontFamily: doc
-                  ? `'${doc.font?.name ?? "Noto Sans SC"}', '${doc.font?.fallback ?? "Microsoft YaHei"}', sans-serif`
-                  : undefined,
-              }}
-              onPointerDown={onSvgPointerDown}
-              onPointerMove={onSvgPointerMove}
-              onPointerUp={onSvgPointerUp}
-              dangerouslySetInnerHTML={{ __html: svg }}
-            />
+            <div className="studio-canvas-wrap">
+              <div
+                className="studio-canvas"
+                ref={svgWrapRef}
+                style={{
+                  fontFamily: doc
+                    ? `'${doc.font?.name ?? "Noto Sans SC"}', '${doc.font?.fallback ?? "Microsoft YaHei"}', sans-serif`
+                    : undefined,
+                }}
+                onPointerDown={onCanvasPointerDown}
+                onPointerMove={onCanvasPointerMove}
+                onPointerUp={onCanvasPointerUp}
+                dangerouslySetInnerHTML={{ __html: svg }}
+              />
+              {/* 吸附参考线（画布坐标 → 百分比定位，拖拽中实时出现） */}
+              {guides.v.map((x, i) => (
+                <span key={`v${i}`} className="snap-guide v" style={{ left: `${(x / canvasW) * 100}%` }} />
+              ))}
+              {guides.h.map((y, i) => (
+                <span key={`h${i}`} className="snap-guide h" style={{ top: `${(y / canvasH) * 100}%` }} />
+              ))}
+              {/* 框选矩形 */}
+              {marquee && (
+                <span
+                  className="marquee-rect"
+                  style={{
+                    left: `${(marquee.x / canvasW) * 100}%`,
+                    top: `${(marquee.y / canvasH) * 100}%`,
+                    width: `${(marquee.w / canvasW) * 100}%`,
+                    height: `${(marquee.h / canvasH) * 100}%`,
+                  }}
+                />
+              )}
+            </div>
           )}
           {validation && (validation.errors.length > 0 || validation.warnings.length > 0) ? (
             <div className="studio-validate">
@@ -480,11 +736,34 @@ export default function StudioEditor() {
 
         {/* 右：属性面板 */}
         <div className="card studio-props">
-          <h3>属性{selectedEl ? ` · ${selectedEl.id}` : ""}</h3>
-          {!selectedEl ? (
+          <h3>属性{selectedEl ? ` · ${selectedEl.id}` : selIds.length > 1 ? ` · 已选 ${selIds.length} 个` : ""}</h3>
+          {selIds.length > 1 ? (
+            <div className="prop-form multi-bar">
+              <p className="multi-hint">对齐（按选区包围盒）</p>
+              <div className="multi-btns">
+                <button onClick={() => alignSel("left")}>⇤ 左对齐</button>
+                <button onClick={() => alignSel("hcenter")}>⇔ 水平居中</button>
+                <button onClick={() => alignSel("right")}>右对齐 ⇥</button>
+                <button onClick={() => alignSel("top")}>⇡ 顶对齐</button>
+                <button onClick={() => alignSel("vcenter")}>⇕ 垂直居中</button>
+                <button onClick={() => alignSel("bottom")}>底对齐 ⇣</button>
+              </div>
+              <p className="multi-hint">等距分布（≥3 个生效）</p>
+              <div className="multi-btns">
+                <button onClick={() => distributeSel("h")}>↔ 水平等距</button>
+                <button onClick={() => distributeSel("v")}>↕ 垂直等距</button>
+              </div>
+              <p className="multi-hint">批量操作</p>
+              <div className="multi-btns">
+                <button className="danger" onClick={() => removeMany(selIds)}>删除所选（{selIds.length}）</button>
+                <button onClick={() => setSelIds([])}>取消选择</button>
+              </div>
+              <small>拖动任一选中元素可整组移动（带对齐吸附，Alt 拖拽禁用吸附）；方向键微调整组。</small>
+            </div>
+          ) : !selectedEl ? (
             <div className="placeholder slim">
-              <p>在画布或左侧列表点选一个元素。</p>
-              <small>拖拽移动位置；方向键微调（Shift ×10）；Delete 删除。</small>
+              <p>在画布或左侧列表点选一个元素；空白处拖动可框选多选。</p>
+              <small>拖拽移动（带对齐吸附，Alt 暂时禁用）；Shift/Ctrl 加选；方向键微调（Shift ×10）；Delete 删除。</small>
             </div>
           ) : (
             <div className="prop-form">
@@ -664,7 +943,7 @@ export default function StudioEditor() {
               <div className="prop-actions">
                 <button className="btn ghost mini" onClick={() => moveEl(selectedEl.id, -1)}>上移一层</button>
                 <button className="btn ghost mini" onClick={() => moveEl(selectedEl.id, 1)}>下移一层</button>
-                <button className="btn ghost mini danger" onClick={() => removeEl(selectedEl.id)}>删除元素</button>
+                <button className="btn ghost mini danger" onClick={() => removeMany([selectedEl.id])}>删除元素</button>
               </div>
             </div>
           )}
@@ -708,13 +987,50 @@ export default function StudioEditor() {
 
       {/* 构建与预览 */}
       <div className="card wb-build" id="studio-build">
-        <h3>构建并预览（Python 引擎实测）</h3>
-        <p className="build-desc">把当前 spec 交给引擎双渲染与四道校验门；产物在线预览，可下载沉淀。</p>
+        <h3>构建与预览（Python 引擎实测）</h3>
+        <p className="build-desc">
+          「构建并校验」= 单次双渲染 + 四道校验门；「构建并自动迭代」= 未通过时把失败项回询视觉模型修正 spec
+          并重建复检（可附加参考原图做视觉比对），<b>最终 spec 自动写回编辑器</b>。
+        </p>
         <div className="wb-actions">
-          <button className="btn primary" onClick={buildNow} disabled={!yaml.trim() || buildBusy} aria-busy={buildBusy}>
+          <button className="btn primary" onClick={buildNow} disabled={!yaml.trim() || busy} aria-busy={buildBusy}>
             {buildBusy ? (<><span className="spinner" aria-hidden /> 构建中…</>) : "构建并校验"}
           </button>
-          <Link className="btn ghost" href="/#workbench">回工作台（图片抽取 / 自动回询迭代）</Link>
+        </div>
+        <div className="wb-actions refine-row">
+          <label className="refine-rounds">
+            迭代轮次
+            <select value={maxRounds} onChange={(e) => setMaxRounds(Number(e.target.value))} disabled={busy}>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+            </select>
+          </label>
+          <button className="btn primary" onClick={refineNow} disabled={!yaml.trim() || busy} aria-busy={refineBusy}>
+            {refineBusy ? (<><span className="spinner" aria-hidden /> 迭代中…</>) : "构建并自动迭代（refine）"}
+          </button>
+          <button className="btn ghost" onClick={() => imgRef.current?.click()} disabled={busy}>
+            {refImg ? "换一张参考原图" : "附加参考原图（可选）"}
+          </button>
+          {refImg && (
+            <span className="chip-lite">
+              🖼 {refImg.meta.filename} · {refImg.meta.width}×{refImg.meta.height}
+              <button className="mini-x" title="移除原图" onClick={() => setRefImg(null)}>×</button>
+            </span>
+          )}
+          {roundsDone != null && art && (
+            <span className={`badge-mode ${art.ok ? "vlm" : "skeleton"}`}>AI 修正 {roundsDone} 轮</span>
+          )}
+          <input
+            ref={imgRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => onImgPick(e.target.files?.[0])}
+          />
+        </div>
+        <div className="wb-actions">
+          <Link className="btn ghost" href="/#workbench">回工作台（图片抽取 → 自动回询迭代）</Link>
         </div>
         {buildLog.length > 0 && (
           <div className="logs" aria-hidden>

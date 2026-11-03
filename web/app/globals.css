@@ -982,3 +982,107 @@ body {
   margin-top: 10px;
   height: 260px;
 }
+
+/* —— studio v0.4：框选多选 / 吸附参考线 / 批量对齐 / refine 迭代行 —— */
+.studio-canvas-wrap {
+  position: relative;
+}
+
+/* 吸附参考线：拖拽对齐时出现（琥珀色，1px，画布坐标按百分比映射） */
+.snap-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 6;
+  background: #f59e0b;
+  box-shadow: 0 0 0 0.5px rgba(245, 158, 11, 0.4);
+}
+
+.snap-guide.v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+}
+
+.snap-guide.h {
+  left: 0;
+  right: 0;
+  height: 1px;
+  margin-top: -0.5px;
+}
+
+/* 框选矩形 */
+.marquee-rect {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid var(--accent);
+  background: rgba(43, 108, 176, 0.08);
+  border-radius: 2px;
+}
+
+/* 多选批量操作条 */
+.multi-bar .multi-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 10px 0 4px;
+}
+
+.multi-bar .multi-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.multi-bar .multi-btns button {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.multi-bar .multi-btns button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.multi-bar .multi-btns button.danger {
+  color: #c0392b;
+}
+
+.multi-bar .multi-btns button.danger:hover {
+  border-color: #c0392b;
+}
+
+/* refine 迭代行 */
+.refine-row {
+  margin-top: 8px;
+}
+
+.refine-rounds {
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.refine-rounds select {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chip-lite .mini-x {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #c0392b;
+  font-weight: 700;
+  margin-left: 4px;
+  padding: 0 2px;
+}

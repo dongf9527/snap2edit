@@ -2,7 +2,9 @@
 // 渲染报告自动回询迭代（PRD 四道校验门的闭环化）：
 //   build → check --json → 未通过？→ 把报告 failures 回询 VLM 修正 spec → 重建重检
 //   循环 maxRounds 轮（默认 2），全程 NDJSON 流式推送 round/report/spec/tick 事件。
-// 输入 { image(dataURL), meta, spec(YAML), maxRounds? }。
+// 输入 { image?(dataURL), meta?, spec(YAML), maxRounds? }：
+//   - 附原图（工作台/studio 均可）：失败项 + 原图视觉比对修正；
+//   - 无原图（studio 可视化编辑入口）：仅按报告失败项纯文本修正。
 
 import { NextRequest, NextResponse } from "next/server";
 import { parse as yamlParse } from "yaml";
@@ -40,9 +42,9 @@ export async function POST(req: NextRequest) {
   }
 
   const image = typeof body.image === "string" ? body.image : "";
-  if (!image.startsWith("data:image/")) {
+  if (image && !image.startsWith("data:image/")) {
     return NextResponse.json(
-      { ok: false, error: "自动回询迭代需要原图（image dataURL），用于视觉模型比对修正" },
+      { ok: false, error: "image 必须是 data:image/ 开头的 dataURL；无原图时可省略该字段（按报告纯文本修正）" },
       { status: 400 }
     );
   }
@@ -50,8 +52,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "图片过大（原始字节 > 8MB）" }, { status: 413 });
   }
   const meta = normalizeImageMeta(body.meta);
-  if (!meta.width || !meta.height) {
-    return NextResponse.json({ ok: false, error: "meta.width / meta.height 缺失" }, { status: 400 });
+  if (image && (!meta.width || !meta.height)) {
+    return NextResponse.json({ ok: false, error: "附原图时 meta.width / meta.height 缺失" }, { status: 400 });
   }
   const spec0 = typeof body.spec === "string" ? body.spec : "";
   if (!spec0.trim()) {
@@ -121,18 +123,30 @@ export async function POST(req: NextRequest) {
       try {
         // 当前 spec 转 JSON 作为模型上下文
         const curJson = yamlToJson(curYaml);
-        const resp = await vlm.callVision([
-          { role: "system", content: buildSystemPrompt() },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: buildUserPrompt(meta) },
-              { type: "image_url", image_url: { url: image } },
-            ],
-          },
-          { role: "assistant", content: JSON.stringify(curJson) },
-          { role: "user", content: buildFixPrompt(failures, curYaml) },
-        ]);
+        // 附原图：四段式（系统 + 原图抽取 + 已产 spec + 失败项修正）；
+        // 无原图（studio 可视化编辑入口）：三段式纯文本修正
+        const messages = image
+          ? [
+              { role: "system", content: buildSystemPrompt() },
+              {
+                role: "user",
+                content: [
+                  { type: "text", text: buildUserPrompt(meta) },
+                  { type: "image_url", image_url: { url: image } },
+                ],
+              },
+              { role: "assistant", content: JSON.stringify(curJson) },
+              { role: "user", content: buildFixPrompt(failures, curYaml) },
+            ]
+          : [
+              { role: "system", content: buildSystemPrompt() },
+              {
+                role: "user",
+                content: `我在可视化编辑器中维护以下 spec JSON（未经图片抽取）：\n${JSON.stringify(curJson)}`,
+              },
+              { role: "user", content: buildFixPrompt(failures, curYaml) },
+            ];
+        const resp = await vlm.callVision(messages);
         const content = vlm.contentOf(resp);
         if (!content.trim()) throw new Error("VLM 返回为空");
         if (vlm.finishOf(resp) === "length") {

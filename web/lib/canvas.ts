@@ -169,8 +169,8 @@ export function renderElementSvg(spec: SpecDoc, el: SpecEl): string {
 }
 
 export interface CanvasOpts {
-  /** 选中高亮的元素 id（编辑器内部态，不影响导出） */
-  selectedId?: string | null;
+  /** 选中高亮的元素 id 列表（编辑器内部态，不影响导出；支持多选） */
+  selectedIds?: string[] | null;
   /** 鼠标悬停 id */
   hoverId?: string | null;
 }
@@ -184,29 +184,25 @@ export function renderSpecSvg(spec: SpecDoc, opts: CanvasOpts = {}): string {
   const ch = Number(spec.canvas?.height ?? 720);
   const bg = spec.palette?.bg;
   const body = (spec.elements ?? []).map((el) => renderElementSvg(spec, el)).join("\n");
-  // 覆盖层：选中/悬停描边框（不参与导出语义）
+  // 覆盖层：多选/悬停描边框（不参与导出语义；用 elBBox 统一处理线段/文本）
   const overlay: string[] = [];
-  const sel = (spec.elements ?? []).find((e) => e.id === opts.selectedId);
-  if (sel && sel.x != null) {
+  const els = spec.elements ?? [];
+  const selSet = new Set(opts.selectedIds ?? []);
+  for (const el of els) {
+    if (!selSet.has(el.id)) continue;
+    const b = elBBox(el);
     const pad = 3;
-    const x = Number(sel.x) - pad;
-    const y = Number(sel.y) - pad;
-    const w = Number(sel.w ?? 0) + pad * 2;
-    const h = Number(sel.h ?? (Number(sel.size ?? 16) * 1.4)) + pad * 2;
     overlay.push(
-      `<rect class="ov-sel" x="${n(x)}" y="${n(y)}" width="${n(Math.max(w, 8))}" ` +
-        `height="${n(Math.max(h, 8))}" fill="none"/>`
+      `<rect class="ov-sel" x="${n(b.x - pad)}" y="${n(b.y - pad)}" width="${n(Math.max(b.w + pad * 2, 8))}" ` +
+        `height="${n(Math.max(b.h + pad * 2, 8))}" fill="none"/>`
     );
   }
-  const hov = (spec.elements ?? []).find((e) => e.id === opts.hoverId);
-  if (hov && hov.x != null && hov.id !== opts.selectedId) {
-    const x = Number(hov.x) - 2;
-    const y = Number(hov.y) - 2;
-    const w = Number(hov.w ?? 0) + 4;
-    const h = Number(hov.h ?? Number(hov.size ?? 16) * 1.4) + 4;
+  const hov = els.find((e) => e.id === opts.hoverId);
+  if (hov && !selSet.has(hov.id)) {
+    const b = elBBox(hov);
     overlay.push(
-      `<rect class="ov-hov" x="${n(x)}" y="${n(y)}" width="${n(Math.max(w, 8))}" ` +
-        `height="${n(Math.max(h, 8))}" fill="none"/>`
+      `<rect class="ov-hov" x="${n(b.x - 2)}" y="${n(b.y - 2)}" width="${n(Math.max(b.w + 4, 8))}" ` +
+        `height="${n(Math.max(b.h + 4, 8))}" fill="none"/>`
     );
   }
   return (
@@ -264,13 +260,19 @@ export function blankSpec(w = 1280, h = 720): SpecDoc {
   };
 }
 
-/** 元素几何边界（拖拽用） */
+/** 元素几何边界（拖拽/框选命中/吸附/对齐共用；文本宽度按字号估算） */
 export function elBBox(el: SpecEl): { x: number; y: number; w: number; h: number } {
   if (el.type === "text") {
     const size = Number(el.size ?? 16);
     const lines = el.lines ?? [elText(el) || " "];
     const lh = Number(el.line_height ?? 1.45) * size;
-    return { x: Number(el.x ?? 0), y: Number(el.y ?? 0), w: 0, h: lines.length * lh };
+    const maxLen = Math.max(1, ...lines.map((l) => String(l).length));
+    return {
+      x: Number(el.x ?? 0),
+      y: Number(el.y ?? 0),
+      w: Math.round(maxLen * size * 0.62),
+      h: lines.length * lh,
+    };
   }
   if (el.type === "line" || el.type === "arrow") {
     const x = Math.min(Number(el.x1 ?? 0), Number(el.x2 ?? 0));
@@ -278,6 +280,89 @@ export function elBBox(el: SpecEl): { x: number; y: number; w: number; h: number
     return { x, y, w: Math.abs(Number(el.x2 ?? 0) - Number(el.x1 ?? 0)), h: Math.abs(Number(el.y2 ?? 0) - Number(el.y1 ?? 0)) };
   }
   return { x: Number(el.x ?? 0), y: Number(el.y ?? 0), w: Number(el.w ?? 0), h: Number(el.h ?? 0) };
+}
+
+export interface SnapGuides {
+  v: number[];
+  h: number[];
+}
+
+/** 吸附触发距离（画布 px） */
+export const SNAP_THRESHOLD = 8;
+
+/**
+ * 拖拽吸附：移动元素的左/中/右（上/中/下）边缘，对齐静态元素边缘/中线与画布边缘/中线。
+ * 返回修正后的位移与需要渲染的吸附线位置（画布坐标）。
+ */
+export function computeSnap(
+  moving: SpecEl[],
+  movingIds: string[],
+  all: SpecEl[],
+  canvas: { w: number; h: number },
+  dx: number,
+  dy: number,
+  threshold = SNAP_THRESHOLD
+): { dx: number; dy: number; guides: SnapGuides } {
+  const ids = new Set(movingIds);
+  const mv = moving.map((el) => {
+    const b = elBBox(el);
+    return { x: b.x + dx, y: b.y + dy, w: b.w, h: b.h };
+  });
+  const st = all.filter((e) => !ids.has(e.id)).map(elBBox);
+
+  const vx = new Set<number>([0, Math.round(canvas.w / 2), canvas.w]);
+  const hy = new Set<number>([0, Math.round(canvas.h / 2), canvas.h]);
+  for (const b of st) {
+    vx.add(b.x);
+    vx.add(Math.round(b.x + b.w / 2));
+    vx.add(b.x + b.w);
+    hy.add(b.y);
+    hy.add(Math.round(b.y + b.h / 2));
+    hy.add(b.y + b.h);
+  }
+  const edgesOf = (boxes: { x: number; y: number; w: number; h: number }[], axis: "x" | "y") => {
+    const s = new Set<number>();
+    for (const b of boxes) {
+      if (axis === "x") {
+        s.add(b.x);
+        s.add(b.x + b.w / 2);
+        s.add(b.x + b.w);
+      } else {
+        s.add(b.y);
+        s.add(b.y + b.h / 2);
+        s.add(b.y + b.h);
+      }
+    }
+    return s;
+  };
+
+  const best = (edges: Set<number>, targets: Set<number>) => {
+    let adj = 0;
+    let guides: number[] = [];
+    let found = false;
+    for (const m of edges) {
+      for (const t of targets) {
+        const a = t - m;
+        if (Math.abs(a) > threshold) continue;
+        if (!found || Math.abs(a) < Math.abs(adj)) {
+          found = true;
+          adj = a;
+          guides = [t];
+        } else if (found && Math.abs(a) === Math.abs(adj) && !guides.includes(t)) {
+          guides.push(t);
+        }
+      }
+    }
+    return { adj: found ? adj : 0, guides };
+  };
+
+  const bx = best(edgesOf(mv, "x"), vx);
+  const by = best(edgesOf(mv, "y"), hy);
+  return {
+    dx: dx + bx.adj,
+    dy: dy + by.adj,
+    guides: { v: bx.guides, h: by.guides },
+  };
 }
 
 /** 平移元素（拖拽/方向键微调共用） */
