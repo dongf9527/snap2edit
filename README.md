@@ -96,6 +96,18 @@ python -m snap2edit check examples/demo
               build/report.md（全 ✓ 才算交付）
 ```
 
+**Mermaid 版**（GitHub 原生渲染；与上图同构，供交互式查看与复制改画）：
+
+```mermaid
+flowchart TB
+    SPEC["spec.yaml"] --> VAL["spec 校验<br/>字段 / 几何 / id / 占位符"]
+    VAL --> L1["产线① svgout<br/>HTML + SVG<br/>全真实 &lt;text&gt;"]
+    VAL --> L2["产线② pptxout<br/>原生文本框 + 形状<br/>Picture = 0"]
+    L1 --> VFY["verify 四道校验门<br/>门1 文案覆盖 / 无位图 · 门2 尺寸 / Picture=0 / 文案<br/>门3 字宽实测防溢出 · 门4 Playwright 截图（+原图 diff）"]
+    L2 --> VFY
+    VFY --> RPT["build/report.md（全 ✓ 才算交付）"]
+```
+
 ## 与六步标准流程的映射
 
 | 流程结点 | Snap2Edit 承接方式 |
