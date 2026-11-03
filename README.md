@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| 版本 | v0.1.0（引擎骨架 + demo） |
+| 版本 | v0.2.0（引擎 + 案例库 + Web 框架骨架） |
 | 语言 | Python ≥ 3.9 |
 | 协议 | MIT |
 | 状态 | 活跃开发（PRD 见 `docs/PRD.md`） |
@@ -112,26 +112,28 @@ python -m snap2edit check examples/demo
 
 ```
 snap2edit/
-├── docs/
-│   ├── PRD.md            # 产品需求文档
-│   └── WORKFLOW.md       # 六步标准流程（方法论来源）
-├── examples/demo/        # 规格书示例 + 构建产物
-├── src/snap2edit/
-│   ├── spec.py           # 规格书加载与校验（唯一事实源）
-│   ├── geometry.py       # px→EMU / px→pt 换算
-│   ├── svgout.py         # 产线①：HTML+SVG
-│   ├── pptxout.py        # 产线②：原生 PPTX
-│   ├── verify.py         # 四道校验门
-│   └── cli.py            # new / build / check
+├── docs/                     # 文档与案例库（索引见 docs/README.md）
+│   ├── PRD.md                # 产品需求文档 v0.2
+│   ├── WORKFLOW.md           # 六步标准流程（方法论来源）
+│   ├── 德勤AI落地方法论拆解/   # 案例：源图片 + HTML + PPTX + 预览
+│   ├── 框架与实施工具/         # 案例：同上（含 PPT 预览 PDF）
+│   ├── 企业AI落地_复刻/       # 案例：同上
+│   ├── AI技术体系对比图/      # 案例：同上
+│   ├── LLM推理全流程_图解/    # 案例：同上
+│   └── workbench/            # 引擎化之前的过程脚本存档（37 个）+ 校验证据图
+├── examples/demo/            # 引擎规格书示例 + 构建产物
+├── src/snap2edit/            # Python 引擎（spec/geometry/svgout/pptxout/verify/cli）
+├── web/                      # Next.js 16 基础框架（App Router，PRD F9 预备）
 └── tests/test_smoke.py
 ```
 
 ## 路线图
 
-- **v0.1**（当前）：引擎骨架 + 双产线 + 四道校验门 + demo
+- **v0.1**：引擎骨架 + 双产线 + 四道校验门 + demo
+- **v0.2**（当前）：docs 案例库（5 案例：源图片 + 双产物 + 预览）+ workbench 过程存档 + `web/` Next.js 基础框架
 - **v0.5**：组件库扩充（立方体/矩阵格子/流程框/图标库）、`loop` 自动迭代、HTML 可视化报告
 - **v1.0**：完整测试覆盖、文档站、PyPI 发布
-- **v2.0**：AI 规格书生成（看图写 spec）、Web UI、批量模式
+- **v2.0**：AI 规格书生成（看图写 spec）、Web UI 完整版（`web/` 基础框架已就绪）、批量模式
 
 ## 命名
 

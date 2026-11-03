@@ -1,0 +1,148 @@
+:root {
+  --bg: #f7f9fc;
+  --card: #ffffff;
+  --ink: #16233b;
+  --muted: #6b7a90;
+  --line: #d8e0ea;
+  --accent: #2b6cb0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 64px 24px 48px;
+}
+
+.hero .badge {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 2px 14px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: 44px;
+  line-height: 1.25;
+  letter-spacing: 0.5px;
+}
+
+.hero .accent {
+  color: var(--accent);
+}
+
+.hero .sub {
+  margin-top: 16px;
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.hero code {
+  background: #eef2f7;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 14px;
+}
+
+.cta {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+.grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.card .step {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.card h2 {
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+.card p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.cases {
+  margin-top: 40px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 24px;
+}
+
+.cases h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.cases ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cases li {
+  font-size: 13px;
+  background: #eef2f7;
+  border-radius: 999px;
+  padding: 4px 14px;
+  color: var(--ink);
+}
+
+.footer {
+  margin-top: 48px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}

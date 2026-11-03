@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>德勤AI落地方法论拆解：评估、路线图、治理</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#D8DDE4;display:flex;justify-content:center;padding:24px;
+       font-family:'PingFang SC','Microsoft YaHei','Noto Sans SC','Source Han Sans SC',sans-serif;
+       -webkit-font-smoothing:antialiased}
+  #canvas{position:relative;flex:none;width:1728px;height:972px;overflow:hidden;
+          background:linear-gradient(155deg,#FDFDFE 0%,#FBFCFE 52%,#F1F4F9 100%)}
+  .abs{position:absolute}
+
+  /* ===== 标题 ===== */
+  .title{left:34px;top:30px;font-size:66px;font-weight:900;color:#0D2139;line-height:1.3;letter-spacing:1px}
+
+  /* ===== 三列容器 ===== */
+  .col{position:absolute;top:256px;width:333px;height:608px;background:#FDFDFE;
+       border:1px solid #E7EBF1;border-radius:10px;box-shadow:0 3px 10px rgba(25,45,75,.05)}
+  #col1{left:34px}#col2{left:384px}#col3{left:734px}
+  .head{position:relative;height:77px;border-radius:9px 9px 0 0;color:#fff}
+  .c1 .head{background:#3E586C}.c2 .head{background:#75814E}.c3 .head{background:#858192}
+  .num{position:absolute;left:0;top:0;height:100%;width:84px;
+       display:flex;align-items:center;justify-content:center;
+       font-size:30px;font-weight:800;letter-spacing:1px;
+       clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)}
+  .c1 .num{background:#2C4254}.c2 .num{background:#5D6940}.c3 .num{background:#655E74}
+  .htitle{position:absolute;left:100px;top:50%;transform:translateY(-50%);
+          font-size:31px;font-weight:800;letter-spacing:3px}
+  .hicon{position:absolute;right:13px;top:50%;transform:translateY(-50%)}
+  .sub{margin:15px 14px 13px;font-size:15px;font-weight:700;color:#152A40;letter-spacing:.2px}
+
+  /* ===== 步骤卡片 ===== */
+  .card{position:relative;height:84px;margin:0 12px 10px;border-radius:8px}
+  .c1 .card{background:#EBEFF2}.c2 .card{background:#EFEFEC}.c3 .card{background:#F0EEF3}
+  .badge{position:absolute;left:10px;top:25px;width:34px;height:34px;border-radius:50%;
+         color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .c1 .badge{background:#2A4056}.c2 .badge{background:#6D7154}.c3 .badge{background:#7B7587}
+  .cicon{position:absolute;left:58px;top:21px;width:66px;height:44px}
+  .ctext{margin-left:130px;padding:11px 4px 0 0}
+  .ct{font-size:16.5px;font-weight:800;color:#15273C}
+  .cd{margin-top:5px;font-size:12.5px;color:#57626F;line-height:1.36}
+
+  /* ===== 右侧插图区 ===== */
+  #illus{position:absolute;left:1050px;top:0;width:678px;height:972px}
+  #illus::before{content:'';position:absolute;left:-30px;top:120px;width:730px;height:780px;
+                 background:radial-gradient(ellipse at 50% 45%,#EDF1F8 0%,rgba(237,241,248,0) 68%)}
+  #illus .lbl{position:absolute;font-size:20px;font-weight:800;color:#12263C;white-space:nowrap;z-index:5}
+  #illus .isub{position:absolute;font-size:13.5px;color:#4C5B6E;line-height:1.45;white-space:nowrap;z-index:5}
+  #illus svg{position:absolute;overflow:visible}
+
+  /* ===== 页脚 ===== */
+  .foot{left:34px;top:929px;font-size:15px;color:#4A5C74;letter-spacing:.5px}
+  .footline{left:404px;top:944px;width:1290px;height:1px;background:#C7CEDA}
+</style>
+</head>
+<body>
+<div id="canvas">
+
+  <!-- ===== 标题（真实文本） ===== -->
+  <div class="abs title">德勤AI落地方法论拆解<br>评估、路线图、治理。</div>
+
+  <!-- ===== 第 01 列：评估 ===== -->
+  <section class="col c1" id="col1">
+    <div class="head">
+      <div class="num">01</div>
+      <div class="htitle">评估</div>
+      <svg class="hicon" width="46" height="46" viewBox="0 0 52 52" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="6" width="28" height="36" rx="3"/><path d="M15 15h14M15 22h9"/>
+        <circle cx="34" cy="33" r="8"/><path d="M40 39l7 7"/>
+      </svg>
+    </div>
+    <div class="sub">识别价值与可行性，明确AI落地起点</div>
+
+    <div class="card"><div class="badge">1</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#46617A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="22" cy="24" r="11"/><circle cx="22" cy="24" r="5"/>
+        <circle cx="22" cy="24" r="1.4" fill="#46617A" stroke="none"/>
+        <path d="M44 6 30 20M30 20l8-1.6M30 20l1.6-8"/>
+      </svg>
+      <div class="ctext"><div class="ct">战略对齐</div><div class="cd">结合业务战略，明确AI的价值方向与关键问题</div></div>
+    </div>
+
+    <div class="card"><div class="badge">2</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#46617A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="30" cy="18" r="10"/><path d="M26 32h8M27.5 37h5"/>
+        <path d="M30 2v3M13 18h3M47 18h-3M18 6l2 2M42 6l-2 2"/>
+      </svg>
+      <div class="ctext"><div class="ct">机会识别</div><div class="cd">梳理业务场景，评估价值空间与可行性</div></div>
+    </div>
+
+    <div class="card"><div class="badge">3</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#46617A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 37h40"/><path d="M17 37v-9h7v9M30 37V19h7v18M43 37V9h-7v28"/>
+      </svg>
+      <div class="ctext"><div class="ct">能力评估</div><div class="cd">评估数据、技术、人才与组织现状</div></div>
+    </div>
+
+    <div class="card"><div class="badge">4</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#46617A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M30 3l15 6v11c0 9-6.5 15-15 18-8.5-3-15-9-15-18V9z"/>
+        <path d="M30 15v9"/><circle cx="30" cy="30" r="1.4" fill="#46617A" stroke="none"/>
+      </svg>
+      <div class="ctext"><div class="ct">风险与合规评估</div><div class="cd">识别技术、数据、法律、伦理等潜在风险</div></div>
+    </div>
+
+    <div class="card"><div class="badge">5</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#46617A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="17" y="5" width="26" height="34" rx="3"/><path d="M23 14h14M23 21h14M23 28h8"/>
+      </svg>
+      <div class="ctext"><div class="ct">优先级排序</div><div class="cd">基于价值、可行性与风险确定优先落地场景</div></div>
+    </div>
+  </section>
+
+  <!-- ===== 第 02 列：路线图 ===== -->
+  <section class="col c2" id="col2">
+    <div class="head">
+      <div class="num">02</div>
+      <div class="htitle">路线图</div>
+      <svg class="hicon" width="46" height="46" viewBox="0 0 52 52" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 12l14-5 12 5 14-5v33l-14 5-12-5-14 5z"/><path d="M20 7v33M32 12v33"/>
+        <circle cx="39" cy="19" r="3.5"/>
+      </svg>
+    </div>
+    <div class="sub">从试点到规模化，规划可执行的实施路径</div>
+
+    <div class="card"><div class="badge">1</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#6D7154" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="22" cy="24" r="11"/><circle cx="22" cy="24" r="5"/>
+        <circle cx="22" cy="24" r="1.4" fill="#6D7154" stroke="none"/>
+        <path d="M44 6 30 20M30 20l8-1.6M30 20l1.6-8"/>
+      </svg>
+      <div class="ctext"><div class="ct">目标与愿景</div><div class="cd">明确阶段性目标与预期价值，设定可衡量的里程碑</div></div>
+    </div>
+
+    <div class="card"><div class="badge">2</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#6D7154" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="17" cy="12" r="5"/><circle cx="44" cy="10" r="5"/><circle cx="30" cy="34" r="5.5"/>
+        <path d="M21 15l6 13M40 14l-7 15M22 12h17"/>
+      </svg>
+      <div class="ctext"><div class="ct">场景与用例规划</div><div class="cd">选择高价值场景，设计试点与推广路径</div></div>
+    </div>
+
+    <div class="card"><div class="badge">3</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#6D7154" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="5" width="13" height="11" rx="2"/><rect x="39" y="5" width="13" height="11" rx="2"/>
+        <rect x="24" y="28" width="13" height="11" rx="2"/>
+        <path d="M14.5 16v6h32v-6M30.5 16v12"/>
+      </svg>
+      <div class="ctext"><div class="ct">实施路径</div><div class="cd">制定从试点到规模化的阶段计划，明确关键任务与依赖关系</div></div>
+    </div>
+
+    <div class="card"><div class="badge">4</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#6D7154" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="19" cy="14" r="5"/><circle cx="41" cy="14" r="5"/><circle cx="30" cy="11" r="5.5"/>
+        <path d="M11 36c0-6 4-9 8-9M41 27c4 0 8 3 8 9M20 36c0-7 4.5-11 10-11s10 4 10 11"/>
+      </svg>
+      <div class="ctext"><div class="ct">资源与能力建设</div><div class="cd">规划数据、技术、人才与生态合作的风入与建设</div></div>
+    </div>
+
+    <div class="card"><div class="badge">5</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#6D7154" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 38h42"/><path d="M15 38v-7h6v7M26 38V25h6v13M37 38V17h6v21"/>
+        <path d="M13 16C21 8 33 5 45 6M45 6l-6-3M45 6l-3 6"/>
+      </svg>
+      <div class="ctext"><div class="ct">价值衡量</div><div class="cd">建立量化指标体系，跟踪进展并持续优化</div></div>
+    </div>
+  </section>
+
+  <!-- ===== 第 03 列：治理 ===== -->
+  <section class="col c3" id="col3">
+    <div class="head">
+      <div class="num">03</div>
+      <div class="htitle">治理</div>
+      <svg class="hicon" width="46" height="46" viewBox="0 0 52 52" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M26 4l17 7v13c0 11-7.5 18-17 21-9.5-3-17-10-17-21V11z"/>
+        <path d="M19 26h12M31 26l-4.5-4.5M31 26l-4.5 4.5"/>
+      </svg>
+    </div>
+    <div class="sub">建立负责任的AI治理体系，保障可持续发展</div>
+
+    <div class="card"><div class="badge">1</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#7B7587" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="24" y="4" width="12" height="9" rx="2"/><rect x="8" y="30" width="12" height="9" rx="2"/>
+        <rect x="40" y="30" width="12" height="9" rx="2"/>
+        <path d="M30 13v5M14 30v-6h32v6M30 19v11"/>
+      </svg>
+      <div class="ctext"><div class="ct">治理框架</div><div class="cd">明确治理原则、组织架构与决策机制</div></div>
+    </div>
+
+    <div class="card"><div class="badge">2</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#7B7587" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M30 5l21 34H9z"/><path d="M30 18v8"/><circle cx="30" cy="32" r="1.4" fill="#7B7587" stroke="none"/>
+      </svg>
+      <div class="ctext"><div class="ct">风险管理</div><div class="cd">覆盖数据安全、模型风险、合规与伦理</div></div>
+    </div>
+
+    <div class="card"><div class="badge">3</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#7B7587" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="17" y="5" width="26" height="34" rx="3"/><path d="M23 14h14M23 21h14M23 28h8"/>
+      </svg>
+      <div class="ctext"><div class="ct">政策与标准</div><div class="cd">制定AI相关政策、流程与技术标准</div></div>
+    </div>
+
+    <div class="card"><div class="badge">4</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#7B7587" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="26" cy="19" r="11"/><path d="M34 27l11 11"/>
+      </svg>
+      <div class="ctext"><div class="ct">监控与审计</div><div class="cd">建立全生命周期监控、审计与问责机制</div></div>
+    </div>
+
+    <div class="card"><div class="badge">5</div>
+      <svg class="cicon" viewBox="0 0 60 44" fill="none" stroke="#7B7587" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="19" cy="14" r="5"/><circle cx="41" cy="14" r="5"/><circle cx="30" cy="11" r="5.5"/>
+        <path d="M11 36c0-6 4-9 8-9M41 27c4 0 8 3 8 9M20 36c0-7 4.5-11 10-11s10 4 10 11"/>
+      </svg>
+      <div class="ctext"><div class="ct">文化与人才</div><div class="cd">推动负责任的AI文化，提升员工意识与专业能力</div></div>
+    </div>
+  </section>
+
+  <!-- ===== 右侧 AI 技术栈立体插图（独立 SVG 单元组装） ===== -->
+  <div id="illus">
+    <!-- 光晕（独立单元） -->
+    <svg style="left:150px;top:150px" width="380" height="350" viewBox="0 0 380 350" fill="none">
+      <defs><radialGradient id="gGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#CFE4F2" stop-opacity=".95"/><stop offset="60%" stop-color="#DCEAF4" stop-opacity=".5"/>
+        <stop offset="100%" stop-color="#DCEAF4" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="190" cy="165" rx="175" ry="135" fill="url(#gGlow)"/>
+      <ellipse cx="150" cy="306" rx="128" ry="20" fill="#B7D8EE" opacity=".38"/>
+    </svg>
+
+    <!-- 基座·白色底层（独立单元） -->
+    <svg style="left:40px;top:425px" width="520" height="272" viewBox="0 0 520 272" fill="none">
+      <path d="M30 128 260 10 490 128 260 246Z" fill="#F6F8FC" stroke="#E6EBF2" stroke-width="1.5"/>
+      <path d="M30 128 260 246 260 262 30 144Z" fill="#E3E9F2"/>
+      <path d="M490 128 260 246 260 262 490 144Z" fill="#EDF1F7"/>
+    </svg>
+    <!-- 基座·浅层（独立单元） -->
+    <svg style="left:40px;top:397px" width="520" height="234" viewBox="0 0 520 234" fill="none">
+      <path d="M52 115 260 10 468 115 260 220Z" fill="#D5DEE9"/>
+      <path d="M52 115 260 220 260 244 52 139Z" fill="#AEBCCD"/>
+      <path d="M468 115 260 220 260 244 468 139Z" fill="#C4CFDD"/>
+    </svg>
+    <!-- 基座·中层（独立单元） -->
+    <svg style="left:40px;top:376px" width="520" height="198" viewBox="0 0 520 198" fill="none">
+      <path d="M84 99 260 10 436 99 260 188Z" fill="#93A5BA"/>
+      <path d="M84 99 260 188 260 218 84 129Z" fill="#6E8299"/>
+      <path d="M436 99 260 188 260 218 436 129Z" fill="#7F92A8"/>
+    </svg>
+    <!-- 基座·顶层深色（独立单元，含台阶块） -->
+    <svg style="left:40px;top:356px" width="520" height="166" viewBox="0 0 520 166" fill="none">
+      <path d="M150 118 176 130 176 158 150 146Z" fill="#4E6076"/><path d="M150 118 163 112 189 124 176 130Z" fill="#5E7188"/>
+      <path d="M348 122 374 134 374 162 348 150Z" fill="#4E6076"/><path d="M348 122 361 116 387 128 374 134Z" fill="#5E7188"/>
+      <path d="M118 82 260 16 402 82 260 148Z" fill="#5E7189"/>
+      <path d="M118 82 260 148 260 182 118 116Z" fill="#3E5068"/>
+      <path d="M402 82 260 148 260 182 402 116Z" fill="#4A5C74"/>
+    </svg>
+
+    <!-- 连接线与节点（独立单元，置于图形之后、文字之下） -->
+    <svg style="left:0;top:0" width="678" height="972" viewBox="0 0 678 972" fill="none" pointer-events="none">
+      <g stroke="#A9B4C4" stroke-width="1.6" fill="none">
+        <path d="M262 108C225 165 215 220 218 258"/>
+        <path d="M545 206v30c0 22-55 18-125 34"/>
+        <path d="M115 332c15 48 20 98 16 138-3 40-11 75-26 115-9 24-8 45 5 68 8 14 18 26 32 37"/>
+        <path d="M196 642c34 60 50 82 66 103"/>
+        <path d="M346 816c74 30 126 4 172-42"/>
+        <path d="M576 505v34c0 50-14 106-27 148"/>
+        <path d="M430 330c48 26 80 56 114 88"/>
+      </g>
+      <g stroke="#8B99AB" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 8" fill="none">
+        <path d="M121 470A212 152 0 0 0 182 658"/>
+        <path d="M480 655A200 142 0 0 0 560 472"/>
+        <path d="M108 598A150 104 0 0 0 208 694"/>
+      </g>
+      <g fill="#5F7086">
+        <circle cx="262" cy="108" r="4"/><circle cx="218" cy="258" r="4.5"/><circle cx="545" cy="206" r="4"/>
+        <circle cx="420" cy="270" r="4.5"/><circle cx="115" cy="332" r="4"/><circle cx="131" cy="470" r="4.5"/>
+        <circle cx="105" cy="585" r="4"/><circle cx="142" cy="690" r="4.5"/><circle cx="262" cy="745" r="4.5"/>
+        <circle cx="518" cy="774" r="4.5"/><circle cx="576" cy="505" r="4"/><circle cx="576" cy="539" r="4.5"/>
+        <circle cx="544" cy="687" r="4"/><circle cx="544" cy="418" r="4.5"/><circle cx="95" cy="300" r="4"/>
+        <circle cx="470" cy="178" r="4"/><circle cx="60" cy="588" r="4"/><circle cx="612" cy="640" r="4"/>
+      </g>
+    </svg>
+
+    <!-- AI 立方体（独立单元） -->
+    <svg style="left:175px;top:215px" width="250" height="280" viewBox="0 0 250 280" fill="none">
+      <defs>
+        <linearGradient id="cTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A3B9D0"/><stop offset="1" stop-color="#7E96AF"/></linearGradient>
+        <linearGradient id="cLeft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#68809B"/><stop offset="1" stop-color="#3E556E"/></linearGradient>
+        <linearGradient id="cRight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#465E7C"/><stop offset="1" stop-color="#2C4258"/></linearGradient>
+      </defs>
+      <path d="M125 20 235 75 125 130 15 75Z" fill="url(#cTop)"/>
+      <ellipse cx="125" cy="75" rx="48" ry="20" fill="#8FD0EA" opacity=".3"/>
+      <ellipse cx="125" cy="75" rx="20" ry="9" fill="#A8DFF4" opacity=".55"/>
+      <path d="M15 75 125 130 125 265 15 210Z" fill="url(#cLeft)"/>
+      <path d="M235 75 125 130 125 265 235 210Z" fill="url(#cRight)"/>
+      <g stroke="#9FD4EF" stroke-width="1.4" opacity=".85" fill="none">
+        <path d="M245 108 148 156M242 140 152 188M238 172 156 214"/>
+        <path d="M170 145 208 126 208 190 170 209Z"/>
+        <circle cx="189" cy="167" r="7"/><circle cx="189" cy="167" r="2.5" fill="#BFE6F8" stroke="none"/>
+        <circle cx="243" cy="122" r="2.4" fill="#BFE6F8" stroke="none"/><circle cx="150" cy="200" r="2.4" fill="#BFE6F8" stroke="none"/>
+      </g>
+      <g transform="translate(40,138) skewY(26.6)">
+        <text x="0" y="0" font-size="44" font-weight="800" fill="#F5FAFD" letter-spacing="2" font-family="Arial,'Noto Sans SC',sans-serif">AI</text>
+      </g>
+      <path d="M125 57 157 75 125 93 93 75Z" fill="#7FA6C2" opacity=".9"/>
+      <path d="M125 64 143 75 125 86 107 75Z" fill="#BFE3F5"/>
+      <circle cx="125" cy="75" r="3" fill="#E8F7FF"/>
+      <path d="M125 57v-8M157 75h8M125 93v8M93 75h-8" stroke="#9FC9E2" stroke-width="1.6"/>
+    </svg>
+
+    <!-- 云与基础设施·图标（独立单元） -->
+    <svg style="left:212px;top:26px" width="112" height="82" viewBox="0 0 112 82" fill="none">
+      <path d="M32 64a16 16 0 0 1-1-31 21 21 0 0 1 40-7 15 15 0 0 1 14 26 13 13 0 0 1-9 12z" fill="#F2F5FA" stroke="#C9D2DE" stroke-width="2"/>
+      <path d="M32 64h44a13 13 0 0 0 9-12 15 15 0 0 0 3-13l-56 13z" fill="#DEE5EF"/>
+      <rect x="47" y="36" width="22" height="16" rx="3" fill="#4A5A70"/>
+      <rect x="52" y="41" width="12" height="6" rx="1.5" fill="#9BD8F2"/>
+      <path d="M51 32v4M58 32v4M65 32v4M43 40h4M43 48h4M69 40h4M69 48h4" stroke="#4A5A70" stroke-width="1.8"/>
+    </svg>
+
+    <!-- 数据层·图标（独立单元） -->
+    <svg style="left:488px;top:86px" width="110" height="118" viewBox="0 0 110 118" fill="none">
+      <path d="M55 66 105 91 55 116 5 91Z" fill="#EDF1F7"/>
+      <path d="M5 91 55 116 55 118 5 93Z" fill="#D8E0EB"/><path d="M105 91 55 116 55 118 105 93Z" fill="#E4EAF2"/>
+      <path d="M27 22v40c0 7 12.5 13 28 13s28-6 28-13V22" fill="#D7E0EA" stroke="#C0CBD9" stroke-width="2"/>
+      <ellipse cx="55" cy="22" rx="28" ry="11" fill="#EEF3F9" stroke="#C0CBD9" stroke-width="2"/>
+      <path d="M27 36c0 7 12.5 13 28 13s28-6 28-13M27 50c0 7 12.5 13 28 13s28-6 28-13" stroke="#B9C5D4" stroke-width="2" fill="none"/>
+      <ellipse cx="55" cy="22" rx="18" ry="6.5" fill="#D5DFEB"/>
+    </svg>
+
+    <!-- 模型与技术层·柱状图标（独立单元） -->
+    <svg style="left:56px;top:220px" width="102" height="108" viewBox="0 0 102 108" fill="none">
+      <path d="M14 14v74h12M14 14h10" stroke="#B9C3D2" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="14" cy="8" r="3.5" fill="#8B99AB"/><circle cx="8" cy="88" r="3.5" fill="#8B99AB"/>
+      <path d="M40 34 52 28v54l-12 6Z" fill="#6C8098"/><path d="M52 28l10 5v54l-10-5Z" fill="#9FAFBF"/>
+      <path d="M62 48 74 42v34l-12 6Z" fill="#6C8098"/><path d="M74 42l10 5v34l-10-5Z" fill="#9FAFBF"/>
+      <path d="M40 34 50 39v54l-10-5Z" fill="#586A80"/>
+      <path d="M62 48 72 53v34l-10-5Z" fill="#586A80"/>
+      <path d="M28 96 88 66 100 72 40 102Z" fill="#E8EDF4"/>
+    </svg>
+
+    <!-- 应用层·网格图标（独立单元） -->
+    <svg style="left:536px;top:424px" width="74" height="76" viewBox="0 0 74 76" fill="none">
+      <rect x="8" y="8" width="26" height="26" rx="6" fill="#8496AA"/>
+      <rect x="40" y="8" width="26" height="26" rx="6" fill="#5F7288"/>
+      <rect x="8" y="42" width="26" height="26" rx="6" fill="#5F7288"/>
+      <rect x="40" y="42" width="26" height="26" rx="6" fill="#9AAABB"/>
+    </svg>
+    <svg style="left:500px;top:440px" width="26" height="62" viewBox="0 0 26 62" fill="none">
+      <rect x="3" y="3" width="20" height="56" rx="5" stroke="#9AA7B8" stroke-width="2" fill="#F2F5F9"/>
+      <rect x="8" y="9" width="10" height="9" rx="2" fill="#B9C4D3"/><rect x="8" y="27" width="10" height="9" rx="2" fill="#B9C4D3"/><rect x="8" y="45" width="10" height="9" rx="2" fill="#B9C4D3"/>
+    </svg>
+
+    <!-- 组织与人才·楼宇图标（独立单元） -->
+    <svg style="left:26px;top:676px" width="140" height="130" viewBox="0 0 140 130" fill="none">
+      <path d="M66 62 128 93 66 124 4 93Z" fill="#E8EDF4"/>
+      <path d="M4 93 66 124 66 126 4 95Z" fill="#D3DCE7"/><path d="M128 93 66 124 66 126 128 95Z" fill="#DEE5EE"/>
+      <rect x="26" y="42" width="20" height="54" fill="#647690"/>
+      <rect x="46" y="47" width="8" height="52" fill="#8B9CB1"/>
+      <rect x="58" y="22" width="24" height="76" fill="#55687F"/>
+      <rect x="82" y="28" width="9" height="72" fill="#93A3B6"/>
+      <rect x="96" y="54" width="16" height="44" fill="#7C8DA3"/>
+      <rect x="112" y="58" width="7" height="42" fill="#A9B7C6"/>
+      <g fill="#D9E2EC">
+        <rect x="30" y="48" width="4" height="5"/><rect x="38" y="48" width="4" height="5"/><rect x="30" y="60" width="4" height="5"/><rect x="38" y="60" width="4" height="5"/><rect x="30" y="72" width="4" height="5"/><rect x="38" y="72" width="4" height="5"/>
+        <rect x="63" y="30" width="5" height="6"/><rect x="72" y="30" width="5" height="6"/><rect x="63" y="44" width="5" height="6"/><rect x="72" y="44" width="5" height="6"/><rect x="63" y="58" width="5" height="6"/><rect x="72" y="58" width="5" height="6"/><rect x="63" y="72" width="5" height="6"/><rect x="72" y="72" width="5" height="6"/>
+        <rect x="100" y="60" width="4" height="5"/><rect x="106" y="60" width="4" height="5"/><rect x="100" y="72" width="4" height="5"/><rect x="106" y="72" width="4" height="5"/>
+      </g>
+    </svg>
+
+    <!-- 治用与合规·人员图标（独立单元） -->
+    <svg style="left:230px;top:728px" width="118" height="120" viewBox="0 0 118 120" fill="none">
+      <path d="M59 70 111 96 59 122 7 96Z" fill="#E8EDF4"/>
+      <path d="M7 96 59 122 59 118 7 92Z" fill="#D3DCE7"/><path d="M111 96 59 122 59 118 111 92Z" fill="#DEE5EE"/>
+      <circle cx="30" cy="52" r="9" fill="#8C9CB0"/>
+      <path d="M16 88c0-12 6-19 14-19s14 7 14 19z" fill="#8C9CB0"/>
+      <circle cx="88" cy="52" r="9" fill="#9AA9BB"/>
+      <path d="M74 88c0-12 6-19 14-19s14 7 14 19z" fill="#9AA9BB"/>
+      <circle cx="59" cy="38" r="11" fill="#55687F"/>
+      <path d="M42 84c0-14 8-22 17-22s17 8 17 22z" fill="#55687F"/>
+    </svg>
+
+    <!-- 业务价值·增长图标（独立单元） -->
+    <svg style="left:506px;top:676px" width="118" height="128" viewBox="0 0 118 128" fill="none">
+      <path d="M57 74 111 101 57 128 3 101Z" fill="#E8EDF4"/>
+      <path d="M3 101 57 128 57 124 3 97Z" fill="#D3DCE7"/><path d="M111 101 57 128 57 124 111 97Z" fill="#DEE5EE"/>
+      <rect x="14" y="74" width="11" height="18" rx="2" fill="#98A8BA"/>
+      <rect x="31" y="62" width="11" height="30" rx="2" fill="#8799AD"/>
+      <rect x="48" y="50" width="11" height="42" rx="2" fill="#6C82A0"/>
+      <rect x="65" y="36" width="11" height="56" rx="2" fill="#4E647E"/>
+      <path d="M12 52C30 30 48 20 74 14" stroke="#3E5470" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M76 8 62 10l8 10z" fill="#3E5470"/>
+    </svg>
+
+    <!-- 插图标签（真实文本） -->
+    <div class="lbl" style="left:300px;top:104px">云与基础设施</div>
+    <div class="isub" style="left:300px;top:134px">算力｜存储｜平台</div>
+
+    <div class="lbl" style="left:500px;top:206px">数据层</div>
+    <div class="isub" style="left:500px;top:236px">数据治理｜数据安全<br>数据资产｜高质量数据</div>
+
+    <div class="lbl" style="left:28px;top:324px">模型与技术层</div>
+    <div class="isub" style="left:28px;top:354px">基础模型｜行业模型<br>工具链｜MLOps</div>
+
+    <div class="lbl" style="left:502px;top:500px">应用层</div>
+    <div class="isub" style="left:502px;top:530px">业务场景｜智能体<br>产品与服务</div>
+
+    <div class="lbl" style="left:26px;top:806px">组织与人才</div>
+    <div class="isub" style="left:26px;top:836px">组织架构｜人才能力<br>文化变革</div>
+
+    <div class="lbl" style="left:192px;top:850px">治用与合规</div>
+    <div class="isub" style="left:192px;top:880px">政策标准｜风险管理<br>监控审计｜伦理责任</div>
+
+    <div class="lbl" style="left:500px;top:806px">业务价值</div>
+    <div class="isub" style="left:500px;top:836px">效率提升｜创新增长<br>客户体验｜社会价值</div>
+  </div>
+
+  <!-- ===== 页脚 ===== -->
+<!--FOOT-->
+  <div class="abs foot">基于德勤公开资料的独立研究。</div>
+  <div class="abs footline"></div>
+
+
+</div>
+</body>
+</html>

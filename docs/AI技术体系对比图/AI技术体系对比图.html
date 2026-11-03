@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI、ML、DL、GenAI、LLMs、RAG 与 Agentic AI 的区别</title>
+<style>
+  html,body { margin:0; padding:0; background:#E8EAF0; }
+  #stage { width:1200px; margin:0 auto; background:#FDFDFE; box-shadow:0 4px 30px rgba(30,40,90,.12); }
+  svg { display:block; }
+  text { font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif; }
+</style>
+</head>
+<body>
+<div id="stage">
+<!--
+  高保真重建：AI / ML / DL / GenAI / LLMs / RAG / Agentic AI 技术体系对比信息图
+  基准坐标系：1200 x 1600（等比对应原图 1086 x 1448）
+  所有文字均为真实 <text> 文本；所有图形（箭头/胶囊/卡片/弧形/图标）均为独立 SVG 矢量单元，
+  每个可编辑单元都有唯一 id（card-1、flow-2-ml、connector-3、why-item-4 ...），
+  可单独选中、移动、修改、复用。
+-->
+<svg id="infographic" viewBox="0 0 1200 1600" width="1200" height="1600" xmlns="http://www.w3.org/2000/svg">
+<rect id="page-bg" x="0" y="0" width="1200" height="1600" fill="#FDFDFE"/>
+<g id="header">
+<rect x="748.2" y="22.0" width="224.2" height="46.0" rx="10" fill="#E0D8F7" id="title-highlight"/>
+<text x="111.7" y="58.0" font-size="38" fill="#0E274B" font-weight="900" text-anchor="start" letter-spacing="-1.5">AI、ML、DL、GenAI、LLMs、RAG 与 </text>
+<text x="756.2" y="58.0" font-size="38" fill="#0E274B" font-weight="900" text-anchor="start" letter-spacing="-1.5">Agentic AI</text>
+<text x="964.4" y="58.0" font-size="38" fill="#0E274B" font-weight="900" text-anchor="start" letter-spacing="-1.5"> 的区别</text>
+<g id="deco-spark-1" fill="#A78BFA"><path d="M 1156.0,13.0 L 1158.3,23.7 L 1169.0,26.0 L 1158.3,28.3 L 1156.0,39.0 L 1153.7,28.3 L 1143.0,26.0 L 1153.7,23.7 Z"/></g>
+<g id="deco-spark-2" fill="#C4B5FD"><path d="M 1180.0,43.5 L 1181.2,48.8 L 1186.5,50.0 L 1181.2,51.2 L 1180.0,56.5 L 1178.8,51.2 L 1173.5,50.0 L 1178.8,48.8 Z"/></g>
+<text x="600.0" y="102.0" font-size="19" fill="#5A6B85" font-weight="400" text-anchor="middle">它们不是同一个概念，但彼此紧密关联 —— 共同构成了技术生态的多层次体系。</text>
+</g>
+<g id="ai-arc">
+<defs><linearGradient id="arcGrad" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#DCD5F6"/><stop offset="1" stop-color="#F5F3FC"/>
+</linearGradient></defs>
+<path d="M 460,265 C 530,147 600.0,122 800.0,122 C 1000.0,122 1070,147 1140,265 C 880.0,234 860.0,254 800.0,254 C 740.0,254 720.0,234 460,265 Z" fill="url(#arcGrad)" stroke="#B7AEE8" stroke-width="1.6"/>
+<g id="ai-arc-text">
+<text x="800.0" y="190.0" font-size="46" fill="#1E2A5E" font-weight="900" text-anchor="middle">AI</text>
+<text x="800.0" y="221.0" font-size="20" fill="#1E2A5E" font-weight="700" text-anchor="middle">人工智能</text>
+<text x="800.0" y="241.0" font-size="15" fill="#3A4A6B" font-weight="500" text-anchor="middle">更广泛的概念，包含多种技术方向</text>
+</g></g>
+<g id="core-card">
+<rect x="15.0" y="119.0" width="360.0" height="152.0" rx="18" fill="#FEF3C8"/>
+<g id="core-bulb"><circle cx="57.0" cy="161.0" r="26.0" fill="#FBE9A8"/><g stroke="#B45309" fill="none" stroke-width="2.86" stroke-linecap="round"><circle cx="57.0" cy="157.9" r="8.8"/><path d="M 52.8,169.3 V 173.5 H 61.2 V 169.3"/><line x1="57.0" y1="143.3" x2="57.0" y2="140.2"/><line x1="44.5" y1="147.5" x2="41.9" y2="144.9"/><line x1="69.5" y1="147.5" x2="72.1" y2="144.9"/></g></g>
+<text x="97.0" y="153.0" font-size="21" fill="#0E274B" font-weight="900" text-anchor="start">核心观点</text>
+<g id="core-body">
+<text x="97.0" y="186.0" font-size="15.5" fill="#4A4458" font-weight="500" text-anchor="middle">它们不是互相替代，</text><text x="97.0" y="208.5" font-size="15.5" fill="#4A4458" font-weight="500" text-anchor="middle">而是层层递进的关系，</text><text x="97.0" y="231.0" font-size="15.5" fill="#4A4458" font-weight="500" text-anchor="middle">共同构成了智能时代</text><text x="97.0" y="253.5" font-size="15.5" fill="#4A4458" font-weight="500" text-anchor="middle">的技术生态。</text>
+</g></g>
+<g id="connectors" fill="none" stroke-width="2.4">
+<g id="connector-1" stroke="#E05C8A">
+<path d="M 89.5,261.0 H 486"/>
+<circle cx="89.5" cy="266.5" r="4.6" fill="#E05C8A" stroke="none"/>
+</g>
+<g id="connector-2" stroke="#17A96B">
+<path d="M 259.8,261.0 H 486"/>
+<circle cx="259.8" cy="266.5" r="4.6" fill="#17A96B" stroke="none"/>
+</g>
+<g id="connector-3" stroke="#7B2FBE">
+<path d="M 429.9,261.0 H 486"/>
+<circle cx="429.9" cy="266.5" r="4.6" fill="#7B2FBE" stroke="none"/>
+</g>
+<g id="connector-4" stroke="#9AA1B5">
+<line x1="600.1" y1="252" x2="600.1" y2="261.0"/>
+<circle cx="600.1" cy="266.5" r="4.6" fill="#9AA1B5" stroke="none"/>
+</g>
+<g id="connector-5" stroke="#D6246E">
+<line x1="770.3" y1="248" x2="770.3" y2="261.0"/>
+<circle cx="770.3" cy="266.5" r="4.6" fill="#D6246E" stroke="none"/>
+</g>
+<g id="connector-6" stroke="#E08E00">
+<line x1="940.5" y1="250" x2="940.5" y2="261.0"/>
+<circle cx="940.5" cy="266.5" r="4.6" fill="#E08E00" stroke="none"/>
+</g>
+<g id="connector-7" stroke="#00907F">
+<line x1="1110.8" y1="261.0" x2="1110.8" y2="261.9"/>
+<circle cx="1110.8" cy="266.5" r="4.6" fill="#00907F" stroke="none"/>
+</g>
+</g>
+<g id="card-ai">
+<rect x="13.3" y="271.0" width="152.5" height="497.0" rx="16" fill="#FDEEF1" stroke="#F3C3D4" stroke-width="2"/>
+
+<g id="card-1-icon" stroke="#C2185B" fill="none" stroke-width="4.12" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M 89.5,289.8
+           C 79.4,285.4 72.3,298.6 75.4,303.0
+           C 65.3,308.5 66.3,326.1 77.4,329.4
+           C 78.4,340.4 92.1,343.7 89.5,337.1 Z"
+        fill="#C2185B" fill-opacity=".14"/>
+  <path d="M 89.5,289.8
+           C 99.7,285.4 106.8,298.6 103.7,303.0
+           C 113.8,308.5 112.8,326.1 101.7,329.4
+           C 100.7,340.4 87.0,343.7 89.5,337.1 Z"
+        fill="#C2185B" fill-opacity=".14"/>
+  <path d="M 89.5,289.8 L 89.5,337.1"/>
+  <path d="M 77.4,303.0 q 6.1,3.3 10.1,-0.0"/>
+  <path d="M 75.4,317.3 q 7.1,0.0 11.1,4.4"/>
+  <path d="M 101.7,305.2 q -6.1,2.8 -10.1,-0.0"/>
+  <path d="M 103.7,318.4 q -6.6,0.0 -10.6,5.0"/>
+</g>
+<text x="89.5" y="371.0" font-size="26" fill="#8E1963" font-weight="900" text-anchor="middle">AI</text>
+<text x="89.5" y="398.0" font-size="16" fill="#8E1963" font-weight="700" text-anchor="middle">人工智能</text>
+<g id="card-1-desc">
+<text x="89.5" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">使机器具备思考、</text><text x="89.5" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">推理和学习的能力，</text><text x="89.5" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">让机器能像人一样</text><text x="89.5" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">处理问题。</text>
+</g>
+<g id="card-1-pill">
+<rect x="35.5" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#FBDCE6"/>
+<text x="89.5" y="559.5" font-size="14.5" fill="#8E1963" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-1-examples">
+<g id="card-1-ex-1-icon" stroke="#C2185B" stroke-width="2.08" fill="none" stroke-linecap="round"><circle cx="35.3" cy="599.0" r="4.8"/><line x1="41.4" y1="599.0" x2="43.3" y2="599.0"/><line x1="38.3" y1="604.3" x2="39.3" y2="605.9"/><line x1="32.3" y1="604.3" x2="31.3" y2="605.9"/><line x1="29.2" y1="599.0" x2="27.3" y2="599.0"/><line x1="32.3" y1="593.7" x2="31.3" y2="592.1"/><line x1="38.3" y1="593.7" x2="39.3" y2="592.1"/></g>
+<text x="48.3" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">专家系统</text>
+<g id="card-1-ex-2-icon" stroke="#C2185B" fill="none" stroke-width="1.92" stroke-linecap="round"><path d="M 28.6,652.4 H 42.0"/><path d="M 30.8,652.4 L 34.5,645.2 L 39.8,641.2"/><circle cx="34.5" cy="645.2" r="1.6" fill="#C2185B" stroke="none"/><circle cx="40.4" cy="640.7" r="1.9"/></g>
+<text x="48.3" y="651.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">机器人</text>
+<g id="card-1-ex-3-icon" stroke="#C2185B" fill="none" stroke-width="1.76" stroke-linecap="round" stroke-linejoin="round"><path d="M 27.9,694.6 L 30.2,690.4 H 40.4 L 42.7,694.6 V 697.8 H 27.9 Z"/><circle cx="31.1" cy="698.4" r="1.8"/><circle cx="39.5" cy="698.4" r="1.8"/></g>
+<text x="48.3" y="698.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">自动驾驶</text>
+</g>
+</g>
+<g id="card-ml">
+<rect x="183.5" y="271.0" width="152.5" height="497.0" rx="16" fill="#EDFCF4" stroke="#AEE3CC" stroke-width="2"/>
+
+<g id="card-2-icon" stroke="#0FA36B" fill="none" stroke-width="4.40" stroke-linecap="round">
+  <rect x="237.0" y="314.0" width="7.9" height="18.7" rx="2.4"/><rect x="248.6" y="305.2" width="7.9" height="27.5" rx="2.4"/><rect x="260.2" y="296.4" width="7.9" height="36.3" rx="2.4"/><rect x="271.9" y="287.6" width="7.9" height="45.1" rx="2.4"/>
+  <path d="M 237.0,332.7 H 277.6"/>
+</g>
+<text x="259.8" y="371.0" font-size="26" fill="#00602F" font-weight="900" text-anchor="middle">ML</text>
+<text x="259.8" y="398.0" font-size="16" fill="#00602F" font-weight="700" text-anchor="middle">机器学习</text>
+<g id="card-2-desc">
+<text x="259.8" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">从数据中学习</text><text x="259.8" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">规律和模式，</text><text x="259.8" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">让系统具备预测</text><text x="259.8" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">和决策能力。</text>
+</g>
+<g id="card-2-pill">
+<rect x="205.8" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#D9F4E6"/>
+<text x="259.8" y="559.5" font-size="14.5" fill="#00602F" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-2-examples">
+<g id="card-2-ex-1-icon" stroke="#0FA36B" fill="none" stroke-width="1.76" stroke-linejoin="round"><rect x="198.5" y="593.9" width="14.1" height="10.2" rx="1.3"/><path d="M 198.5,593.9 L 205.5,600.0 L 212.5,593.9"/></g>
+<text x="218.5" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">垃圾邮件检测</text>
+<g id="card-2-ex-2-icon" stroke="#0FA36B" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="200.1" y="639.3" width="10.9" height="13.4" rx="1.3"/><line x1="202.5" y1="643.0" x2="208.5" y2="643.0"/><line x1="202.5" y1="645.7" x2="208.5" y2="645.7"/><line x1="202.5" y1="648.4" x2="208.5" y2="648.4"/></g>
+<text x="218.5" y="651.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">推荐系统</text>
+<g id="card-2-ex-3-icon" stroke="#0FA36B" fill="none" stroke-width="1.76" stroke-linecap="round" stroke-linejoin="round"><path d="M 205.5,686.3 L 210.9,688.5 V 693.6 C 210.9,697.2 208.1,699.4 205.5,700.4 C 202.9,699.4 200.1,697.2 200.1,693.6 V 688.5 Z"/></g>
+<text x="218.5" y="698.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">欺诈检测</text>
+</g>
+</g>
+<g id="card-dl">
+<rect x="353.7" y="271.0" width="152.5" height="497.0" rx="16" fill="#F2EDFE" stroke="#D5C6F6" stroke-width="2"/>
+
+<g id="card-3-icon" stroke="#7B2FBE" stroke-width="3.30" fill="none" stroke-linecap="round">
+  <line x1="429.9" y1="314.0" x2="429.9" y2="292.0"/><line x1="429.9" y1="314.0" x2="410.9" y2="303.0"/><line x1="429.9" y1="314.0" x2="410.9" y2="325.0"/><line x1="429.9" y1="314.0" x2="429.9" y2="336.0"/><line x1="429.9" y1="314.0" x2="449.0" y2="325.0"/><line x1="429.9" y1="314.0" x2="449.0" y2="303.0"/>
+  <circle cx="429.9" cy="292.0" r="5.8" fill="#7B2FBE" stroke="none"/><circle cx="410.9" cy="303.0" r="5.8" fill="#7B2FBE" stroke="none"/><circle cx="410.9" cy="325.0" r="5.8" fill="#7B2FBE" stroke="none"/><circle cx="429.9" cy="336.0" r="5.8" fill="#7B2FBE" stroke="none"/><circle cx="449.0" cy="325.0" r="5.8" fill="#7B2FBE" stroke="none"/><circle cx="449.0" cy="303.0" r="5.8" fill="#7B2FBE" stroke="none"/>
+  <circle cx="429.9" cy="314.0" r="6.2" fill="#7B2FBE" stroke="none"/>
+</g>
+<text x="429.9" y="371.0" font-size="26" fill="#5B10A0" font-weight="900" text-anchor="middle">DL</text>
+<text x="429.9" y="398.0" font-size="16" fill="#5B10A0" font-weight="700" text-anchor="middle">深度学习</text>
+<g id="card-3-desc">
+<text x="429.9" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">基于多层神经网络</text><text x="429.9" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">学习复杂特征，</text><text x="429.9" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">处理更大规模的</text><text x="429.9" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">数据和任务。</text>
+</g>
+<g id="card-3-pill">
+<rect x="375.9" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#E7DDF9"/>
+<text x="429.9" y="559.5" font-size="14.5" fill="#5B10A0" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-3-examples">
+<g id="card-3-ex-1-icon" stroke="#7B2FBE" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="369.0" y="593.6" width="13.4" height="10.9" rx="1.3"/><circle cx="373.0" cy="597.0" r="1.1"/><path d="M 369.0,602.0 L 373.5,598.6 L 377.3,601.4 L 379.7,599.7 L 382.4,601.6"/></g>
+<text x="388.7" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">图像识别</text>
+<g id="card-3-ex-2-icon" stroke="#7B2FBE" fill="none" stroke-width="1.60" stroke-linecap="round"><rect x="373.6" y="639.0" width="4.2" height="7.4" rx="2.1"/><path d="M 371.2,646.3 A 4.5 4.5 0 0 0 380.2,646.3"/><line x1="375.7" y1="650.8" x2="375.7" y2="653.0"/></g>
+<text x="388.7" y="651.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">语音识别</text>
+<g id="card-3-ex-3-icon" stroke="#7B2FBE" fill="none" stroke-width="1.76" stroke-linecap="round" stroke-linejoin="round"><path d="M 368.3,694.6 L 370.6,690.4 H 380.8 L 383.1,694.6 V 697.8 H 368.3 Z"/><circle cx="371.5" cy="698.4" r="1.8"/><circle cx="379.9" cy="698.4" r="1.8"/></g>
+<text x="388.7" y="698.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">自动驾驶</text>
+</g>
+</g>
+<g id="card-genai">
+<rect x="523.9" y="271.0" width="152.5" height="497.0" rx="16" fill="#FDF9E4" stroke="#E9D892" stroke-width="2"/>
+
+<g id="card-4-icon" fill="#1A2C55">
+  <path d="M 599.0,297.5 C 600.4,309.5 605.8,314.9 617.8,316.2 C 605.8,317.5 600.4,322.9 599.0,334.9 C 597.7,322.9 592.3,317.5 580.3,316.2 C 592.3,314.9 597.7,309.5 Z"/>
+  <path d="M 618.9,289.2 C 619.4,294.5 621.8,296.9 627.1,297.5 C 621.8,298.1 619.4,300.5 618.9,305.8 C 618.3,300.5 615.9,298.1 610.6,297.5 C 615.9,296.9 618.3,294.5 Z"/>
+  <path d="M 614.4,327.2 C 614.8,330.7 616.4,332.3 619.9,332.7 C 616.4,333.1 614.8,334.7 614.4,338.2 C 614.1,334.7 612.5,333.1 608.9,332.7 C 612.5,332.3 614.1,330.7 Z"/>
+</g>
+<text x="600.1" y="371.0" font-size="20" fill="#0E2749" font-weight="900" text-anchor="middle">GenAI</text>
+<text x="600.1" y="398.0" font-size="16" fill="#0E2749" font-weight="700" text-anchor="middle">生成式 AI</text>
+<g id="card-4-desc">
+<text x="600.1" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">基于大规模数据</text><text x="600.1" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">生成新的内容，</text><text x="600.1" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">如文本、图像、</text><text x="600.1" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">音频、代码等。</text>
+</g>
+<g id="card-4-pill">
+<rect x="546.1" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#F7EDC4"/>
+<text x="600.1" y="559.5" font-size="14.5" fill="#0E2749" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-4-examples">
+
+<g id="card-4-ex-1-icon" fill="none" stroke="#1A2C55" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M 537.9,592.1 H 553.9 V 600.6 H 544.0 L 541.4,603.6 V 600.6 H 537.9 Z"
+        fill="#1A2C55" fill-opacity=".13"/>
+  <line x1="541.4" y1="595.9" x2="550.4" y2="595.9"/>
+  <line x1="541.4" y1="598.1" x2="547.5" y2="598.1"/>
+</g>
+<text x="558.9" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">ChatGPT</text>
+<g id="card-4-ex-2-icon" stroke="#1A2C55" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="539.2" y="626.1" width="13.4" height="10.9" rx="1.3"/><circle cx="543.2" cy="629.5" r="1.1"/><path d="M 539.2,634.5 L 543.7,631.1 L 547.5,633.9 L 549.9,632.2 L 552.6,634.1"/></g>
+<text x="558.9" y="636.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Midjourney</text>
+<g id="card-4-ex-3-icon" stroke="#1A2C55" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="539.2" y="658.6" width="13.4" height="10.9" rx="1.3"/><circle cx="543.2" cy="662.0" r="1.1"/><path d="M 539.2,667.0 L 543.7,663.6 L 547.5,666.4 L 549.9,664.7 L 552.6,666.6"/></g>
+<text x="558.9" y="669.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">DALL·E</text>
+<g id="card-4-ex-4-icon" stroke="#1A2C55" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="539.2" y="691.1" width="13.4" height="10.9" rx="1.3"/><circle cx="543.2" cy="694.5" r="1.1"/><path d="M 539.2,699.5 L 543.7,696.1 L 547.5,698.9 L 549.9,697.2 L 552.6,699.1"/></g>
+<text x="558.9" y="701.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Claude</text>
+<g id="card-4-ex-5-icon" stroke="#1A2C55" fill="none" stroke-width="1.76" stroke-linecap="round"><path d="M 547.5,722.9 V 732.5"/><path d="M 547.5,722.9 L 552.0,724.2"/><circle cx="545.3" cy="732.8" r="2.2"/></g>
+<text x="558.9" y="734.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Suno</text>
+<g id="card-4-ex-6-icon" stroke="#1A2C55" fill="none" stroke-width="1.60" stroke-linejoin="round"><rect x="539.2" y="756.2" width="13.4" height="10.6" rx="1.9"/><path d="M 544.8,759.3 L 548.5,761.5 L 544.8,763.7 Z" fill="#1A2C55" stroke="none"/></g>
+<text x="558.9" y="766.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Runway</text>
+</g>
+</g>
+<g id="card-llms">
+<rect x="694.1" y="271.0" width="152.5" height="497.0" rx="16" fill="#FFF1F5" stroke="#F3C6D6" stroke-width="2"/>
+
+<g id="card-5-icon" fill="none" stroke="#D6246E" stroke-width="4.40" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M 742.8,290.4 H 797.8 V 319.5 H 763.7 L 754.9,329.8 V 319.5 H 742.8 Z"
+        fill="#D6246E" fill-opacity=".13"/>
+  <line x1="754.9" y1="303.2" x2="785.7" y2="303.2"/>
+  <line x1="754.9" y1="310.9" x2="775.8" y2="310.9"/>
+</g>
+<text x="770.3" y="371.0" font-size="26" fill="#941A70" font-weight="900" text-anchor="middle">LLMs</text>
+<text x="770.3" y="398.0" font-size="16" fill="#941A70" font-weight="700" text-anchor="middle">大语言模型</text>
+<g id="card-5-desc">
+<text x="770.3" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">以大规模数据为</text><text x="770.3" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">基础，具备理解</text><text x="770.3" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">和生成自然语言</text><text x="770.3" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">的能力。</text>
+</g>
+<g id="card-5-pill">
+<rect x="716.3" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#FBDDEA"/>
+<text x="770.3" y="559.5" font-size="14.5" fill="#941A70" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-5-examples">
+<g id="card-5-ex-1-icon" stroke="#D6246E" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="710.7" y="592.3" width="10.9" height="13.4" rx="1.3"/><line x1="713.1" y1="596.0" x2="719.1" y2="596.0"/><line x1="713.1" y1="598.7" x2="719.1" y2="598.7"/><line x1="713.1" y1="601.4" x2="719.1" y2="601.4"/></g>
+<text x="729.1" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">GPT-4/5</text>
+<g id="card-5-ex-2-icon" stroke="#D6246E" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="710.7" y="624.8" width="10.9" height="13.4" rx="1.3"/><line x1="713.1" y1="628.5" x2="719.1" y2="628.5"/><line x1="713.1" y1="631.2" x2="719.1" y2="631.2"/><line x1="713.1" y1="633.9" x2="719.1" y2="633.9"/></g>
+<text x="729.1" y="636.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Claude 3</text>
+<g id="card-5-ex-3-icon" stroke="#D6246E" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="710.7" y="657.3" width="10.9" height="13.4" rx="1.3"/><line x1="713.1" y1="661.0" x2="719.1" y2="661.0"/><line x1="713.1" y1="663.7" x2="719.1" y2="663.7"/><line x1="713.1" y1="666.4" x2="719.1" y2="666.4"/></g>
+<text x="729.1" y="669.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Gemini 1.5</text>
+<g id="card-5-ex-4-icon" stroke="#D6246E" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="710.7" y="689.8" width="10.9" height="13.4" rx="1.3"/><line x1="713.1" y1="693.5" x2="719.1" y2="693.5"/><line x1="713.1" y1="696.2" x2="719.1" y2="696.2"/><line x1="713.1" y1="698.9" x2="719.1" y2="698.9"/></g>
+<text x="729.1" y="701.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Llama 3</text>
+<g id="card-5-ex-5-icon" stroke="#D6246E" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="710.7" y="722.3" width="10.9" height="13.4" rx="1.3"/><line x1="713.1" y1="726.0" x2="719.1" y2="726.0"/><line x1="713.1" y1="728.7" x2="719.1" y2="728.7"/><line x1="713.1" y1="731.4" x2="719.1" y2="731.4"/></g>
+<text x="729.1" y="734.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Mistral</text>
+<g id="card-5-ex-6-icon" stroke="#D6246E" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="710.7" y="754.8" width="10.9" height="13.4" rx="1.3"/><line x1="713.1" y1="758.5" x2="719.1" y2="758.5"/><line x1="713.1" y1="761.2" x2="719.1" y2="761.2"/><line x1="713.1" y1="763.9" x2="719.1" y2="763.9"/></g>
+<text x="729.1" y="766.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Qwen</text>
+</g>
+</g>
+<g id="card-rag">
+<rect x="864.3" y="271.0" width="152.5" height="497.0" rx="16" fill="#FDF6EA" stroke="#EDD6A4" stroke-width="2"/>
+
+<g id="card-6-icon" fill="none" stroke="#E08E00" stroke-width="4.12">
+  <ellipse cx="940.5" cy="293.6" rx="23.1" ry="7.2"/>
+  <path d="M 917.4,293.6 V 334.4"/>
+  <path d="M 963.6,293.6 V 334.4"/>
+  <path d="M 917.4,312.9 A 23.1 7.2 0 0 0 963.6,312.9"/>
+  <path d="M 917.4,334.4 A 23.1 7.2 0 0 0 963.6,334.4"/>
+</g>
+<text x="940.5" y="371.0" font-size="26" fill="#B06A00" font-weight="900" text-anchor="middle">RAG</text>
+<text x="940.5" y="398.0" font-size="16" fill="#B06A00" font-weight="700" text-anchor="middle">检索增强生成</text>
+<g id="card-6-desc">
+<text x="940.5" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">结合外部知识库，</text><text x="940.5" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">在生成时进行检索，</text><text x="940.5" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">提升回答的准确性</text><text x="940.5" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">和时效性。</text>
+</g>
+<g id="card-6-pill">
+<rect x="886.5" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#F8E9CB"/>
+<text x="940.5" y="559.5" font-size="14.5" fill="#B06A00" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-6-examples">
+
+<g id="card-6-ex-1-icon" fill="none" stroke="#E08E00" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M 878.3,592.1 H 894.3 V 600.6 H 884.4 L 881.8,603.6 V 600.6 H 878.3 Z"
+        fill="#E08E00" fill-opacity=".13"/>
+  <line x1="881.8" y1="595.9" x2="890.8" y2="595.9"/>
+  <line x1="881.8" y1="598.1" x2="887.9" y2="598.1"/>
+</g>
+<text x="899.3" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">企业知识库</text>
+<g id="card-6-ex-2-icon" stroke="#E08E00" fill="none" stroke-width="1.76" stroke-linecap="round"><circle cx="886.3" cy="643.4" r="2.9"/><path d="M 881.2,652.4 C 881.2,647.6 891.4,647.6 891.4,652.4"/></g>
+<text x="899.3" y="651.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">公司客服</text>
+
+<g id="card-6-ex-3-icon" fill="none" stroke="#E08E00" stroke-width="1.20">
+  <ellipse cx="886.3" cy="687.1" rx="6.7" ry="2.1"/>
+  <path d="M 879.6,687.1 V 698.9"/>
+  <path d="M 893.0,687.1 V 698.9"/>
+  <path d="M 879.6,692.7 A 6.7 2.1 0 0 0 893.0,692.7"/>
+  <path d="M 879.6,698.9 A 6.7 2.1 0 0 0 893.0,698.9"/>
+</g>
+<text x="899.3" y="698.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">文档问答</text>
+</g>
+</g>
+<g id="card-agentic-ai">
+<rect x="1034.5" y="271.0" width="152.5" height="497.0" rx="16" fill="#E6FAF6" stroke="#A5E0D6" stroke-width="2"/>
+
+<g id="card-7-icon" fill="none" stroke="#00907F" stroke-width="3.85" stroke-linecap="round">
+  <line x1="1110.8" y1="291.4" x2="1110.8" y2="296.9"/>
+  <circle cx="1110.8" cy="289.8" r="3.0" fill="#00907F" stroke="none"/>
+  <rect x="1085.5" y="296.9" width="50.6" height="40.7" rx="8.8" fill="#00907F" fill-opacity=".12"/>
+  <circle cx="1099.6" cy="315.3" r="4.1" fill="#00907F" stroke="none"/>
+  <circle cx="1121.9" cy="315.3" r="4.1" fill="#00907F" stroke="none"/>
+  <path d="M 1102.7,327.1 Q 1110.8,332.0 1118.8,327.1"/>
+  <line x1="1080.0" y1="315.3" x2="1085.5" y2="315.3"/>
+  <line x1="1136.0" y1="315.3" x2="1141.5" y2="315.3"/>
+</g>
+<text x="1110.8" y="371.0" font-size="20" fill="#00615C" font-weight="900" text-anchor="middle">Agentic AI</text>
+<text x="1110.8" y="398.0" font-size="16" fill="#00615C" font-weight="700" text-anchor="middle">自主智能体</text>
+<g id="card-7-desc">
+<text x="1110.8" y="432.0" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">具备自主规划、</text><text x="1110.8" y="456.3" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">调用工具和执行</text><text x="1110.8" y="480.6" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">任务的能力，</text><text x="1110.8" y="504.9" font-size="14" fill="#3A4A66" font-weight="400" text-anchor="middle">能主动完成目标。</text>
+</g>
+<g id="card-7-pill">
+<rect x="1056.8" y="539.0" width="108.0" height="30.0" rx="15.0" fill="#D2F0EA"/>
+<text x="1110.8" y="559.5" font-size="14.5" fill="#00615C" font-weight="700" text-anchor="middle">典型示例</text>
+</g>
+<g id="card-7-examples">
+<g id="card-7-ex-1-icon" stroke="#00907F" stroke-width="2.08" fill="none" stroke-linecap="round"><circle cx="1056.5" cy="599.0" r="4.8"/><line x1="1062.6" y1="599.0" x2="1064.5" y2="599.0"/><line x1="1059.5" y1="604.3" x2="1060.5" y2="605.9"/><line x1="1053.5" y1="604.3" x2="1052.5" y2="605.9"/><line x1="1050.4" y1="599.0" x2="1048.5" y2="599.0"/><line x1="1053.5" y1="593.7" x2="1052.5" y2="592.1"/><line x1="1059.5" y1="593.7" x2="1060.5" y2="592.1"/></g>
+<text x="1069.5" y="604.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">OpenAI Agents</text>
+<g id="card-7-ex-2-icon" stroke="#00907F" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="1049.8" y="631.4" width="13.4" height="9.3" rx="1.3"/><line x1="1056.5" y1="640.7" x2="1056.5" y2="642.4"/><line x1="1053.3" y1="642.8" x2="1059.7" y2="642.8"/></g>
+<text x="1069.5" y="638.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Claude</text>
+<text x="1069.5" y="651.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Computer Use</text>
+<g id="card-7-ex-3-icon" stroke="#00907F" fill="none" stroke-width="1.76" stroke-linecap="round"><circle cx="1052.0" cy="670.5" r="1.8"/><circle cx="1061.0" cy="670.5" r="1.8"/><circle cx="1056.5" cy="679.8" r="1.8"/><path d="M 1053.3,671.8 L 1055.5,678.5"/><path d="M 1059.7,671.8 L 1057.5,678.5"/></g>
+<text x="1069.5" y="680.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">AutoGPT</text>
+<g id="card-7-ex-4-icon" stroke="#00907F" fill="none" stroke-width="1.76" stroke-linecap="round"><circle cx="1052.0" cy="708.5" r="1.8"/><circle cx="1061.0" cy="708.5" r="1.8"/><circle cx="1056.5" cy="717.8" r="1.8"/><path d="M 1053.3,709.8 L 1055.5,716.5"/><path d="M 1059.7,709.8 L 1057.5,716.5"/></g>
+<text x="1069.5" y="714.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">LangGraph</text>
+<text x="1069.5" y="727.5" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Agents</text>
+<g id="card-7-ex-5-icon" stroke="#00907F" fill="none" stroke-width="1.60" stroke-linecap="round" stroke-linejoin="round"><rect x="1051.1" y="744.3" width="10.9" height="13.4" rx="1.3"/><line x1="1053.5" y1="748.0" x2="1059.5" y2="748.0"/><line x1="1053.5" y1="750.7" x2="1059.5" y2="750.7"/><line x1="1053.5" y1="753.4" x2="1059.5" y2="753.4"/></g>
+<text x="1069.5" y="756.0" font-size="13.5" fill="#3A4A66" font-weight="500" text-anchor="start">Manus AI</text>
+</g>
+</g>
+<g id="flow-panel">
+<rect x="20.0" y="798.0" width="1160.0" height="158.0" rx="14" fill="#F7F8FB" stroke="#E3E7F0" stroke-width="1.5"/>
+<text x="600.0" y="830.0" font-size="21" fill="#0E274B" font-weight="900" text-anchor="middle">演进路径（简单流程）</text>
+<g id="flow-items">
+<g id="flow-1-ai">
+<defs><linearGradient id="flowGrad1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FDEFF3"/><stop offset="1" stop-color="#F9BCCD"/></linearGradient></defs>
+<rect x="106.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad1)"/>
+<text x="165.0" y="879.0" font-size="19" fill="#8E1963" font-weight="900" text-anchor="middle">AI</text>
+<g id="flow-1-ai-note">
+<text x="165.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">具备思考和</text><text x="165.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">智能的能力。</text>
+</g></g>
+<g id="flow-arrow-1">
+<line x1="229.5" y1="872.5" x2="242.5" y2="872.5" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 237.5,868.0 L 244.5,872.5 L 237.5,877.0" fill="none" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="flow-2-ml">
+<defs><linearGradient id="flowGrad2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F0FBF6"/><stop offset="1" stop-color="#BCE9D4"/></linearGradient></defs>
+<rect x="251.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad2)"/>
+<text x="310.0" y="879.0" font-size="19" fill="#00602F" font-weight="900" text-anchor="middle">ML</text>
+<g id="flow-2-ml-note">
+<text x="310.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">从数据中学习</text><text x="310.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">规律。</text>
+</g></g>
+<g id="flow-arrow-2">
+<line x1="374.5" y1="872.5" x2="387.5" y2="872.5" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 382.5,868.0 L 389.5,872.5 L 382.5,877.0" fill="none" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="flow-3-dl">
+<defs><linearGradient id="flowGrad3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F5F0FC"/><stop offset="1" stop-color="#D6C2F2"/></linearGradient></defs>
+<rect x="396.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad3)"/>
+<text x="455.0" y="879.0" font-size="19" fill="#5B10A0" font-weight="900" text-anchor="middle">DL</text>
+<g id="flow-3-dl-note">
+<text x="455.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">学习复杂的</text><text x="455.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">模式和特征。</text>
+</g></g>
+<g id="flow-arrow-3">
+<line x1="519.5" y1="872.5" x2="532.5" y2="872.5" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 527.5,868.0 L 534.5,872.5 L 527.5,877.0" fill="none" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="flow-4-genai">
+<defs><linearGradient id="flowGrad4" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FEFDF2"/><stop offset="1" stop-color="#F7E9AC"/></linearGradient></defs>
+<rect x="541.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad4)"/>
+<text x="600.0" y="879.0" font-size="19" fill="#6B5900" font-weight="900" text-anchor="middle">GenAI</text>
+<g id="flow-4-genai-note">
+<text x="600.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">生成新的</text><text x="600.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">内容。</text>
+</g></g>
+<g id="flow-arrow-4">
+<line x1="664.5" y1="872.5" x2="677.5" y2="872.5" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 672.5,868.0 L 679.5,872.5 L 672.5,877.0" fill="none" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="flow-5-llms">
+<defs><linearGradient id="flowGrad5" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FEF0F4"/><stop offset="1" stop-color="#F9BDD1"/></linearGradient></defs>
+<rect x="686.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad5)"/>
+<text x="745.0" y="879.0" font-size="19" fill="#941A70" font-weight="900" text-anchor="middle">LLMs</text>
+<g id="flow-5-llms-note">
+<text x="745.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">理解并生成</text><text x="745.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">自然语言。</text>
+</g></g>
+<g id="flow-arrow-5">
+<line x1="809.5" y1="872.5" x2="822.5" y2="872.5" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 817.5,868.0 L 824.5,872.5 L 817.5,877.0" fill="none" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="flow-6-rag">
+<defs><linearGradient id="flowGrad6" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FEF8EC"/><stop offset="1" stop-color="#F5D8A2"/></linearGradient></defs>
+<rect x="831.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad6)"/>
+<text x="890.0" y="879.0" font-size="19" fill="#B06A00" font-weight="900" text-anchor="middle">RAG</text>
+<g id="flow-6-rag-note">
+<text x="890.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">结合知识库</text><text x="890.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">增强生成。</text>
+</g></g>
+<g id="flow-arrow-6">
+<line x1="954.5" y1="872.5" x2="967.5" y2="872.5" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 962.5,868.0 L 969.5,872.5 L 962.5,877.0" fill="none" stroke="#6B7A99" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="flow-7-agentic-ai">
+<defs><linearGradient id="flowGrad7" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EFFCFA"/><stop offset="1" stop-color="#93E2DA"/></linearGradient></defs>
+<rect x="976.0" y="853.0" width="118.0" height="39.0" rx="19.5" fill="url(#flowGrad7)"/>
+<text x="1035.0" y="879.0" font-size="15.5" fill="#00615C" font-weight="900" text-anchor="middle">Agentic AI</text>
+<g id="flow-7-agentic-ai-note">
+<text x="1035.0" y="918.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">能够自主完成</text><text x="1035.0" y="938.0" font-size="14" fill="#4A5A78" font-weight="500" text-anchor="middle">目标任务。</text>
+</g></g>
+</g></g>
+<g id="apps-panel">
+<rect x="20.0" y="953.0" width="687.0" height="246.0" rx="14" fill="#FEFEFF" stroke="#DBE7F7" stroke-width="1.5"/>
+<text x="47.0" y="987.0" font-size="21" fill="#0E274B" font-weight="900" text-anchor="start">真实世界的典型应用</text>
+<g id="apps-rows">
+<g id="app-row-1">
+<rect x="47.0" y="1009.0" width="122.0" height="21.5" rx="6" fill="#EFE9FB" stroke="#CDBCF0" stroke-width="1.4"/>
+<text x="108.0" y="1024.0" font-size="13.5" fill="#5B21B6" font-weight="800" text-anchor="middle">AI</text>
+<line x1="182.0" y1="1019.8" x2="193.0" y2="1019.8" stroke="#5B21B6" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1015.8 L 196.0,1019.8 L 190.0,1023.8" fill="none" stroke="#5B21B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1024.5" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">机器人、专家系统、自动驾驶 AI</text>
+</g>
+<g id="app-row-2">
+<rect x="47.0" y="1034.5" width="122.0" height="21.5" rx="6" fill="#E4F7EC" stroke="#A5DFC2" stroke-width="1.4"/>
+<text x="108.0" y="1049.5" font-size="13.5" fill="#0A7A44" font-weight="800" text-anchor="middle">ML</text>
+<line x1="182.0" y1="1045.3" x2="193.0" y2="1045.3" stroke="#0A7A44" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1041.3 L 196.0,1045.3 L 190.0,1049.3" fill="none" stroke="#0A7A44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1050.0" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">垃圾邮件检测、推荐系统、欺诈检测</text>
+</g>
+<g id="app-row-3">
+<rect x="47.0" y="1060.0" width="122.0" height="21.5" rx="6" fill="#EFE9FB" stroke="#CDBCF0" stroke-width="1.4"/>
+<text x="108.0" y="1075.0" font-size="13.5" fill="#5B21B6" font-weight="800" text-anchor="middle">DL</text>
+<line x1="182.0" y1="1070.8" x2="193.0" y2="1070.8" stroke="#5B21B6" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1066.8 L 196.0,1070.8 L 190.0,1074.8" fill="none" stroke="#5B21B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1075.5" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">图像识别、语音识别、自动驾驶</text>
+</g>
+<g id="app-row-4">
+<rect x="47.0" y="1085.5" width="122.0" height="21.5" rx="6" fill="#FCF5D8" stroke="#EBD896" stroke-width="1.4"/>
+<text x="108.0" y="1100.5" font-size="13.5" fill="#8A6D00" font-weight="800" text-anchor="middle">GenAI</text>
+<line x1="182.0" y1="1096.3" x2="193.0" y2="1096.3" stroke="#8A6D00" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1092.3 L 196.0,1096.3 L 190.0,1100.3" fill="none" stroke="#8A6D00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1101.0" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">ChatGPT、Midjourney、DALL·E、Claude、Stable Diffusion、Suno</text>
+</g>
+<g id="app-row-5">
+<rect x="47.0" y="1111.0" width="122.0" height="21.5" rx="6" fill="#FCE4ED" stroke="#F2BBD0" stroke-width="1.4"/>
+<text x="108.0" y="1126.0" font-size="13.5" fill="#C2185B" font-weight="800" text-anchor="middle">LLMs</text>
+<line x1="182.0" y1="1121.8" x2="193.0" y2="1121.8" stroke="#C2185B" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1117.8 L 196.0,1121.8 L 190.0,1125.8" fill="none" stroke="#C2185B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1126.5" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">GPT-4/5、Claude 3、Gemini 1.5、Llama 3、Mistral、Qwen</text>
+</g>
+<g id="app-row-6">
+<rect x="47.0" y="1136.5" width="122.0" height="21.5" rx="6" fill="#FCEFDA" stroke="#EFD3A0" stroke-width="1.4"/>
+<text x="108.0" y="1151.5" font-size="13.5" fill="#B06A00" font-weight="800" text-anchor="middle">RAG</text>
+<line x1="182.0" y1="1147.3" x2="193.0" y2="1147.3" stroke="#B06A00" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1143.3 L 196.0,1147.3 L 190.0,1151.3" fill="none" stroke="#B06A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1152.0" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">企业知识库、公司知识助手、文档问答</text>
+</g>
+<g id="app-row-7">
+<rect x="47.0" y="1162.0" width="122.0" height="21.5" rx="6" fill="#DCF4F1" stroke="#9FDFD7" stroke-width="1.4"/>
+<text x="108.0" y="1177.0" font-size="11" fill="#00726D" font-weight="800" text-anchor="middle">Agentic AI</text>
+<line x1="182.0" y1="1172.8" x2="193.0" y2="1172.8" stroke="#00726D" stroke-width="2" stroke-linecap="round"/>
+<path d="M 190.0,1168.8 L 196.0,1172.8 L 190.0,1176.8" fill="none" stroke="#00726D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="210.0" y="1177.5" font-size="15" fill="#3A4A66" font-weight="500" text-anchor="start">自主智能体、工具使用、工作流自动化</text>
+</g>
+</g></g>
+<g id="why-panel">
+<rect x="724.0" y="953.0" width="456.0" height="246.0" rx="14" fill="#FEFEFF" stroke="#DBE7F7" stroke-width="1.5"/>
+<text x="751.0" y="987.0" font-size="21" fill="#0E274B" font-weight="900" text-anchor="start">为什么这很重要</text>
+<g id="why-items">
+<g id="why-item-1">
+<g id="why-check-1"><circle cx="768.0" cy="1013.0" r="12.5" fill="#3D9E63"/><path d="M 762.4,1013.0 L 766.8,1017.4 L 774.0,1009.0" stroke="#FFFFFF" stroke-width="3.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="792.0" y="1018.0" font-size="15.5" fill="#3A4A66" font-weight="500" text-anchor="start">理解它们的层级关系和相互联系。</text>
+</g>
+<g id="why-item-2">
+<g id="why-check-2"><circle cx="768.0" cy="1052.0" r="12.5" fill="#3D9E63"/><path d="M 762.4,1052.0 L 766.8,1056.4 L 774.0,1048.0" stroke="#FFFFFF" stroke-width="3.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="792.0" y="1057.0" font-size="15.5" fill="#3A4A66" font-weight="500" text-anchor="start">选择适合你问题的正确方法。</text>
+</g>
+<g id="why-item-3">
+<g id="why-check-3"><circle cx="768.0" cy="1091.0" r="12.5" fill="#3D9E63"/><path d="M 762.4,1091.0 L 766.8,1095.4 L 774.0,1087.0" stroke="#FFFFFF" stroke-width="3.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="792.0" y="1096.0" font-size="15.5" fill="#3A4A66" font-weight="500" text-anchor="start">构建更智能的 AI 产品，提升实际价值。</text>
+</g>
+<g id="why-item-4">
+<g id="why-check-4"><circle cx="768.0" cy="1130.0" r="12.5" fill="#3D9E63"/><path d="M 762.4,1130.0 L 766.8,1134.4 L 774.0,1126.0" stroke="#FFFFFF" stroke-width="3.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="792.0" y="1135.0" font-size="15.5" fill="#3A4A66" font-weight="500" text-anchor="start">使用 RAG 和 AI Agent 能带来更高的准确性</text><text x="792.0" y="1159.0" font-size="15.5" fill="#3A4A66" font-weight="500" text-anchor="start">和自主性。</text>
+</g>
+<g id="why-item-5">
+<g id="why-check-5"><circle cx="768.0" cy="1181.0" r="12.5" fill="#3D9E63"/><path d="M 762.4,1181.0 L 766.8,1185.4 L 774.0,1177.0" stroke="#FFFFFF" stroke-width="3.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="792.0" y="1186.0" font-size="15.5" fill="#3A4A66" font-weight="500" text-anchor="start">保持对技术发展的关注，持续探索和演进。</text>
+</g>
+</g></g>
+<g id="concepts">
+<text x="600.0" y="1222.0" font-size="21" fill="#0E274B" font-weight="900" text-anchor="middle">关键现代概念</text>
+<g id="concept-1">
+<rect x="20.0" y="1240.0" width="183.0" height="110.0" rx="12" fill="#F3EEFC"/>
+<text x="111.5" y="1268.0" font-size="17.5" fill="#0E2749" font-weight="900" text-anchor="middle">多模态 AI</text>
+<g id="concept-1-icon"><g id="concept-1-icon-img" opacity="1" stroke="#7C5CE0" fill="none" stroke-width="2.99" stroke-linecap="round" stroke-linejoin="round"><rect x="69.7" y="1283.8" width="25.1" height="20.3" rx="2.4"/><circle cx="77.3" cy="1290.3" r="2.1"/><path d="M 69.7,1299.7 L 78.3,1293.2 L 85.3,1298.5 L 89.8,1295.2 L 94.9,1298.9"/></g><g stroke="#7C5CE0" stroke-width="2.42" stroke-linecap="round" fill="none"><line x1="113.1" y1="1287.0" x2="113.1" y2="1301.0"/><line x1="116.4" y1="1282.6" x2="116.4" y2="1305.4"/><line x1="119.7" y1="1287.0" x2="119.7" y2="1301.0"/><line x1="123.0" y1="1282.6" x2="123.0" y2="1305.4"/><line x1="126.3" y1="1287.0" x2="126.3" y2="1301.0"/></g><circle cx="140.4" cy="1294.0" r="10.6" fill="#8B5CF6"/><path d="M 137.7,1289.6 L 145.7,1294.0 L 137.7,1298.4 Z" fill="#FFFFFF"/></g>
+<text x="111.5" y="1328.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">处理文本、图像、音频、</text><text x="111.5" y="1347.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">视频等多种信息。</text>
+</g>
+<g id="concept-2">
+<rect x="211.4" y="1240.0" width="183.0" height="110.0" rx="12" fill="#E9F8F0"/>
+<text x="302.9" y="1268.0" font-size="17.5" fill="#0E2749" font-weight="900" text-anchor="middle">RAG</text>
+<g id="concept-2-icon">
+<g id="concept-2-icon-db" fill="none" stroke="#0FA36B" stroke-width="2.57">
+  <ellipse cx="295.9" cy="1281.3" rx="14.4" ry="4.5"/>
+  <path d="M 281.4,1281.3 V 1306.7"/>
+  <path d="M 310.3,1281.3 V 1306.7"/>
+  <path d="M 281.4,1293.3 A 14.4 4.5 0 0 0 310.3,1293.3"/>
+  <path d="M 281.4,1306.7 A 14.4 4.5 0 0 0 310.3,1306.7"/>
+</g><g stroke="#0A7A44" stroke-width="4.40" stroke-linecap="round"><line x1="320.5" y1="1287.0" x2="320.5" y2="1301.0"/><line x1="312.6" y1="1294.0" x2="328.4" y2="1294.0"/></g></g>
+<text x="302.9" y="1328.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">从外部知识库获取信息，</text><text x="302.9" y="1347.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">提升生成效果。</text>
+</g>
+<g id="concept-3">
+<rect x="402.8" y="1240.0" width="183.0" height="110.0" rx="12" fill="#F3EEFC"/>
+<text x="494.3" y="1268.0" font-size="17.5" fill="#6D28D9" font-weight="900" text-anchor="middle">微调训练</text>
+<g id="concept-3-icon" stroke="#8B5CF6" stroke-width="3.00" stroke-linecap="round" fill="none"><line x1="479.9" y1="1286.8" x2="508.7" y2="1286.8"/><line x1="479.9" y1="1299.6" x2="508.7" y2="1299.6"/><circle cx="490.3" cy="1286.8" r="4.0" fill="#FFFFFF"/><circle cx="500.7" cy="1299.6" r="4.0" fill="#FFFFFF"/></g>
+<text x="494.3" y="1328.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">针对特定任务优化</text><text x="494.3" y="1347.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">模型表现。</text>
+</g>
+<g id="concept-4">
+<rect x="594.2" y="1240.0" width="183.0" height="110.0" rx="12" fill="#ECEBFB"/>
+<text x="685.7" y="1268.0" font-size="17.5" fill="#2563EB" font-weight="900" text-anchor="middle">提示工程</text>
+<g id="concept-4-icon"><circle cx="685.7" cy="1294.0" r="12.0" fill="#4F6EF0"/><path d="M 679.3,1303.6 L 676.1,1310.0 L 684.1,1306.0 Z" fill="#4F6EF0"/><circle cx="680.9" cy="1294.0" r="1.4" fill="#FFFFFF"/><circle cx="685.7" cy="1294.0" r="1.4" fill="#FFFFFF"/><circle cx="690.5" cy="1294.0" r="1.4" fill="#FFFFFF"/></g>
+<text x="685.7" y="1328.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">设计更好的提示，</text><text x="685.7" y="1347.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">引导模型输出。</text>
+</g>
+<g id="concept-5">
+<rect x="785.6" y="1240.0" width="183.0" height="110.0" rx="12" fill="#E9F8F0"/>
+<text x="877.1" y="1268.0" font-size="17.5" fill="#0E2749" font-weight="900" text-anchor="middle">AI 安全</text>
+<g id="concept-5-icon"><path d="M 877.1,1278.0 L 889.1,1283.2 V 1294.8 C 889.1,1302.8 883.1,1307.6 877.1,1310.0 C 871.1,1307.6 865.1,1302.8 865.1,1294.8 V 1283.2 Z" fill="#0FA36B"/><path d="M 871.9,1293.2 L 875.9,1298.0 L 883.5,1289.2" stroke="#FFFFFF" stroke-width="2.80" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="877.1" y="1328.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">建立信任与安全机制，</text><text x="877.1" y="1347.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">确保 AI 可控、可靠。</text>
+</g>
+<g id="concept-6">
+<rect x="977.0" y="1240.0" width="183.0" height="110.0" rx="12" fill="#F0EEFB"/>
+<text x="1068.5" y="1268.0" font-size="17.5" fill="#0E2749" font-weight="900" text-anchor="middle">AI 智能体</text>
+
+<g id="concept-6-icon" fill="none" stroke="#6366F1" stroke-width="2.80" stroke-linecap="round">
+  <line x1="1068.5" y1="1277.6" x2="1068.5" y2="1281.6"/>
+  <circle cx="1068.5" cy="1276.4" r="2.2" fill="#6366F1" stroke="none"/>
+  <rect x="1050.1" y="1281.6" width="36.8" height="29.6" rx="6.4" fill="#6366F1" fill-opacity=".12"/>
+  <circle cx="1060.4" cy="1294.9" r="3.0" fill="#6366F1" stroke="none"/>
+  <circle cx="1076.6" cy="1294.9" r="3.0" fill="#6366F1" stroke="none"/>
+  <path d="M 1062.6,1303.5 Q 1068.5,1307.1 1074.4,1303.5"/>
+  <line x1="1046.1" y1="1294.9" x2="1050.1" y2="1294.9"/>
+  <line x1="1086.9" y1="1294.9" x2="1090.9" y2="1294.9"/>
+</g>
+<text x="1068.5" y="1328.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">能够感知、思考、行动，</text><text x="1068.5" y="1347.0" font-size="13.5" fill="#4A5568" font-weight="400" text-anchor="middle">达成目标。</text>
+</g>
+</g>
+<g id="scenes-panel">
+<rect x="20.0" y="1358.0" width="1160.0" height="126.0" rx="14" fill="#FEFEFF" stroke="#DBE7F7" stroke-width="1.5"/>
+<text x="47.0" y="1388.0" font-size="20" fill="#0E274B" font-weight="900" text-anchor="start">常见使用场景</text>
+<g id="scene-items">
+<g id="scene-1">
+<rect x="42.0" y="1400.0" width="32.0" height="32.0" rx="9" fill="#F1F4F9"/>
+<g id="scene-1-icon" stroke="#4A5568" fill="none" stroke-width="1.98" stroke-linecap="round"><path d="M 51.4,1417.3 A 6.6 6.6 0 0 1 64.6,1417.3"/><rect x="49.6" y="1416.4" width="3.1" height="5.3" rx="1.3"/><rect x="63.3" y="1416.4" width="3.1" height="5.3" rx="1.3"/><path d="M 64.8,1421.7 Q 64.8,1424.8 60.2,1424.8"/></g>
+<text x="84.0" y="1413.0" font-size="15" fill="#0E274B" font-weight="800" text-anchor="start">客服支持</text>
+<text x="84.0" y="1430.0" font-size="15" fill="#0E274B" font-weight="800" text-anchor="start">(LLM + RAG)</text>
+<g id="scene-1-note">
+<text x="42.0" y="1448.0" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">问答、知识库、个性化服务</text>
+</g></g>
+<g id="scene-2">
+<rect x="274.0" y="1400.0" width="32.0" height="32.0" rx="9" fill="#F1F4F9"/>
+<g id="scene-2-icon" stroke="#0FA36B" fill="none" stroke-width="2.20" stroke-linecap="round" stroke-linejoin="round"><rect x="282.5" y="1406.8" width="15.0" height="18.5" rx="1.8"/><line x1="285.8" y1="1411.9" x2="294.2" y2="1411.9"/><line x1="285.8" y1="1415.6" x2="294.2" y2="1415.6"/><line x1="285.8" y1="1419.3" x2="294.2" y2="1419.3"/></g>
+<text x="316.0" y="1421.0" font-size="15" fill="#0E274B" font-weight="800" text-anchor="start">文档处理 (LLM)</text>
+<g id="scene-2-note">
+<text x="274.0" y="1448.0" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">摘要、提取、生成、写作</text>
+</g></g>
+<g id="scene-3">
+<rect x="506.0" y="1400.0" width="32.0" height="32.0" rx="9" fill="#F1F4F9"/>
+<g id="scene-3-icon" stroke="#2563EB" fill="none" stroke-width="2.20" stroke-linecap="round" stroke-linejoin="round"><rect x="512.8" y="1408.5" width="18.5" height="15.0" rx="1.8"/><circle cx="518.3" cy="1413.3" r="1.5"/><path d="M 512.8,1420.2 L 519.0,1415.4 L 524.2,1419.3 L 527.5,1416.9 L 531.2,1419.6"/></g>
+<text x="548.0" y="1421.0" font-size="15" fill="#0E274B" font-weight="800" text-anchor="start">图像生成 (GenAI)</text>
+<g id="scene-3-note">
+<text x="506.0" y="1448.0" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">图像、设计、内容创作</text>
+</g></g>
+<g id="scene-4">
+<rect x="738.0" y="1400.0" width="32.0" height="32.0" rx="9" fill="#F1F4F9"/>
+
+<g id="scene-4-icon" stroke="#2563EB" fill="none" stroke-width="1.76" stroke-linecap="round">
+  <rect x="744.9" y="1416.0" width="3.2" height="7.5" rx="1.0"/><rect x="749.5" y="1412.5" width="3.2" height="11.0" rx="1.0"/><rect x="754.2" y="1409.0" width="3.2" height="14.5" rx="1.0"/><rect x="758.9" y="1405.4" width="3.2" height="18.0" rx="1.0"/>
+  <path d="M 744.9,1423.5 H 761.1"/>
+</g>
+<text x="780.0" y="1421.0" font-size="15" fill="#0E274B" font-weight="800" text-anchor="start">数据分析 (AI)</text>
+<g id="scene-4-note">
+<text x="738.0" y="1448.0" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">分析规律、构建数据集、</text><text x="738.0" y="1465.5" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">执行任务。</text>
+</g></g>
+<g id="scene-5">
+<rect x="970.0" y="1400.0" width="32.0" height="32.0" rx="9" fill="#F1F4F9"/>
+<g id="scene-5-icon" stroke="#0FA36B" fill="none" stroke-width="2.42" stroke-linecap="round" stroke-linejoin="round"><path d="M 986.0,1406.8 L 993.5,1409.8 V 1416.9 C 993.5,1421.7 989.5,1424.8 986.0,1426.1 C 982.5,1424.8 978.5,1421.7 978.5,1416.9 V 1409.8 Z"/><path d="M 982.9,1416.0 L 985.3,1418.9 L 989.5,1413.4"/></g>
+<text x="1012.0" y="1421.0" font-size="15" fill="#0E274B" font-weight="800" text-anchor="start">流程自动化 (ML)</text>
+<g id="scene-5-note">
+<text x="970.0" y="1448.0" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">检测异常、降低风险、</text><text x="970.0" y="1465.5" font-size="13" fill="#5A6B85" font-weight="400" text-anchor="start">提升效率。</text>
+</g></g>
+</g></g>
+<g id="warn-panel">
+<rect x="20.0" y="1496.0" width="1160.0" height="92.0" rx="14" fill="#FDF3F5" stroke="#F5D8DE" stroke-width="1.5"/>
+<g id="warn-1">
+<g id="warn-1-icon"><circle cx="69.0" cy="1526.0" r="17.0" fill="#E53946"/><line x1="69.0" y1="1517.8" x2="69.0" y2="1527.7" stroke="#FFFFFF" stroke-width="3.74" stroke-linecap="round"/><circle cx="69.0" cy="1533.7" r="2.2" fill="#FFFFFF"/></g>
+<text x="98.0" y="1518.0" font-size="15.5" fill="#D32F3E" font-weight="900" text-anchor="start">重要提醒</text>
+<text x="98.0" y="1537.0" font-size="15.5" fill="#D32F3E" font-weight="900" text-anchor="start">RAG 并非总是 100% 准确。</text>
+<g id="warn-1-desc">
+<text x="98.0" y="1560.0" font-size="13.5" fill="#7A5A62" font-weight="400" text-anchor="start">生成内容可能包含错误，需由可信来源</text><text x="98.0" y="1579.0" font-size="13.5" fill="#7A5A62" font-weight="400" text-anchor="start">进行验证。</text>
+</g></g>
+<g id="warn-2">
+<g id="warn-2-icon"><circle cx="417.0" cy="1526.0" r="14.7" fill="#FFFFFF" stroke="#E53946" stroke-width="2.56"/><line x1="417.0" y1="1519.0" x2="417.0" y2="1527.3" stroke="#E53946" stroke-width="3.20" stroke-linecap="round"/><circle cx="417.0" cy="1532.7" r="1.9" fill="#E53946"/></g>
+<text x="446.0" y="1518.0" font-size="15.5" fill="#D32F3E" font-weight="900" text-anchor="start">AI 生成内容更需谨慎。</text>
+<g id="warn-2-desc">
+<text x="446.0" y="1541.0" font-size="13.5" fill="#7A5A62" font-weight="400" text-anchor="start">AI 可能会产生不准确的信息，</text><text x="446.0" y="1560.0" font-size="13.5" fill="#7A5A62" font-weight="400" text-anchor="start">务必核实关键信息的来源。</text>
+</g></g>
+<g id="warn-3">
+<g id="warn-3-icon"><path d="M 807.0,1512.4 L 817.2,1516.8 V 1526.7 C 817.2,1533.5 812.1,1537.6 807.0,1539.6 C 801.9,1537.6 796.8,1533.5 796.8,1526.7 V 1516.8 Z" fill="#3B82F6"/><path d="M 802.6,1525.3 L 806.0,1529.4 L 812.4,1521.9" stroke="#FFFFFF" stroke-width="2.38" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="836.0" y="1518.0" font-size="15.5" fill="#1D4ED8" font-weight="900" text-anchor="start">自主智能体需要更多安全保障。</text>
+<g id="warn-3-desc">
+<text x="836.0" y="1541.0" font-size="13.5" fill="#5A6B85" font-weight="400" text-anchor="start">它的能力更强，也带来更大的风险，</text><text x="836.0" y="1560.0" font-size="13.5" fill="#5A6B85" font-weight="400" text-anchor="start">需要在部署时进行监控、评估和安全机制建设。</text>
+</g></g>
+</g>
+</svg>
+</div>
+</body>
+</html>

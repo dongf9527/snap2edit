@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>公开框架与实施工具的对应关系</title>
+<style>
+  html,body { margin:0; padding:0; background:#FDFDFD; }
+  #stage { width:1728px; height:972px; position:relative; }
+  svg { display:block; }
+  text { font-family:Noto Sans SC, Microsoft YaHei, PingFang SC, sans-serif; }
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="canvas" viewBox="0 0 1728 972" width="1728" height="972" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="1728" height="972" fill="#FDFDFD"/>
+  <g id="grid" class="unit" data-unit="grid">
+    <line x1="187" y1="160" x2="187" y2="922" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="503" y1="160" x2="503" y2="922" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="806" y1="160" x2="806" y2="922" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="1122" y1="160" x2="1122" y2="922" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="1434" y1="160" x2="1434" y2="771" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="1716" y1="160" x2="1716" y2="922" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="187" y1="160" x2="1716" y2="160" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="187" y1="312" x2="1716" y2="312" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="187" y1="465" x2="1716" y2="465" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="187" y1="619" x2="1716" y2="619" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="187" y1="771" x2="1716" y2="771" stroke="#D8DEE3" stroke-width="2"/>
+    <line x1="187" y1="922" x2="1716" y2="922" stroke="#D8DEE3" stroke-width="2"/>
+  </g>
+  <g id="title" class="unit" data-unit="title">
+    <text x="31" y="67.1" font-size="60" fill="#13294B" font-weight="700" text-anchor="start" stroke="#13294B" stroke-width="2.28" paint-order="stroke" stroke-linejoin="round">公开框架与实施工具的对应关系</text>
+  </g>
+  <g id="chev1" class="unit" data-unit="chev1">
+    <polygon points="186,102 494,102 508,135 494,168 186,168" fill="#1C3C5E"/>
+  </g>
+  <g id="chev1_icon" class="unit" data-unit="chev1_icon">
+    <path d="M212,123.0 C218.0,119.0 225.0,119.0 230.0,123.0 C235.0,119.0 242.0,119.0 248.0,123.0 L248.0,145.0 C242.0,141.0 235.0,141.0 230.0,145.0 C225.0,141.0 218.0,141.0 212,145.0 Z" fill="#FFFFFF"/>
+    <rect x="229" y="122" width="2" height="24" fill="#FFFFFF"/>
+  </g>
+  <g id="chev1_txt" class="unit" data-unit="chev1_txt">
+    <text x="378" y="143.1" font-size="22.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">公开研究 / 能力评估</text>
+  </g>
+  <g id="chev2" class="unit" data-unit="chev2">
+    <polygon points="505,102 800,102 814,135 800,168 505,168 519,135" fill="#7E8869"/>
+  </g>
+  <g id="chev2_icon" class="unit" data-unit="chev2_icon">
+    <path d="M546.0,118.0 L561.0,123.0 L561.0,135.0 C561.0,144.0 555.0,150.0 546.0,153.0 C537.0,150.0 531.0,144.0 531.0,135.0 L531.0,123.0 Z" fill="#FFFFFF"/>
+    <polyline points="539,135 544,140 554,129" fill="none" stroke="#FFFFFF" stroke-width="2.6"/>
+  </g>
+  <g id="chev2_txt" class="unit" data-unit="chev2_txt">
+    <text x="663" y="143.1" font-size="22.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">可信 AI</text>
+  </g>
+  <g id="chev3" class="unit" data-unit="chev3">
+    <polygon points="816,102 1101,102 1115,135 1101,168 816,168 830,135" fill="#998C85"/>
+  </g>
+  <g id="chev3_icon" class="unit" data-unit="chev3_icon">
+    <circle cx="846.2" cy="127.5" r="4.6" fill="#FFFFFF"/>
+    <path d="M840.2,140.5 C840.2,133.5 843.0,133.0 846.2,133.0 C849.4,133.0 852.2,133.5 852.2,140.5 Z" fill="#FFFFFF"/>
+    <circle cx="865.8" cy="127.5" r="4.6" fill="#FFFFFF"/>
+    <path d="M859.8,140.5 C859.8,133.5 862.6,133.0 865.8,133.0 C869.0,133.0 871.8,133.5 871.8,140.5 Z" fill="#FFFFFF"/>
+    <circle cx="856" cy="125.6" r="5.4" fill="#FFFFFF"/>
+    <path d="M849.2,140.0 C849.2,132.0 852.4,131.2 856.0,131.2 C859.6,131.2 862.8,132.0 862.8,140.0 Z" fill="#FFFFFF"/>
+  </g>
+  <g id="chev3_txt" class="unit" data-unit="chev3_txt">
+    <text x="1005" y="143.1" font-size="22.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">董事会治理</text>
+  </g>
+  <g id="chev4" class="unit" data-unit="chev4">
+    <polygon points="1116,102 1404,102 1418,135 1404,168 1116,168 1130,135" fill="#8A819B"/>
+  </g>
+  <g id="chev4_icon" class="unit" data-unit="chev4_icon">
+    <rect x="1141" y="141" width="6.5" height="11" fill="#FFFFFF"/>
+    <rect x="1149.5" y="135" width="6.5" height="17" fill="#FFFFFF"/>
+    <rect x="1158" y="129" width="6.5" height="23" fill="#FFFFFF"/>
+    <path d="M1141.0,136.0 C1151.0,133.0 1161.0,128.0 1169.0,121.5" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+    <polygon points="1166.5,118 1174,119.5 1169,125.5" fill="#FFFFFF"/>
+  </g>
+  <g id="chev4_txt" class="unit" data-unit="chev4_txt">
+    <text x="1292" y="143.1" font-size="22.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">规模化实践</text>
+  </g>
+  <g id="src_head_box" class="unit" data-unit="src_head_box">
+    <rect x="1442" y="102" width="276" height="68" fill="#E4E8EB" rx="8"/>
+  </g>
+  <g id="src_head_icon" class="unit" data-unit="src_head_icon">
+    <path d="M1466.4444444444443,115.66666666666667 L1488.6666666666667,115.66666666666667 L1497.5555555555557,124.55555555555556 L1497.5555555555557,152.33333333333334 L1466.4444444444443,152.33333333333334 Z" fill="#1B3A5C"/>
+    <path d="M1488.6666666666667,115.66666666666667 L1488.6666666666667,124.55555555555556 L1497.5555555555557,124.55555555555556 Z" fill="#FFFFFF"/>
+    <rect x="1470.89" y="130.67" width="20" height="2.67" fill="#FFFFFF"/>
+    <rect x="1470.89" y="137.33" width="20" height="2.67" fill="#FFFFFF"/>
+    <rect x="1470.89" y="144" width="13.33" height="2.67" fill="#FFFFFF"/>
+  </g>
+  <g id="src_head_txt" class="unit" data-unit="src_head_txt">
+    <text x="1510" y="142.06" font-size="21" fill="#1B3A5C" font-weight="700" text-anchor="start">主要来源（公开资料）</text>
+  </g>
+  <g id="rowlabel1" class="unit" data-unit="rowlabel1">
+    <polygon points="14,177 160,177 178,243.5 160,310 14,310" fill="#EDF1F3"/>
+    <circle cx="44" cy="207" r="18" fill="#0A2340"/>
+    <text x="44" y="214.2" font-size="20" fill="#FFFFFF" font-weight="700" text-anchor="middle">1</text>
+    <text x="30" y="253.56" font-size="21" fill="#0A2340" font-weight="700" text-anchor="start">本报告拆解 /</text>
+    <text x="30" y="283.56" font-size="21" fill="#0A2340" font-weight="700" text-anchor="start">现状证据</text>
+  </g>
+  <g id="rowlabel2" class="unit" data-unit="rowlabel2">
+    <polygon points="14,319 160,319 178,391 160,463 14,463" fill="#EDF1F3"/>
+    <circle cx="44" cy="358" r="18" fill="#0A2340"/>
+    <text x="44" y="365.2" font-size="20" fill="#FFFFFF" font-weight="700" text-anchor="middle">2</text>
+    <text x="30" y="411.56" font-size="21" fill="#0A2340" font-weight="700" text-anchor="start">场景组合</text>
+  </g>
+  <g id="rowlabel3" class="unit" data-unit="rowlabel3">
+    <polygon points="14,471 160,471 178,543 160,615 14,615" fill="#EDF1F3"/>
+    <circle cx="44" cy="512" r="18" fill="#0A2340"/>
+    <text x="44" y="519.2" font-size="20" fill="#FFFFFF" font-weight="700" text-anchor="middle">3</text>
+    <text x="30" y="564.56" font-size="21" fill="#0A2340" font-weight="700" text-anchor="start">分阶段交付</text>
+  </g>
+  <g id="rowlabel4" class="unit" data-unit="rowlabel4">
+    <polygon points="14,623 160,623 178,695 160,767 14,767" fill="#EDF1F3"/>
+    <circle cx="44" cy="664" r="18" fill="#0A2340"/>
+    <text x="44" y="671.2" font-size="20" fill="#FFFFFF" font-weight="700" text-anchor="middle">4</text>
+    <text x="30" y="715.56" font-size="21" fill="#0A2340" font-weight="700" text-anchor="start">责任与控制</text>
+  </g>
+  <g id="rowlabel5" class="unit" data-unit="rowlabel5">
+    <polygon points="14,775 160,775 178,847 160,919 14,919" fill="#EDF1F3"/>
+    <circle cx="44" cy="809" r="18" fill="#0A2340"/>
+    <text x="44" y="816.2" font-size="20" fill="#FFFFFF" font-weight="700" text-anchor="middle">5</text>
+    <text x="30" y="860.56" font-size="21" fill="#0A2340" font-weight="700" text-anchor="start">企业应用</text>
+  </g>
+  <g id="r1c1_icon" class="unit" data-unit="r1c1_icon">
+    <rect x="197" y="244" width="16" height="44" fill="#9FB0C0"/>
+    <rect x="218" y="228" width="16" height="60" fill="#33566F"/>
+    <rect x="239" y="212" width="16" height="76" fill="#3D607E"/>
+    <rect x="260" y="196" width="16" height="92" fill="#2C4C68"/>
+    <rect x="281" y="202" width="16" height="86" fill="#5B7C9C"/>
+    <rect x="302" y="182" width="16" height="106" fill="#A9BACA"/>
+    <rect x="197" y="226" width="121" height="2.4" fill="#FFFFFF" opacity="0.85"/>
+    <rect x="197" y="288" width="121" height="2.6" fill="#1B3A5C"/>
+  </g>
+  <g id="r1c1_b" class="unit" data-unit="r1c1_b">
+    <circle cx="345" cy="217" r="3.6" fill="#1B3A5C"/>
+    <text x="357" y="222.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">行业水平与标杆对比</text>
+    <circle cx="345" cy="243" r="3.6" fill="#1B3A5C"/>
+    <text x="357" y="248.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">企业能力现状评估</text>
+    <circle cx="345" cy="268" r="3.6" fill="#1B3A5C"/>
+    <text x="357" y="273.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">差距与改进方向</text>
+  </g>
+  <g id="r1c2_icon" class="unit" data-unit="r1c2_icon">
+    <path d="M541.1333333333333,194.3 L571.8,194.3 L584.0666666666667,206.56666666666666 L584.0666666666667,244.9 L541.1333333333333,244.9 Z" fill="#818B6B"/>
+    <path d="M571.8,194.3 L571.8,206.56666666666666 L584.0666666666667,206.56666666666666 Z" fill="#FFFFFF"/>
+    <rect x="547.27" y="215" width="27.6" height="3.68" fill="#FFFFFF"/>
+    <rect x="547.27" y="224.2" width="27.6" height="3.68" fill="#FFFFFF"/>
+    <rect x="547.27" y="233.4" width="18.4" height="3.68" fill="#FFFFFF"/>
+    <circle cx="575" cy="232" r="13.33" fill="#FFFFFF" stroke="#818B6B" stroke-width="5.33"/>
+    <line x1="585.83" y1="242.83" x2="595" y2="252" stroke="#818B6B" stroke-width="6"/>
+  </g>
+  <g id="r1c2_b" class="unit" data-unit="r1c2_b">
+    <circle cx="648" cy="217" r="3.6" fill="#1B3A5C"/>
+    <text x="661" y="222.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">风险类型与典型案例</text>
+    <circle cx="648" cy="243" r="3.6" fill="#1B3A5C"/>
+    <text x="661" y="248.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">可信特征与能力要求</text>
+    <circle cx="648" cy="268" r="3.6" fill="#1B3A5C"/>
+    <text x="661" y="273.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">现状证据与差距分析</text>
+  </g>
+  <g id="r1c3_icon" class="unit" data-unit="r1c3_icon">
+    <circle cx="851.78" cy="213.22" r="7.92" fill="#998C85"/>
+    <circle cx="886.22" cy="213.22" r="7.92" fill="#998C85"/>
+    <circle cx="869" cy="210.64" r="9.64" fill="#998C85"/>
+    <path d="M843.1666666666666,233.88888888888889 C843.1666666666666,225.27777777777777 847.4722222222222,221.83333333333334 851.7777777777778,221.83333333333334 C856.0833333333334,221.83333333333334 860.3888888888889,225.27777777777777 860.3888888888889,233.88888888888889 Z" fill="#998C85"/>
+    <path d="M877.6111111111111,233.88888888888889 C877.6111111111111,225.27777777777777 881.9166666666666,221.83333333333334 886.2222222222222,221.83333333333334 C890.5277777777778,221.83333333333334 894.8333333333334,225.27777777777777 894.8333333333334,233.88888888888889 Z" fill="#998C85"/>
+    <path d="M857.8055555555555,232.16666666666669 C857.8055555555555,222.69444444444446 862.9722222222222,219.25 869.0,219.25 C875.0277777777778,219.25 880.1944444444445,222.69444444444446 880.1944444444445,232.16666666666669 Z" fill="#998C85"/>
+    <polygon points="844.89,239.06 893.11,239.06 886.22,252.83 851.78,252.83" fill="#998C85"/>
+  </g>
+  <g id="r1c3_b" class="unit" data-unit="r1c3_b">
+    <circle cx="953" cy="217" r="3.6" fill="#1B3A5C"/>
+    <text x="966" y="222.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">治理重点与监督议题</text>
+    <circle cx="953" cy="243" r="3.6" fill="#1B3A5C"/>
+    <text x="966" y="248.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">监管要求与合规趋势</text>
+    <circle cx="953" cy="268" r="3.6" fill="#1B3A5C"/>
+    <text x="966" y="273.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">董事会关注点分析</text>
+  </g>
+  <g id="r1c4_icon" class="unit" data-unit="r1c4_icon">
+    <rect x="1152" y="236" width="22" height="36" fill="#89809A"/>
+    <rect x="1182" y="216" width="22" height="56" fill="#89809A"/>
+    <rect x="1212" y="196" width="22" height="76" fill="#89809A"/>
+    <rect x="1242" y="174" width="22" height="98" fill="#A49BB5"/>
+    <path d="M1156.0,252.0 C1186.0,232.0 1214.0,214.0 1244.0,196.0" fill="none" stroke="#89809A" stroke-width="5"/>
+    <polygon points="1240,188 1256,200 1238,206" fill="#89809A"/>
+  </g>
+  <g id="r1c4_b" class="unit" data-unit="r1c4_b">
+    <circle cx="1268" cy="217" r="3.6" fill="#1B3A5C"/>
+    <text x="1281" y="222.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">规模化应用趋势</text>
+    <circle cx="1268" cy="243" r="3.6" fill="#1B3A5C"/>
+    <text x="1281" y="248.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">行业实践与成效证据</text>
+    <circle cx="1268" cy="268" r="3.6" fill="#1B3A5C"/>
+    <text x="1281" y="273.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">成功要素与挑战</text>
+  </g>
+  <g id="r2c1_tiles" class="unit" data-unit="r2c1_tiles">
+    <rect x="200" y="332" width="50" height="52" fill="#DDE3E9" rx="10"/>
+    <rect x="263" y="332" width="50" height="52" fill="#DDE3E9" rx="10"/>
+    <rect x="200" y="391" width="50" height="52" fill="#DDE3E9" rx="10"/>
+    <rect x="263" y="391" width="50" height="52" fill="#DDE3E9" rx="10"/>
+  </g>
+  <g id="r2c1_ic1" class="unit" data-unit="r2c1_ic1">
+    <circle cx="222.67" cy="354.67" r="7.39" fill="none" stroke="#2E5070" stroke-width="2.64"/>
+    <line x1="228.11" y1="360.11" x2="235.11" y2="367.11" stroke="#2E5070" stroke-width="3.11"/>
+  </g>
+  <g id="r2c1_ic2" class="unit" data-unit="r2c1_ic2">
+    <path d="M276.3333333333333,346.8888888888889 L299.6666666666667,346.8888888888889 L299.6666666666667,362.44444444444446 L284.8888888888889,362.44444444444446 L279.44444444444446,367.1111111111111 L279.44444444444446,362.44444444444446 L276.3333333333333,362.44444444444446 Z" fill="#2E5070"/>
+    <circle cx="282.56" cy="354.67" r="1.56" fill="#FFFFFF"/>
+    <circle cx="288" cy="354.67" r="1.56" fill="#FFFFFF"/>
+    <circle cx="293.44" cy="354.67" r="1.56" fill="#FFFFFF"/>
+  </g>
+  <g id="r2c1_ic3" class="unit" data-unit="r2c1_ic3">
+    <path d="M217.83333333333334,404.5 L230.33333333333334,404.5 L236.16666666666666,410.3333333333333 L236.16666666666666,429.5 L217.83333333333334,429.5 Z" fill="#FFFFFF" stroke="#2E5070" stroke-width="2.17"/>
+    <path d="M230.33333333333334,404.5 L230.33333333333334,410.3333333333333 L236.16666666666666,410.3333333333333" fill="none" stroke="#2E5070" stroke-width="1.83"/>
+    <rect x="221.17" y="414.5" width="10.83" height="1.83" fill="#2E5070"/>
+    <rect x="221.17" y="419.08" width="10.83" height="1.83" fill="#2E5070"/>
+    <rect x="221.17" y="423.67" width="6.67" height="1.83" fill="#2E5070"/>
+  </g>
+  <g id="r2c1_ic4" class="unit" data-unit="r2c1_ic4">
+    <circle cx="289" cy="416" r="8.17" fill="#2E5070"/>
+    <line x1="296.78" y1="416" x2="301.06" y2="416" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="294.5" y1="421.5" x2="297.52" y2="424.52" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="289" y1="423.78" x2="289" y2="428.06" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="283.5" y1="421.5" x2="280.48" y2="424.52" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="281.22" y1="416" x2="276.94" y2="416" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="283.5" y1="410.5" x2="280.48" y2="407.48" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="289" y1="408.22" x2="289" y2="403.94" stroke="#2E5070" stroke-width="4.04"/>
+    <line x1="294.5" y1="410.5" x2="297.52" y2="407.48" stroke="#2E5070" stroke-width="4.04"/>
+    <circle cx="289" cy="416" r="3.27" fill="#FFFFFF"/>
+  </g>
+  <g id="r2c1_b" class="unit" data-unit="r2c1_b">
+    <circle cx="345" cy="359" r="3.6" fill="#1B3A5C"/>
+    <text x="358" y="364.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">高价值场景识别</text>
+    <circle cx="345" cy="385" r="3.6" fill="#1B3A5C"/>
+    <text x="358" y="390.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">场景优先级排序</text>
+    <circle cx="345" cy="411" r="3.6" fill="#1B3A5C"/>
+    <text x="358" y="416.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">能力匹配与差距</text>
+  </g>
+  <g id="r2c2_pills" class="unit" data-unit="r2c2_pills">
+    <rect x="519" y="331" width="110" height="28" fill="#818B6B" rx="5"/>
+    <text x="574" y="350.94" font-size="16.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">公平性</text>
+    <rect x="519" y="362" width="110" height="28" fill="#818B6B" rx="5"/>
+    <text x="574" y="381.94" font-size="16.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">安全性</text>
+    <rect x="519" y="393" width="110" height="28" fill="#818B6B" rx="5"/>
+    <text x="574" y="412.94" font-size="16.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">可解释性</text>
+    <rect x="519" y="424" width="110" height="28" fill="#818B6B" rx="5"/>
+    <text x="574" y="443.94" font-size="16.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">隐私保护</text>
+  </g>
+  <g id="r2c2_b" class="unit" data-unit="r2c2_b">
+    <circle cx="647" cy="359" r="3.6" fill="#1B3A5C"/>
+    <text x="660" y="364.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">场景可信要求</text>
+    <circle cx="647" cy="385" r="3.6" fill="#1B3A5C"/>
+    <text x="660" y="390.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">风险与缓解措施</text>
+    <circle cx="647" cy="411" r="3.6" fill="#1B3A5C"/>
+    <text x="660" y="416.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">可信能力组合</text>
+  </g>
+  <g id="r2c3_boxes" class="unit" data-unit="r2c3_boxes">
+    <rect x="854" y="335" width="82" height="32" fill="#F8F7F3" rx="3" stroke="#A79B7E" stroke-width="1.6"/>
+    <rect x="820" y="397" width="78" height="32" fill="#F8F7F3" rx="3" stroke="#A79B7E" stroke-width="1.6"/>
+    <rect x="910" y="397" width="78" height="32" fill="#F8F7F3" rx="3" stroke="#A79B7E" stroke-width="1.6"/>
+  </g>
+  <g id="r2c3_conn" class="unit" data-unit="r2c3_conn">
+    <polyline points="895,367 895,382" fill="none" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="859" y1="382" x2="949" y2="382" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="859" y1="382" x2="859" y2="397" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="949" y1="382" x2="949" y2="397" stroke="#1B3A5C" stroke-width="2"/>
+  </g>
+  <g id="r2c3_txt" class="unit" data-unit="r2c3_txt">
+    <text x="895" y="356.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">董事会</text>
+    <text x="859" y="417.86" font-size="13.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">审计委员会</text>
+    <text x="949" y="417.86" font-size="13.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">管理层</text>
+  </g>
+  <g id="r2c3_b" class="unit" data-unit="r2c3_b">
+    <circle cx="990" cy="360" r="3.6" fill="#1B3A5C"/>
+    <text x="1003" y="365.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">场景的治理要求</text>
+    <circle cx="990" cy="385" r="3.6" fill="#1B3A5C"/>
+    <text x="1003" y="390.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">决策与监督机制</text>
+    <circle cx="990" cy="413" r="3.6" fill="#1B3A5C"/>
+    <text x="1003" y="418.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">汇报与审查安排</text>
+  </g>
+  <g id="r2c4_pills" class="unit" data-unit="r2c4_pills">
+    <rect x="1132" y="337" width="79" height="49" fill="#4A6481" rx="8"/>
+    <text x="1171" y="366.4" font-size="15" fill="#FFFFFF" font-weight="700" text-anchor="middle">客户服务</text>
+    <rect x="1217" y="337" width="78" height="49" fill="#8E869E" rx="8"/>
+    <text x="1256" y="366.4" font-size="15" fill="#FFFFFF" font-weight="700" text-anchor="middle">营销增长</text>
+    <rect x="1132" y="390" width="79" height="49" fill="#4A6481" rx="8"/>
+    <text x="1171" y="419.4" font-size="15" fill="#FFFFFF" font-weight="700" text-anchor="middle">运营提效</text>
+    <rect x="1217" y="390" width="78" height="49" fill="#9C8F87" rx="8"/>
+    <text x="1256" y="419.4" font-size="15" fill="#FFFFFF" font-weight="700" text-anchor="middle">产品创新</text>
+  </g>
+  <g id="r2c4_b" class="unit" data-unit="r2c4_b">
+    <circle cx="1311" cy="359" r="3.6" fill="#1B3A5C"/>
+    <text x="1324" y="364.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">场景组合策略</text>
+    <circle cx="1311" cy="385" r="3.6" fill="#1B3A5C"/>
+    <text x="1324" y="390.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">跨部门协同</text>
+    <circle cx="1311" cy="411" r="3.6" fill="#1B3A5C"/>
+    <text x="1324" y="416.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">规模化推广路径</text>
+  </g>
+  <g id="r3c1_phases" class="unit" data-unit="r3c1_phases">
+    <polygon points="204,484 287,484 299,501 287,518 204,518" fill="#D6DDE4"/>
+    <text x="249.5" y="506.76" font-size="16" fill="#1B3A5C" font-weight="700" text-anchor="middle">探索期</text>
+    <polygon points="301,484 384,484 396,501 384,518 301,518 313,501" fill="#748BA2"/>
+    <text x="346.5" y="506.76" font-size="16" fill="#FFFFFF" font-weight="700" text-anchor="middle">试点期</text>
+    <polygon points="398,484 483,484 495,501 483,518 398,518 410,501" fill="#264867"/>
+    <text x="444.5" y="506.76" font-size="16" fill="#FFFFFF" font-weight="700" text-anchor="middle">规模化期</text>
+    <line x1="205" y1="530.5" x2="490" y2="530.5" stroke="#1B3A5C" stroke-width="3"/>
+    <circle cx="241" cy="530.5" r="6.5" fill="#1B3A5C"/>
+    <circle cx="337" cy="530.5" r="6.5" fill="#1B3A5C"/>
+    <circle cx="433" cy="530.5" r="6.5" fill="#1B3A5C"/>
+  </g>
+  <g id="r3c1_b" class="unit" data-unit="r3c1_b">
+    <circle cx="224" cy="553" r="3.6" fill="#1B3A5C"/>
+    <text x="237" y="558.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">各阶段目标与范围</text>
+    <circle cx="224" cy="579" r="3.6" fill="#1B3A5C"/>
+    <text x="237" y="584.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">关键里程碑</text>
+    <circle cx="224" cy="604" r="3.6" fill="#1B3A5C"/>
+    <text x="237" y="609.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">资源与能力建设</text>
+  </g>
+  <g id="r3c2_phases" class="unit" data-unit="r3c2_phases">
+    <polygon points="517,484 600,484 612,501 600,518 517,518" fill="#939B80"/>
+    <text x="562.5" y="506.76" font-size="16" fill="#FFFFFF" font-weight="700" text-anchor="middle">评估</text>
+    <polygon points="614,484 696,484 708,501 696,518 614,518 626,501" fill="#8D8B7B"/>
+    <text x="659" y="506.76" font-size="16" fill="#FFFFFF" font-weight="700" text-anchor="middle">加固</text>
+    <polygon points="710,484 793,484 805,501 793,518 710,518 722,501" fill="#8E829A"/>
+    <text x="755.5" y="506.76" font-size="16" fill="#FFFFFF" font-weight="700" text-anchor="middle">监控</text>
+  </g>
+  <g id="r3c2_b" class="unit" data-unit="r3c2_b">
+    <circle cx="528" cy="551" r="3.6" fill="#1B3A5C"/>
+    <text x="541" y="556.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">可信能力分阶段落地</text>
+    <circle cx="528" cy="577" r="3.6" fill="#1B3A5C"/>
+    <text x="541" y="582.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">风险控制里程碑</text>
+    <circle cx="528" cy="602" r="3.6" fill="#1B3A5C"/>
+    <text x="541" y="607.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">验证与持续改进</text>
+  </g>
+  <g id="r3c3_timeline" class="unit" data-unit="r3c3_timeline">
+    <text x="862" y="492.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="middle">阶段1</text>
+    <text x="957" y="492.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="middle">阶段2</text>
+    <text x="1052" y="492.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="middle">阶段3</text>
+    <line x1="826" y1="515" x2="1096" y2="515" stroke="#1B3A5C" stroke-width="3"/>
+    <polygon points="1094,507 1112,515 1094,523" fill="#1B3A5C"/>
+    <circle cx="864" cy="515" r="8.5" fill="#FFFFFF" stroke="#1B3A5C" stroke-width="3.5"/>
+    <circle cx="959" cy="515" r="8.5" fill="#FFFFFF" stroke="#1B3A5C" stroke-width="3.5"/>
+    <circle cx="1054" cy="515" r="8.5" fill="#FFFFFF" stroke="#1B3A5C" stroke-width="3.5"/>
+  </g>
+  <g id="r3c3_b" class="unit" data-unit="r3c3_b">
+    <circle cx="838" cy="551" r="3.6" fill="#1B3A5C"/>
+    <text x="851" y="556.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">治理体系建设节奏</text>
+    <circle cx="838" cy="578" r="3.6" fill="#1B3A5C"/>
+    <text x="851" y="583.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">董事会审查节点</text>
+    <circle cx="838" cy="604" r="3.6" fill="#1B3A5C"/>
+    <text x="851" y="609.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">关键决策事项</text>
+  </g>
+  <g id="r3c4_icon" class="unit" data-unit="r3c4_icon">
+    <rect x="1163" y="547.52" width="25.96" height="42.48" fill="#89809A"/>
+    <rect x="1198.4" y="523.92" width="25.96" height="66.08" fill="#89809A"/>
+    <rect x="1233.8" y="500.32" width="25.96" height="89.68" fill="#89809A"/>
+    <rect x="1269.2" y="474.36" width="25.96" height="115.64" fill="#A49BB5"/>
+    <path d="M1167.72,566.4 C1203.12,542.8 1236.16,521.56 1271.56,500.32" fill="none" stroke="#89809A" stroke-width="5.9"/>
+    <polygon points="1266.84,490.88 1285.72,505.04 1264.48,512.12" fill="#89809A"/>
+  </g>
+  <g id="r3c4_b" class="unit" data-unit="r3c4_b">
+    <circle cx="1305" cy="513" r="3.6" fill="#1B3A5C"/>
+    <text x="1318" y="518.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">试点到规模化路径</text>
+    <circle cx="1305" cy="540" r="3.6" fill="#1B3A5C"/>
+    <text x="1318" y="545.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">能力复制与推广</text>
+    <circle cx="1305" cy="566" r="3.6" fill="#1B3A5C"/>
+    <text x="1318" y="571.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">组织与工具准备</text>
+  </g>
+  <g id="r4c1_boxes" class="unit" data-unit="r4c1_boxes">
+    <rect x="246" y="638" width="114" height="32" fill="#FFFFFF" rx="3" stroke="#35597B" stroke-width="1.8"/>
+    <rect x="193" y="709" width="64" height="28" fill="#FFFFFF" rx="3" stroke="#35597B" stroke-width="1.8"/>
+    <rect x="262" y="709" width="63" height="28" fill="#FFFFFF" rx="3" stroke="#35597B" stroke-width="1.8"/>
+    <rect x="330" y="709" width="62" height="28" fill="#FFFFFF" rx="3" stroke="#35597B" stroke-width="1.8"/>
+  </g>
+  <g id="r4c1_conn" class="unit" data-unit="r4c1_conn">
+    <line x1="303" y1="670" x2="303" y2="690" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="225" y1="690" x2="361" y2="690" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="225" y1="690" x2="225" y2="709" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="293" y1="690" x2="293" y2="709" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="361" y1="690" x2="361" y2="709" stroke="#1B3A5C" stroke-width="2"/>
+  </g>
+  <g id="r4c1_txt" class="unit" data-unit="r4c1_txt">
+    <text x="303" y="659.4" font-size="15" fill="#1B3A5C" font-weight="700" text-anchor="middle">业务负责人</text>
+    <text x="225" y="727.68" font-size="13" fill="#1B3A5C" font-weight="700" text-anchor="middle">技术团队</text>
+    <text x="293" y="727.68" font-size="13" fill="#1B3A5C" font-weight="700" text-anchor="middle">数据团队</text>
+    <text x="361" y="727.68" font-size="13" fill="#1B3A5C" font-weight="700" text-anchor="middle">运营团队</text>
+  </g>
+  <g id="r4c1_b" class="unit" data-unit="r4c1_b">
+    <circle cx="396" cy="671" r="3.6" fill="#1B3A5C"/>
+    <text x="409" y="676.22" font-size="14.5" fill="#274767" font-weight="400" text-anchor="start">角色与分工</text>
+    <circle cx="396" cy="695" r="3.6" fill="#1B3A5C"/>
+    <text x="409" y="700.22" font-size="14.5" fill="#274767" font-weight="400" text-anchor="start">关键控制点</text>
+    <circle cx="396" cy="720" r="3.6" fill="#1B3A5C"/>
+    <text x="409" y="725.22" font-size="14.5" fill="#274767" font-weight="400" text-anchor="start">三道防线协同</text>
+  </g>
+  <g id="r4c2_cards" class="unit" data-unit="r4c2_cards">
+    <rect x="523" y="629" width="80" height="80" fill="#E9EDF0" rx="10"/>
+    <text x="563" y="697.94" font-size="16.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">风险控制</text>
+    <rect x="615" y="629" width="80" height="80" fill="#E9EDF0" rx="10"/>
+    <text x="655" y="697.94" font-size="16.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">合规审查</text>
+    <rect x="710" y="629" width="80" height="80" fill="#E9EDF0" rx="10"/>
+    <text x="750" y="697.94" font-size="16.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">持续监控</text>
+  </g>
+  <g id="r4c2_ic1" class="unit" data-unit="r4c2_ic1">
+    <path d="M564.0,638.1666666666666 L581.5,644.0 L581.5,658.0 C581.5,668.5 574.5,675.5 564.0,679.0 C553.5,675.5 546.5,668.5 546.5,658.0 L546.5,644.0 Z" fill="#1F3F60"/>
+    <polyline points="564,649.83 564,662.67" fill="none" stroke="#1F3F60" stroke-width="3.27"/>
+    <polygon points="558.75,659.17 569.25,659.17 564,666.17" fill="#1F3F60"/>
+  </g>
+  <g id="r4c2_ic2" class="unit" data-unit="r4c2_ic2">
+    <path d="M638.4444444444445,640.6666666666666 L660.6666666666666,640.6666666666666 L669.5555555555555,649.5555555555555 L669.5555555555555,677.3333333333334 L638.4444444444445,677.3333333333334 Z" fill="#1F3F60"/>
+    <path d="M660.6666666666666,640.6666666666666 L660.6666666666666,649.5555555555555 L669.5555555555555,649.5555555555555 Z" fill="#FFFFFF"/>
+    <rect x="642.89" y="655.67" width="20" height="2.67" fill="#FFFFFF"/>
+    <rect x="642.89" y="662.33" width="20" height="2.67" fill="#FFFFFF"/>
+    <rect x="642.89" y="669" width="13.33" height="2.67" fill="#FFFFFF"/>
+  </g>
+  <g id="r4c2_ic3" class="unit" data-unit="r4c2_ic3">
+    <circle cx="751" cy="659" r="12.25" fill="#1F3F60"/>
+    <line x1="762.67" y1="659" x2="769.08" y2="659" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="759.25" y1="667.25" x2="763.79" y2="671.79" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="751" y1="670.67" x2="751" y2="677.08" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="742.75" y1="667.25" x2="738.21" y2="671.79" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="739.33" y1="659" x2="732.92" y2="659" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="742.75" y1="650.75" x2="738.21" y2="646.21" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="751" y1="647.33" x2="751" y2="640.92" stroke="#1F3F60" stroke-width="6.07"/>
+    <line x1="759.25" y1="650.75" x2="763.79" y2="646.21" stroke="#1F3F60" stroke-width="6.07"/>
+    <circle cx="751" cy="659" r="4.9" fill="#FFFFFF"/>
+  </g>
+  <g id="r4c2_b" class="unit" data-unit="r4c2_b">
+    <circle cx="583" cy="720" r="3.6" fill="#1B3A5C"/>
+    <text x="596" y="725.4" font-size="15" fill="#274767" font-weight="400" text-anchor="start">模型全生命周期控制</text>
+    <circle cx="583" cy="740" r="3.6" fill="#1B3A5C"/>
+    <text x="596" y="745.4" font-size="15" fill="#274767" font-weight="400" text-anchor="start">数据与隐私管理</text>
+    <circle cx="583" cy="760" r="3.6" fill="#1B3A5C"/>
+    <text x="596" y="765.4" font-size="15" fill="#274767" font-weight="400" text-anchor="start">事件响应机制</text>
+  </g>
+  <g id="r4c3_boxes" class="unit" data-unit="r4c3_boxes">
+    <rect x="860" y="639" width="118" height="34" fill="#F0F0F0" rx="6" stroke="#BBBEBE" stroke-width="1.5"/>
+    <rect x="860" y="682" width="118" height="34" fill="#F0F0F0" rx="6" stroke="#BBBEBE" stroke-width="1.5"/>
+    <rect x="860" y="725" width="118" height="34" fill="#F0F0F0" rx="6" stroke="#BBBEBE" stroke-width="1.5"/>
+  </g>
+  <g id="r4c3_bracket" class="unit" data-unit="r4c3_bracket">
+    <line x1="838" y1="656" x2="830" y2="656" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="830" y1="656" x2="830" y2="742" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="830" y1="699" x2="830" y2="699" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="830" y1="656" x2="854" y2="656" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="830" y1="699" x2="854" y2="699" stroke="#1B3A5C" stroke-width="2"/>
+    <line x1="830" y1="742" x2="854" y2="742" stroke="#1B3A5C" stroke-width="2"/>
+    <polygon points="854,652 862,656 854,660" fill="#1B3A5C"/>
+    <polygon points="854,695 862,699 854,703" fill="#1B3A5C"/>
+    <polygon points="854,738 862,742 854,746" fill="#1B3A5C"/>
+  </g>
+  <g id="r4c3_txt" class="unit" data-unit="r4c3_txt">
+    <text x="919" y="661.94" font-size="16.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">董事会监督</text>
+    <text x="919" y="704.94" font-size="16.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">管理层执行</text>
+    <text x="919" y="747.94" font-size="16.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">内审与监督</text>
+  </g>
+  <g id="r4c3_b" class="unit" data-unit="r4c3_b">
+    <circle cx="993" cy="667" r="3.6" fill="#1B3A5C"/>
+    <text x="1006" y="672.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">治理责任划分</text>
+    <circle cx="993" cy="697" r="3.6" fill="#1B3A5C"/>
+    <text x="1006" y="702.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">汇报机制与频率</text>
+    <circle cx="993" cy="726" r="3.6" fill="#1B3A5C"/>
+    <text x="1006" y="731.58" font-size="15.5" fill="#274767" font-weight="400" text-anchor="start">审计与独立评估</text>
+  </g>
+  <g id="r4c4_icon" class="unit" data-unit="r4c4_icon">
+    <path d="M1165.8333333333333,649.0 L1222.1666666666667,649.0 L1222.1666666666667,709.6666666666666 L1165.8333333333333,709.6666666666666 Z" fill="none" stroke="#8E869E" stroke-width="7.37"/>
+    <rect x="1181" y="640.33" width="26" height="15.17" fill="#8E869E" rx="3.25"/>
+    <rect x="1170.17" y="664.17" width="9.75" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1186.42" y="664.17" width="26" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1170.17" y="677.17" width="9.75" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1186.42" y="677.17" width="26" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1170.17" y="690.17" width="9.75" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1186.42" y="690.17" width="26" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1170.17" y="703.17" width="9.75" height="6.93" fill="#8E869E" rx="1.73"/>
+    <rect x="1186.42" y="703.17" width="26" height="6.93" fill="#8E869E" rx="1.73"/>
+    <circle cx="1220" cy="701" r="19.5" fill="#8E869E"/>
+    <polyline points="1210.25,701 1217.83,708.58 1230.83,693.42" fill="none" stroke="#FFFFFF" stroke-width="6.07"/>
+  </g>
+  <g id="r4c4_b" class="unit" data-unit="r4c4_b">
+    <circle cx="1276" cy="667" r="3.6" fill="#1B3A5C"/>
+    <text x="1289" y="672.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">上线关卡设置</text>
+    <circle cx="1276" cy="695" r="3.6" fill="#1B3A5C"/>
+    <text x="1289" y="700.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">规模化风险控制</text>
+    <circle cx="1276" cy="723" r="3.6" fill="#1B3A5C"/>
+    <text x="1289" y="728.76" font-size="16" fill="#274767" font-weight="400" text-anchor="start">持续监测与优化</text>
+  </g>
+  <g id="t1_title" class="unit" data-unit="t1_title">
+    <text x="200" y="795.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="start">能力评估表</text>
+  </g>
+  <g id="t1_head" class="unit" data-unit="t1_head">
+    <rect x="200" y="801" width="84" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="284" y="801" width="70" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="354" y="801" width="80" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="434" y="801" width="63" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <text x="242" y="818.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">评估维度</text>
+    <text x="319" y="818.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">现状评分</text>
+    <text x="394" y="818.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">目标水平</text>
+    <text x="465.5" y="818.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">差距</text>
+  </g>
+  <g id="t1_rows" class="unit" data-unit="t1_rows">
+    <rect x="200" y="824" width="297" height="24" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="210" y="841.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">战略与组织</text>
+    <rect x="291" y="831" width="56" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="291" y="831" width="58" height="10" fill="#3A5A7A" rx="2"/>
+    <rect x="439" y="831" width="52" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="439" y="831" width="35" height="10" fill="#A4907F" rx="2"/>
+    <rect x="200" y="848" width="297" height="24" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="210" y="865.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">数据与技术</text>
+    <rect x="291" y="855" width="56" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="291" y="855" width="38" height="10" fill="#3A5A7A" rx="2"/>
+    <rect x="439" y="855" width="52" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="439" y="855" width="19" height="10" fill="#A4907F" rx="2"/>
+    <rect x="200" y="872" width="297" height="24" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="210" y="889.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">人才与能力</text>
+    <rect x="291" y="879" width="56" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="291" y="879" width="56" height="10" fill="#3A5A7A" rx="2"/>
+    <rect x="439" y="879" width="52" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="439" y="879" width="21" height="10" fill="#A4907F" rx="2"/>
+    <rect x="200" y="896" width="297" height="24" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="210" y="913.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">流程与运营</text>
+    <rect x="291" y="903" width="56" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="291" y="903" width="38" height="10" fill="#3A5A7A" rx="2"/>
+    <rect x="439" y="903" width="52" height="10" fill="#E6E9EB" rx="2"/>
+    <rect x="439" y="903" width="25" height="10" fill="#A4907F" rx="2"/>
+  </g>
+  <g id="t2_title" class="unit" data-unit="t2_title">
+    <text x="519" y="795.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="start">场景清单</text>
+  </g>
+  <g id="t2_head" class="unit" data-unit="t2_head">
+    <rect x="519" y="799" width="93" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="612" y="799" width="68" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="680" y="799" width="79" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="759" y="799" width="80" height="23" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <text x="565.5" y="816.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">场景名称</text>
+    <text x="646" y="816.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">业务价值</text>
+    <text x="719.5" y="816.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">可信要求</text>
+    <text x="799" y="816.22" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">优先级</text>
+  </g>
+  <g id="t2_rows" class="unit" data-unit="t2_rows">
+    <rect x="519" y="822" width="320" height="25" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="529" y="839.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">智能客服</text>
+    <circle cx="646" cy="834.5" r="7" fill="#7E8D62"/>
+    <circle cx="719" cy="834.5" r="7" fill="#7E8D62"/>
+    <rect x="759" y="822" width="80" height="25" fill="#D3E3C2" stroke="#C9CED3" stroke-width="1"/>
+    <text x="799" y="839.9" font-size="15" fill="#2E6B47" font-weight="700" text-anchor="middle">高</text>
+    <rect x="519" y="847" width="320" height="25" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="529" y="864.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">营销内容生成</text>
+    <circle cx="646" cy="859.5" r="7" fill="#7E8D62"/>
+    <circle cx="719" cy="859.5" r="7" fill="#7E8D62"/>
+    <rect x="759" y="847" width="80" height="25" fill="#D3E3C2" stroke="#C9CED3" stroke-width="1"/>
+    <text x="799" y="864.9" font-size="15" fill="#2E6B47" font-weight="700" text-anchor="middle">高</text>
+    <rect x="519" y="872" width="320" height="25" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="529" y="889.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">运营流程优化</text>
+    <circle cx="646" cy="884.5" r="7" fill="#7E8D62"/>
+    <circle cx="719" cy="884.5" r="7" fill="#8D9297"/>
+    <rect x="759" y="872" width="80" height="25" fill="#FBF3E4" stroke="#C9CED3" stroke-width="1"/>
+    <text x="799" y="889.9" font-size="15" fill="#C07A2E" font-weight="700" text-anchor="middle">中</text>
+    <rect x="519" y="897" width="320" height="25" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="529" y="914.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="start">产品研发辅助</text>
+    <circle cx="646" cy="909.5" r="7" fill="#7E8D62"/>
+    <circle cx="719" cy="909.5" r="7" fill="#8D9297"/>
+    <rect x="759" y="897" width="80" height="25" fill="#FBF3E4" stroke="#C9CED3" stroke-width="1"/>
+    <text x="799" y="914.9" font-size="15" fill="#C07A2E" font-weight="700" text-anchor="middle">中</text>
+  </g>
+  <g id="t3_title" class="unit" data-unit="t3_title">
+    <text x="862" y="795.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="start">路线图与上线关卡</text>
+  </g>
+  <g id="t3_head" class="unit" data-unit="t3_head">
+    <rect x="862" y="804" width="104" height="24" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="966" y="804" width="121" height="24" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="1087" y="804" width="121" height="24" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <text x="914" y="821.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">阶段</text>
+    <text x="1026.5" y="821.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">关键任务</text>
+    <text x="1147.5" y="821.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">上线关卡</text>
+  </g>
+  <g id="t3_rows" class="unit" data-unit="t3_rows">
+    <rect x="862" y="828" width="346" height="29" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="914" y="847.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">探索期</text>
+    <text x="1026.5" y="847.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">场景验证</text>
+    <text x="1147.5" y="847.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">价值评估</text>
+    <rect x="862" y="857" width="346" height="29" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="914" y="876.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">试点期</text>
+    <text x="1026.5" y="876.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">小规模上线</text>
+    <text x="1147.5" y="876.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">风险审查</text>
+    <rect x="862" y="886" width="346" height="29" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="914" y="905.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">规模化期</text>
+    <text x="1026.5" y="905.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">全面推广</text>
+    <text x="1147.5" y="905.4" font-size="15" fill="#1B3A5C" font-weight="400" text-anchor="middle">效果评估</text>
+  </g>
+  <g id="t4_title" class="unit" data-unit="t4_title">
+    <text x="1231" y="795.12" font-size="17" fill="#1B3A5C" font-weight="700" text-anchor="start">价值台账</text>
+  </g>
+  <g id="t4_head" class="unit" data-unit="t4_head">
+    <rect x="1231" y="800" width="119" height="22" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="1350" y="800" width="121" height="22" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="1471" y="800" width="122" height="22" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <rect x="1593" y="800" width="111" height="22" fill="#E8ECEE" stroke="#C9CED3" stroke-width="1"/>
+    <text x="1290.5" y="816.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">场景</text>
+    <text x="1410.5" y="816.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">预期价值</text>
+    <text x="1532" y="816.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">衡量指标</text>
+    <text x="1648.5" y="816.72" font-size="14.5" fill="#1B3A5C" font-weight="700" text-anchor="middle">负责人</text>
+  </g>
+  <g id="t4_rows" class="unit" data-unit="t4_rows">
+    <rect x="1231" y="822" width="473" height="23.4" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="1290.5" y="838.72" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">智能客服</text>
+    <text x="1410.5" y="838.72" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">效率提升</text>
+    <text x="1532" y="838.72" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">处理时长</text>
+    <text x="1648.5" y="838.72" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">客服部</text>
+    <rect x="1231" y="845.4" width="473" height="23.4" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="1290.5" y="862.12" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">营销内容生成</text>
+    <text x="1410.5" y="862.12" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">收入增长</text>
+    <text x="1532" y="862.12" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">转化率</text>
+    <text x="1648.5" y="862.12" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">市场部</text>
+    <rect x="1231" y="868.8" width="473" height="23.4" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="1290.5" y="885.52" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">运营流程优化</text>
+    <text x="1410.5" y="885.52" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">成本降低</text>
+    <text x="1532" y="885.52" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">人效提升</text>
+    <text x="1648.5" y="885.52" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">运营部</text>
+    <rect x="1231" y="892.2" width="473" height="23.4" fill="#FFFFFF" stroke="#C9CED3" stroke-width="1"/>
+    <text x="1290.5" y="908.92" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">产品研发辅助</text>
+    <text x="1410.5" y="908.92" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">创新加速</text>
+    <text x="1532" y="908.92" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">上市周期</text>
+    <text x="1648.5" y="908.92" font-size="14.5" fill="#1B3A5C" font-weight="400" text-anchor="middle">产品部</text>
+  </g>
+  <g id="srccard1" class="unit" data-unit="srccard1">
+    <rect x="1442" y="177" width="276" height="133" fill="#F1F4F6" rx="8" stroke="#E0E5E9" stroke-width="1.2"/>
+  </g>
+  <g id="srccard1_cover" class="unit" data-unit="srccard1_cover">
+    <rect x="1463" y="196" width="78" height="98" fill="#FFFFFF" rx="2" stroke="#C9CED4" stroke-width="1.4"/>
+    <rect x="1468" y="201" width="68" height="74" fill="#33566F"/>
+    <polygon points="1468,201 1536,201 1468,238" fill="#47698A"/>
+    <polygon points="1536,201 1536,256 1481,201" fill="#7C97AE"/>
+    <polygon points="1468,256 1536,224 1536,270 1468,270" fill="#47698A"/>
+    <text x="1472" y="213.8" font-size="5" fill="#FFFFFF" font-weight="700" text-anchor="start">AI capability</text>
+    <text x="1472" y="220.44" font-size="4" fill="#FFFFFF" font-weight="400" text-anchor="start">assessment</text>
+    <text x="1472" y="226.3" font-size="3.6" fill="#FFFFFF" font-weight="400" text-anchor="start">2026 Edition</text>
+    <rect x="1468" y="275" width="68" height="14" fill="#FFFFFF"/>
+    <text x="1472" y="284.51" font-size="4.2" fill="#8A8F96" font-weight="400" text-anchor="start">Deloitte Digital</text>
+  </g>
+  <g id="srccard1_txt" class="unit" data-unit="srccard1_txt">
+    <text x="1560" y="229.84" font-size="19" fill="#1B3A5C" font-weight="700" text-anchor="start">AI capability</text>
+    <text x="1560" y="251.34" font-size="19" fill="#1B3A5C" font-weight="700" text-anchor="start">assessment</text>
+    <text x="1560" y="272.62" font-size="17" fill="#33566F" font-weight="400" text-anchor="start">数字渠道能力评估</text>
+  </g>
+  <g id="srccard2" class="unit" data-unit="srccard2">
+    <rect x="1442" y="317" width="276" height="146" fill="#F1F4F6" rx="8" stroke="#E0E5E9" stroke-width="1.2"/>
+  </g>
+  <g id="srccard2_cover" class="unit" data-unit="srccard2_cover">
+    <rect x="1463" y="341" width="78" height="98" fill="#FFFFFF" rx="2" stroke="#C9CED4" stroke-width="1.4"/>
+    <rect x="1468" y="346" width="68" height="74" fill="#64794F"/>
+    <polygon points="1468,346 1536,346 1468,383" fill="#8CA06F"/>
+    <polygon points="1536,346 1536,401 1481,346" fill="#A9BC8B"/>
+    <polygon points="1468,401 1536,369 1536,415 1468,415" fill="#8CA06F"/>
+    <text x="1472" y="358.8" font-size="5" fill="#FFFFFF" font-weight="700" text-anchor="start">Trustworthy AI</text>
+    <text x="1472" y="365.44" font-size="4" fill="#FFFFFF" font-weight="400" text-anchor="start">Trusted features</text>
+    <text x="1472" y="371.3" font-size="3.6" fill="#FFFFFF" font-weight="400" text-anchor="start"></text>
+    <rect x="1468" y="420" width="68" height="14" fill="#FFFFFF"/>
+    <text x="1472" y="429.51" font-size="4.2" fill="#8A8F96" font-weight="400" text-anchor="start">Deloitte AI Institute</text>
+  </g>
+  <g id="srccard2_txt" class="unit" data-unit="srccard2_txt">
+    <text x="1560" y="383.84" font-size="19" fill="#1B3A5C" font-weight="700" text-anchor="start">Trustworthy AI</text>
+    <text x="1560" y="410.62" font-size="17" fill="#4A5D3A" font-weight="400" text-anchor="start">可信特征</text>
+  </g>
+  <g id="srccard3" class="unit" data-unit="srccard3">
+    <rect x="1442" y="470" width="276" height="144" fill="#F1F4F6" rx="8" stroke="#E0E5E9" stroke-width="1.2"/>
+  </g>
+  <g id="srccard3_cover" class="unit" data-unit="srccard3_cover">
+    <rect x="1463" y="493" width="78" height="98" fill="#FFFFFF" rx="2" stroke="#C9CED4" stroke-width="1.4"/>
+    <rect x="1468" y="498" width="68" height="74" fill="#97897F"/>
+    <polygon points="1468,498 1536,498 1468,535" fill="#B3A79D"/>
+    <polygon points="1536,498 1536,553 1481,498" fill="#CFC5BD"/>
+    <polygon points="1468,553 1536,521 1536,567 1468,567" fill="#B3A79D"/>
+    <text x="1472" y="510.8" font-size="5" fill="#FFFFFF" font-weight="700" text-anchor="start">AI Governance</text>
+    <text x="1472" y="517.44" font-size="4" fill="#FFFFFF" font-weight="400" text-anchor="start">Roadmap</text>
+    <text x="1472" y="523.3" font-size="3.6" fill="#FFFFFF" font-weight="400" text-anchor="start">Board oversight</text>
+    <rect x="1468" y="572" width="68" height="14" fill="#FFFFFF"/>
+    <text x="1472" y="581.51" font-size="4.2" fill="#8A8F96" font-weight="400" text-anchor="start">Deloitte Governance</text>
+  </g>
+  <g id="srccard3_txt" class="unit" data-unit="srccard3_txt">
+    <text x="1560" y="520.34" font-size="19" fill="#1B3A5C" font-weight="700" text-anchor="start">AI Governance</text>
+    <text x="1560" y="547.84" font-size="19" fill="#1B3A5C" font-weight="700" text-anchor="start">Roadmap</text>
+    <text x="1560" y="573.12" font-size="17" fill="#6B5D52" font-weight="400" text-anchor="start">董事会监督</text>
+  </g>
+  <g id="srccard4" class="unit" data-unit="srccard4">
+    <rect x="1442" y="622" width="276" height="143" fill="#F1F4F6" rx="8" stroke="#E0E5E9" stroke-width="1.2"/>
+  </g>
+  <g id="srccard4_cover" class="unit" data-unit="srccard4_cover">
+    <rect x="1463" y="646" width="78" height="98" fill="#FFFFFF" rx="2" stroke="#C9CED4" stroke-width="1.4"/>
+    <rect x="1468" y="651" width="68" height="74" fill="#87829C"/>
+    <polygon points="1468,651 1536,651 1468,688" fill="#A09BB4"/>
+    <polygon points="1536,651 1536,706 1481,651" fill="#BDB8CC"/>
+    <polygon points="1468,706 1536,674 1536,720 1468,720" fill="#A09BB4"/>
+    <text x="1472" y="663.8" font-size="5" fill="#FFFFFF" font-weight="700" text-anchor="start">State of AI 2026</text>
+    <text x="1472" y="670.44" font-size="4" fill="#FFFFFF" font-weight="400" text-anchor="start">Scaling topics</text>
+    <text x="1472" y="676.3" font-size="3.6" fill="#FFFFFF" font-weight="400" text-anchor="start"></text>
+    <rect x="1468" y="725" width="68" height="14" fill="#FFFFFF"/>
+    <text x="1472" y="734.51" font-size="4.2" fill="#8A8F96" font-weight="400" text-anchor="start">Deloitte Insights</text>
+  </g>
+  <g id="srccard4_txt" class="unit" data-unit="srccard4_txt">
+    <text x="1560" y="689.84" font-size="19" fill="#1B3A5C" font-weight="700" text-anchor="start">State of AI 2026</text>
+    <text x="1560" y="717.12" font-size="17" fill="#5A5570" font-weight="400" text-anchor="start">规模化议题</text>
+  </g>
+  <g id="footer_box" class="unit" data-unit="footer_box">
+    <rect x="24" y="927" width="1688" height="36" fill="#FFFFFF" rx="6" stroke="#9AA2AC" stroke-width="1.5" stroke-dasharray="7,5"/>
+  </g>
+  <g id="footer_icon" class="unit" data-unit="footer_icon">
+    <circle cx="44" cy="945" r="10.5" fill="#1B3A5C"/>
+    <text x="44" y="950.4" font-size="15" fill="#FFFFFF" font-weight="700" text-anchor="middle">!</text>
+  </g>
+  <g id="footer_txt" class="unit" data-unit="footer_txt">
+    <text x="68" y="950.94" font-size="16.5" fill="#1B3A5C" font-weight="400" text-anchor="start">评分权重、预算和排期为本报告设计的实施工具，不属于德勤官方统一模板。</text>
+  </g>
+</svg>
+</div>
+</body>
+</html>
