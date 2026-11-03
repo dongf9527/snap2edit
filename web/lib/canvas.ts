@@ -69,11 +69,6 @@ function esc(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function family(spec: SpecDoc): string {
-  const f = spec.font ?? {};
-  return `'${f.name ?? "Noto Sans SC"}', '${f.fallback ?? "Microsoft YaHei"}', sans-serif`;
-}
-
 /** 元素主文本（lines 优先）；供列表/属性面板展示 */
 export function elText(el: SpecEl): string {
   if (Array.isArray(el.lines) && el.lines.length) return el.lines.join("\n");

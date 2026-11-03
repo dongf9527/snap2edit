@@ -19,6 +19,15 @@ npm run build && npm start   # 生产模式
 仓库根执行 `pip install -e .` 即可）；PPTX→PDF 预览依赖 `soffice`（LibreOffice），
 缺失时 PDF 页签自动禁用，不影响下载 PPTX。
 
+## 测试
+
+```bash
+npm test        # 纯逻辑单测（lib/spec.ts / lib/canvas.ts / lib/api.ts），Node ≥24 原生跑 TS
+npm run test:cov   # 附 V8 覆盖率（当前行覆盖 100%）
+```
+
+tests/ 内均为单元测试（44 项）；studio 交互链路由沙箱侧 Playwright E2E 覆盖。
+
 ## 全链路工作台
 
 ```
