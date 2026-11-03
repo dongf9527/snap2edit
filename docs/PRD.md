@@ -3,7 +3,7 @@
 | 项 | 内容 |
 |---|---|
 | 产品名称 | Snap2Edit（截图复刻引擎） |
-| 文档版本 | v0.5 |
+| 文档版本 | v1.0 |
 | 状态 | 已评审定稿（随仓库维护，以仓库为准） |
 | 作者 | Snap2Edit Contributors |
 | 日期 | 2026-11-03 |
@@ -245,7 +245,7 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 |---|---|---|
 | v0.1 | 引擎骨架：F1–F5(P0) + demo + 冒烟测试 | ✅ 已完成（本仓库初始提交） |
 | v0.5 | F5 loop、F6 组件库、F7 可视化报告 | ✅ 全部完成：F5/F6 随 v0.4 交付（含画廊验收）；F7 可视化报告已交付（引擎 67 项单测 100%，demo 实跑验收） |
-| v1.0 | 测试覆盖 ≥ 80%（已达 100%）、文档站、PyPI 发布 | 🔶 测试覆盖已达成，其余规划中 |
+| v1.0 | 测试覆盖 ≥ 80%（已达 100%）、文档站、PyPI 发布 | ✅ 全部完成：打包元数据补全（SPDX/classifiers/URLs）+ 发布流水线（tag→Release→PyPI，Trusted Publishing）；文档站 MkDocs Material + GitHub Pages 自动部署；发布操作见 `.github/workflows/release.yml` 头注 |
 | v2.0 | F8 AI 规格书、F9 Web UI、F10 批量/CI | 愿景（F8/F9 部分能力已提前落地：/api/spec VLM 抽取、/studio 编辑器） |
 
 ## 10. 风险与对策
@@ -260,7 +260,7 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 
 ## 11. 开放问题
 
-1. 包名 `snap2edit` 是否需要在 v0.5 前做 PyPI 占位？
+1. ~~包名 `snap2edit` 是否需要在 v0.5 前做 PyPI 占位？~~ 已解决：v1.0 随发布流水线上线后无需占位——tag 推送即由 Actions 构建发布（trusted publishing），包名以首次发布为准
 2. ~~组件库（F6）优先级排序~~ 已解决：四类组件（cube / matrix-cell / flow-box / icon）已全部随 v0.4 实现，图标集以直线段多边形优先保证 PPTX 原生 Freeform 可渲染；曲线型图标待后续扩展。
 3. ~~`report.md` 是否需要机读版本（JSON）供 Agent 流水线消费？~~ 已解决：机读即 `check --json` / `loop --json`（结构化 gates/failures）；F7 补齐人读可视化层 `report.html`（状态灯/并排图/热力图/溢出标注），`report.md` 文本版保留供 fixer/CI。
 4. 双许可（MIT + 商业）是否保留单一 MIT？

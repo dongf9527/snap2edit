@@ -2,9 +2,9 @@
 
 | 项 | 内容 |
 |---|---|
-| 文档版本 | v1.4（首版 v1.0） |
-| 系统版本 | v0.4.0（以 `pyproject.toml` 为准） |
-| 日期 | 2026-11-03（内容截至 v0.4.0 交付提交） |
+| 文档版本 | v1.5（首版 v1.0） |
+| 系统版本 | v1.0.0（以 `pyproject.toml` 为准） |
+| 日期 | 2026-11-03（内容截至 v1.0.0 发布提交） |
 | 状态 | 随仓库维护，以仓库为准 |
 | 视图模型 | 4+1 视图（逻辑 / 进程 / 部署 / 数据 / 场景）+ C4 容器-组件分层 |
 | 关联文档 | 见 §14-C「关联文档索引」 |
@@ -610,14 +610,15 @@ snap2edit check <dir> [--original IMG] [--no-shot] [--json]
 │                └─ playwright chromium（可选）──▶ 门 4     │
 │  文件系统：/tmp/snap2edit-jobs/<uuid>/（临时任务目录）     │
 └──────────────────────────────────────────────────────────┘
-外部：GitHub 仓库（源码与案例归档）、VLM 服务（外部 API）
+外部：GitHub 仓库（源码与案例归档）、PyPI（引擎分发，tag 触发发布）、
+GitHub Pages（MkDocs 文档站，main 推送自动部署）、VLM 服务（外部 API）
 ```
 
 ### 7.2 环境要求与安装
 
 | 项 | 要求 |
 |---|---|
-| Python | ≥ 3.9；`pip install -e .`（门 4 截图：`pip install -e ".[verify]"` + `playwright install chromium`） |
+| Python | ≥ 3.9；`pip install snap2edit`（PyPI）或 `pip install -e .`（源码）；门 4 截图：`pip install -e ".[verify]"` + `playwright install chromium` |
 | Node | 运行 Web ≥ 18（Next 16）；**跑 Web 单测需 ≥ 24**（node --test 原生执行 TS） |
 | 系统工具 | LibreOffice（PDF 预览，可选）；poppler-utils（高级校验，可选） |
 | 字体 | Noto Sans SC（HTML/量宽）；Microsoft YaHei 由 PPTX 消费端承载 |
@@ -821,12 +822,12 @@ greenlet 并发追踪，保证门 4 异步截图路径计入覆盖）。studio �
 | v0.1 | 引擎骨架：F1–F5(P0) + demo + 冒烟测试 | ✅ |
 | v0.2 | docs 案例库 + workbench 存档 + web/ 框架骨架 | ✅ |
 | v0.3 | Web 在线管线（/api/spec·build·refine·artifacts）+ JSON.parse 三层根治 + studio 可视化编辑器（框选/吸附/手柄/读出气泡）+ rotate 全链路 + 覆盖率补全（引擎 33 项 99% / web 44 项 100%） | ✅ |
-| v0.4（当前） | F5 `loop` 自动迭代命令（--fix 外接修正器 / 快照与最优保留 / --json）+ F6 组件库（cube/matrix-cell/flow-box/icon×10，双产线原生 + 三处镜像同步 + 画廊验收）+ 引擎测试 57 项 100% 覆盖 | ✅ |
-| v0.5 | F7 HTML 可视化报告（并排图 / diff 热力图 / 状态灯） | 规划 |
-| v1.0 | 文档站、PyPI 发布（覆盖率目标 ≥80% 已超前达成） | 规划 |
+| v0.4 | F5 `loop` 自动迭代命令（--fix 外接修正器 / 快照与最优保留 / --json）+ F6 组件库（cube/matrix-cell/flow-box/icon×10，双产线原生 + 三处镜像同步 + 画廊验收）+ 引擎测试 57 项 100% 覆盖 | ✅ |
+| v0.5 | F7 HTML 可视化报告（并排图 / diff 热力图 / 状态灯 / 溢出标注），引擎测试 67 项 100% 覆盖 | ✅ |
+| v1.0（当前） | 打包元数据补全（SPDX/classifiers/URLs）+ PyPI 发布流水线（CI 测试矩阵 / tag→Release→PyPI）+ MkDocs Material 文档站（GitHub Pages 自动部署） | ✅ |
 | v2.0 | AI 规格书增强（多模型/增量修正）、批量模式、CI 示例工作流 | 愿景 |
 
-> 注：根 README、`pyproject.toml` 与包内 `__version__` 已统一为 v0.4.0。
+> 注：根 README、`pyproject.toml` 与包内 `__version__` 已统一为 v1.0.0。
 
 ### 13.2 已知边界
 
@@ -908,3 +909,4 @@ rotate 归一化 = round((((deg % 360) + 360) % 360) × 10) / 10  # 双端同式
 | v1.2 | 2026-11-03 | §3.3 / §5.4 增补 Mermaid 时序图（与 ASCII 流程同构）；§1.4 图表约定更新 |
 | v1.3 | 2026-11-03 | 同步 v0.4.0（F5 loop 命令 + F6 组件库）：§4.1 模块表新增 components.py 并更新行数；§4.4 依赖图纳入 components 底座；§4.5 镜像表补组件库同源内容 |
 | v1.4 | 2026-11-03 | 同步 v0.5.0（F7 可视化报告）：§4.1 模块表新增 report.py 并更新 verify.py 行数；§4.4 依赖图纳入 report（延迟导入）；§5.3 补 report.html 报告层语义与 JSON 字段；§3.2 容器图、产物/CLI 表同步 |
+| v1.5 | 2026-11-03 | 同步 v1.0.0 发布：§13.1 里程碑补齐 v0.5/v1.0 状态；§7.1 部署拓扑纳入 PyPI 分发与 Pages 文档站；§7.2 安装方式补 PyPI 渠道 |

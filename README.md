@@ -5,7 +5,8 @@
 
 | | |
 |---|---|
-| 版本 | v0.5.0（引擎 + 案例库 + Web 全链路 + studio 编辑器 + 组件库 + loop + F7 可视化报告） |
+| 版本 | v1.0.0（引擎 + 案例库 + Web 全链路 + studio 编辑器 + 组件库 + loop + 可视化报告 + PyPI 发布） |
+| 文档 | [dongf9527.github.io/snap2edit](https://dongf9527.github.io/snap2edit/)（MkDocs Material，随 main 自动部署） |
 | 语言 | Python ≥ 3.9 |
 | 协议 | MIT |
 | 状态 | 活跃开发（PRD 见 `docs/PRD.md`） |
@@ -43,7 +44,9 @@
 ## 快速开始
 
 ```bash
-# 安装（开发模式）
+# 安装：PyPI 稳定版（推荐）
+pip install snap2edit
+# 或源码开发模式
 pip install -e .
 # 可选：启用截图校验门
 pip install playwright && playwright install chromium
@@ -175,9 +178,12 @@ snap2edit/
 - **v0.3**：`rotate` 旋转端到端（引擎双产线 + studio 变换手柄/读出气泡 + VLM 倾斜抽取）
 - **v0.4**：F5 `loop` 自动迭代命令（可外接 `--fix` 修正器）+ F6 组件库
   （cube / matrix-cell / flow-box / icon×10，双产线原生实现，三处镜像同步）
-- **v0.5**（当前）：F7 可视化 HTML 报告（结点 N2–N6 状态灯 / 并排图 / diff 热力图 /
+- **v0.5**：F7 可视化 HTML 报告（结点 N2–N6 状态灯 / 并排图 / diff 热力图 /
   溢出标注，单文件零外链；web 端产物白名单同步开放）
-- **v1.0**：文档站、PyPI 发布
+- **v1.0**（当前）：打包元数据补全（SPDX 许可 / classifiers / URLs）+
+  [PyPI 发布](https://pypi.org/project/snap2edit/)（tag → Release 流水线）+
+  [MkDocs Material 文档站](https://dongf9527.github.io/snap2edit/)（Pages 自动部署）+
+  CI（引擎 3.9/3.11/3.13 矩阵 + 打包校验 + Web 测试）
 - **v2.0**：AI 规格书生成（看图写 spec）、Web UI 完整版（`web/` 基础框架已就绪）、批量模式
 
 ## 命名
