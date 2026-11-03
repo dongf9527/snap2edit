@@ -593,6 +593,15 @@ export default function Workbench() {
               <a className="btn ghost" href={`/api/artifacts/${art.jobId}/report.md?dl=1`}>
                 下载校验报告
               </a>
+              <a
+                className="btn ghost"
+                href={`/api/artifacts/${art.jobId}/report.html`}
+                target="_blank"
+                rel="noreferrer"
+                title="F7 可视化报告：状态灯 / 并排图 / diff 热力图 / 溢出标注"
+              >
+                可视化报告
+              </a>
               <span className="chip-lite" title={art.project}>
                 任务 {art.jobId.slice(0, 8)} · {art.project}
               </span>

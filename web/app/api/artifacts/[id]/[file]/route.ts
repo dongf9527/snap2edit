@@ -1,5 +1,6 @@
 // web/app/api/artifacts/[id]/[file]/route.ts —— GET 任务产物。
-// id 为 UUID 任务号；file ∈ {html, pptx, pdf, shot.png, report.md}（双白名单，无路径穿越面）。
+// id 为 UUID 任务号；file ∈ {html, pptx, pdf, shot.png, report.md, report.html}
+// （双白名单，无路径穿越面；report.html 为 F7 可视化校验报告，text/html 直出）。
 // HTML 以 text/html 直出供 iframe 在线预览；PPTX/PDF 以对应 MIME 提供下载/内嵌预览。
 
 import fs from "node:fs/promises";

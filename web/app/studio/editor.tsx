@@ -1638,6 +1638,13 @@ export default function StudioEditor() {
               <a className="btn ghost" href={`/api/artifacts/${art.jobId}/html?dl=1`}>下载 HTML</a>
               <a className="btn primary" href={`/api/artifacts/${art.jobId}/pptx`}>下载 PPTX</a>
               <a className="btn ghost" href={`/api/artifacts/${art.jobId}/report.md?dl=1`}>下载校验报告</a>
+              <a
+                className="btn ghost"
+                href={`/api/artifacts/${art.jobId}/report.html`}
+                target="_blank"
+                rel="noreferrer"
+                title="F7 可视化报告：状态灯 / 并排图 / diff 热力图 / 溢出标注"
+              >可视化报告</a>
               <span className={`badge-mode ${art.ok ? "vlm" : "skeleton"}`}>
                 {art.ok ? "四道门全部通过" : "存在未通过项"}
               </span>

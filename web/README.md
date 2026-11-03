@@ -38,7 +38,7 @@ tests/ 内均为单元测试（44 项）；studio 交互链路由沙箱侧 Playw
   → 页面展示可编辑 YAML，支持复制 / 下载
   → POST /api/build { spec }                       （NDJSON 流式）
       写任务目录 → snap2edit build → snap2edit check --json → PPTX 转 PDF
-  → GET /api/artifacts/<jobId>/<html|pptx|pdf|shot.png|report.md>
+  → GET /api/artifacts/<jobId>/<html|pptx|pdf|shot.png|report.md|report.html>
       HTML iframe 在线预览 / PDF 预览 / 下载
   → POST /api/refine { image, meta, spec, maxRounds }   （NDJSON 流式）
       build → check → 未通过则把报告 failures 回询 VLM 修正 spec → 重建复检
@@ -75,7 +75,7 @@ tests/ 内均为单元测试（44 项）；studio 交互链路由沙箱侧 Playw
 | `/api/spec` | POST | `{ image: dataURL, meta }` | JSON `SpecResult` | 视觉模型抽取规格（失败骨架兜底） |
 | `/api/build` | POST | `{ spec: YAML }` | NDJSON 事件流 | 双渲染 + 四道门 + PPTX→PDF |
 | `/api/refine` | POST | `{ image?, meta?, spec, maxRounds? }` | NDJSON 事件流 | 自动回询迭代闭环（image 可选：无图时按报告纯文本修正） |
-| `/api/artifacts/<id>/<file>` | GET | UUID + `html/pptx/pdf/shot.png/report.md` | 文件（MIME 正确） | 产物服务；`?dl=1` 强制下载 |
+| `/api/artifacts/<id>/<file>` | GET | UUID + `html/pptx/pdf/shot.png/report.md/report.html`（report.html 为 F7 可视化报告，与 html kind 错位隔离） | 文件（MIME 正确） | 产物服务；`?dl=1` 强制下载 |
 
 NDJSON 事件类型：`log`（过程日志）/ `tick`（长静默保活心跳）/ `round`（迭代轮次与阶段）/
 `report`（引擎 `check --json` 结构化四道门报告）/ `spec`（修正后的 spec 文本）/

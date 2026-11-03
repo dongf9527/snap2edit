@@ -157,6 +157,7 @@ const ARTIFACT_EXT: Record<string, string> = {
   pdf: ".pdf",
   "shot.png": ".png",
   "report.md": ".md",
+  "report.html": ".html", // F7 可视化校验报告（单文件 HTML）
 };
 
 /** 按 kind 解析任务产物绝对路径（id / kind 双白名单，杜绝路径穿越）。 */
@@ -167,7 +168,14 @@ export function resolveArtifact(jobId: string, kind: string): string | null {
   const buildDir = path.join(JOBS_ROOT, jobId, "build");
   const root = path.join(JOBS_ROOT, jobId);
   try {
-    const hit = fs.readdirSync(buildDir).filter((f) => f.endsWith(ext)).sort();
+    // F7 后 build/ 内可能有两个 .html：kind=html 只指幻灯片本体；
+    // kind=report.html 只指可视化报告本体（同一扩展名的两个语义位隔离）。
+    const hit = fs
+      .readdirSync(buildDir)
+      .filter((f) => f.endsWith(ext))
+      .filter((f) => (kind === "html" ? f !== "report.html" : true))
+      .filter((f) => (kind === "report.html" ? f === "report.html" : true))
+      .sort();
     if (!hit.length) return null;
     const p = path.join(buildDir, hit[0]);
     if (!p.startsWith(root + path.sep)) return null;

@@ -13,6 +13,7 @@ import { validateSpecYaml } from "./spec";
 export type FullReport = RenderReport & {
   artifacts?: { html: string; pptx: string; shot: string | null };
   report_md?: string;
+  report_html?: string | null; // F7 可视化报告（build/report.html 绝对路径）
 };
 
 export function ndjsonHeaders(): HeadersInit {
