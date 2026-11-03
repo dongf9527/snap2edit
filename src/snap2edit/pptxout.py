@@ -135,8 +135,10 @@ def render_pptx(spec, out_path):
 
     for el in spec["elements"]:
         t = el["type"]
-        if t in ("rect", "rrect", "pill"):
-            shp = (MSO_SHAPE.RECTANGLE if t == "rect" else MSO_SHAPE.ROUNDED_RECTANGLE)
+        if t in ("rect", "rrect", "pill", "circle"):
+            shp = (MSO_SHAPE.RECTANGLE if t == "rect"
+                   else MSO_SHAPE.OVAL if t == "circle"
+                   else MSO_SHAPE.ROUNDED_RECTANGLE)
             sp = shapes.add_shape(shp, Emu(m.emu(el["x"])), Emu(m.emu(el["y"])),
                                   Emu(m.emu(el["w"])), Emu(m.emu(el["h"])))
             sp.name = el["id"]
@@ -147,7 +149,12 @@ def render_pptx(spec, out_path):
                     sp.adjustments[0] = max(0.0, min(0.5, float(el["rx"]) / min(el["w"], el["h"])))
                 except Exception:
                     pass
-            _fill(sp, el.get("fill") or pal.get("card") or "#FFFFFF")
+            # fill 语义与 svgout 对齐：键存在且为 None（VLM 的 none/transparent）→ 透明；
+            # 键缺失 → 回退 palette.card / 白色
+            raw_fill = el.get("fill")
+            if raw_fill is None and "fill" not in el:
+                raw_fill = pal.get("card") or "#FFFFFF"
+            _fill(sp, raw_fill)
             _outline(sp, el.get("stroke"), el.get("stroke_width", 1), m)
             _noshadow(sp)
             if el.get("text"):

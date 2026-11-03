@@ -104,7 +104,7 @@ def check_bounds(spec):
                     avail = cw - el["x"]
                 if avail and need > avail:
                     over.append((el["id"], ln, round(need, 1), round(avail, 1)))
-        elif el.get("text") and el["type"] in ("rect", "rrect", "pill"):
+        elif el.get("text") and el["type"] in ("rect", "rrect", "pill", "circle"):
             need = text_width_px(str(el["text"]), float(el["size"]))
             if need > el["w"] - 8:
                 over.append((el["id"], el["text"], round(need, 1), el["w"]))
@@ -161,64 +161,114 @@ def block_diff(original_png, rendered_png, block=16, top=15):
 
 # ---------------- 汇总执行 ----------------
 
-def run_checks(project_dir, spec, original=None, do_shot=True, log=print):
-    name = spec.get("project", "output")
+def collect_checks(project_dir, spec, original=None, do_shot=True, log=None):
+    """四道校验门 —— 结构化结果（web API 与 CLI --json 使用）。
+
+    返回:
+        {
+          "ok": bool,
+          "project": 安全化的项目名,
+          "gates": [{"gate": "门1 交付物① HTML+SVG", "title": "HTML 检查",
+                     "items": [{"label", "passed", "detail"}, ...]}, ...],
+          "failures": ["门1 · HTML 检查 · 文案清单全部在场（缺失: [...]）", ...],
+          "artifacts": {"html": path, "pptx": path, "shot": path|None},
+        }
+    同时把 markdown 报告写入 build/report.md。
+    """
+
+    def say(msg):
+        if log:
+            log(msg)
+
+    from .spec import safe_project
+
+    name = safe_project(spec)
     build = os.path.join(project_dir, "build")
     html_path = os.path.join(build, f"{name}.html")
     pptx_path = os.path.join(build, f"{name}.pptx")
     ok = True
-    rep = [f"# Snap2Edit 校验报告 · {name}", ""]
+    gates = []
 
-    def section(title, items):
+    def section(gate, title, items):
         nonlocal ok
-        rep.append(f"## {title}")
-        for label, passed, detail in items:
-            ok = ok and passed
-            mark = "✓" if passed else "✗"
-            rep.append(f"- {mark} {label}" + (f"（{detail}）" if detail else ""))
-            log(f"  {mark} {label}" + (f"  [{detail}]" if detail and not passed else ""))
-        rep.append("")
+        ok = ok and all(p for _, p, _ in items)
+        gates.append({
+            "gate": gate,
+            "title": title,
+            "items": [{"label": l, "passed": p, "detail": d} for l, p, d in items],
+        })
 
-    log("== 门1 交付物① HTML+SVG ==")
+    say("== 门1 交付物① HTML+SVG ==")
     with open(html_path, encoding="utf-8") as f:
         html = f.read()
-    section("HTML 检查", check_html(html, spec))
+    section("门1 交付物① HTML+SVG", "HTML 检查", check_html(html, spec))
 
-    log("== 门2 交付物② PPTX ==")
-    section("PPTX 检查", check_pptx(pptx_path, spec))
+    say("== 门2 交付物② PPTX ==")
+    section("门2 交付物② PPTX", "PPTX 检查", check_pptx(pptx_path, spec))
 
-    log("== 门3 文本边界 ==")
+    say("== 门3 文本边界 ==")
     over = check_bounds(spec)
-    section("边界校验（实测宽度 vs 可用宽度）", [
+    section("门3 文本边界", "边界校验（实测宽度 vs 可用宽度）", [
         ("全部文本在边界内", not over,
          "; ".join(f"{i}:「{t}」需{n}>有{v}" for i, t, n, v in over[:5]) if over else "")])
 
+    shot_path = None
     if do_shot:
-        log("== 门4 渲染截图 ==")
+        say("== 门4 渲染截图 ==")
         png = os.path.join(build, "shot.png")
         path, err = screenshot(html_path, png)
         if path:
+            shot_path = path
             ratio = not_blank_ratio(path)
-            section("截图校验", [
-                ("截图非空白（非白像素 > 2%）", ratio > 0.02, f"{ratio:.1%}"),
+            section("门4 渲染截图", "截图校验", [
+                ("截图非空白（非白像素 > 0.2%，拦截整页空白渲染）", ratio > 0.002, f"{ratio:.1%}"),
                 ("截图已保存", True, png)])
         else:
-            section("截图校验", [("截图（跳过）", True, err or "")])
+            section("门4 渲染截图", "截图校验", [("截图（跳过）", True, err or "")])
 
     if original:
-        log("== 附加 与原图差异 ==")
+        say("== 附加 与原图差异 ==")
         png = os.path.join(build, "shot.png")
         if os.path.exists(png):
             mean, top = block_diff(original, png)
-            section("块差异（16px 聚合）", [
+            section("附加 与原图差异", "块差异（16px 聚合）", [
                 ("总平均差异 < 10/255", mean < 10, f"{mean:.1f}"),
                 ("TOP 差异块（信息项）", True,
                  " ".join(f"({bx},{by})={s:.0f}" for s, bx, by in top[:5]))])
         else:
-            section("与原图差异", [("需先完成截图", False, "")])
+            section("附加 与原图差异", "与原图差异", [("需先完成截图", False, "")])
 
+    failures = [f"{g['gate']} · {g['title']} · {it['label']}" + (f"（{it['detail']}）" if it["detail"] else "")
+                for g in gates for it in g["items"] if not it["passed"]]
+
+    # markdown 报告落盘（与 CLI 文本报告同一格式）
+    rep = [f"# Snap2Edit 校验报告 · {name}", ""]
+    for g in gates:
+        rep.append(f"## {g['gate']} —— {g['title']}")
+        for it in g["items"]:
+            mark = "✓" if it["passed"] else "✗"
+            rep.append(f"- {mark} {it['label']}" + (f"（{it['detail']}）" if it["detail"] else ""))
+        rep.append("")
+    os.makedirs(build, exist_ok=True)
     rep_path = os.path.join(build, "report.md")
     with open(rep_path, "w", encoding="utf-8") as f:
         f.write("\n".join(rep) + "\n")
-    log(("\n✓ 全部校验通过" if ok else "\n✗ 存在未通过项") + f"，报告: {rep_path}")
-    return ok
+
+    return {
+        "ok": ok,
+        "project": name,
+        "gates": gates,
+        "failures": failures,
+        "artifacts": {"html": html_path, "pptx": pptx_path, "shot": shot_path},
+        "report_md": rep_path,
+    }
+
+
+def run_checks(project_dir, spec, original=None, do_shot=True, log=print):
+    """CLI 入口：打印过程日志与结论，返回布尔（0/2 退出码）。"""
+    from .spec import safe_project
+
+    data = collect_checks(project_dir, spec, original=original, do_shot=do_shot, log=log)
+    log(("\n✓ 全部校验通过" if data["ok"] else "\n✗ 存在未通过项")
+        + f"，报告: {data['report_md']}")
+    return data["ok"]

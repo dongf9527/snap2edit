@@ -27,7 +27,7 @@ def _text_svg(el, spec, tid, cx, cy, centered):
     pal = spec.get("palette") or {}
     size = float(el["size"])
     lines = el.get("lines") or [str(el.get("text", ""))]
-    color = el.get("color", pal.get("primary", "#1F2937"))
+    color = el.get("color") or pal.get("primary", "#1F2937")
     weight = "bold" if el.get("bold") else "normal"
     lh = float(el.get("line_height", 1.45)) * size
     if centered:
@@ -46,17 +46,26 @@ def _text_svg(el, spec, tid, cx, cy, centered):
 def _box_svg(el, spec):
     pal = spec.get("palette") or {}
     x, y, w, h = el["x"], el["y"], el["w"], el["h"]
-    fill = el.get("fill", pal.get("card", "#FFFFFF"))
+    raw_fill = el.get("fill")
+    if raw_fill is None:
+        # 键存在且为 None（VLM 的 none/transparent）→ 透明；键缺失 → 默认卡片色
+        fill = "none" if "fill" in el else pal.get("card", "#FFFFFF")
+    else:
+        fill = raw_fill
     stroke = el.get("stroke")
     s_attr = (f' stroke="{stroke}" stroke-width="{el.get("stroke_width", 1)}"'
               if stroke else "")
-    if el["type"] == "rect":
-        rx = ""
+    if el["type"] == "circle":
+        out = (f'<ellipse id="{el["id"]}" cx="{_n(x + w / 2.0)}" cy="{_n(y + h / 2.0)}" '
+               f'rx="{_n(w / 2.0)}" ry="{_n(h / 2.0)}" fill="{fill}"{s_attr}/>')
     else:
-        rx_v = h / 2.0 if el["type"] == "pill" else el.get("rx", min(w, h) * 0.1)
-        rx = f' rx="{_n(rx_v)}"'
-    out = (f'<rect id="{el["id"]}" x="{_n(x)}" y="{_n(y)}" '
-           f'width="{_n(w)}" height="{_n(h)}"{rx} fill="{fill}"{s_attr}/>')
+        if el["type"] == "rect":
+            rx = ""
+        else:
+            rx_v = h / 2.0 if el["type"] == "pill" else el.get("rx", min(w, h) * 0.1)
+            rx = f' rx="{_n(rx_v)}"'
+        out = (f'<rect id="{el["id"]}" x="{_n(x)}" y="{_n(y)}" '
+               f'width="{_n(w)}" height="{_n(h)}"{rx} fill="{fill}"{s_attr}/>')
     if el.get("text"):
         out += _text_svg(el, spec, f'{el["id"]}-text',
                          cx=x + w / 2.0, cy=y + h / 2.0, centered=True)
@@ -83,7 +92,7 @@ def _arrow_svg(el, spec):
 
 def render_element(el, spec):
     t = el["type"]
-    if t in ("rect", "rrect", "pill"):
+    if t in ("rect", "rrect", "pill", "circle"):
         return _box_svg(el, spec)
     if t == "text":
         return _text_svg(el, spec, el["id"], cx=el["x"], cy=el["y"], centered=False)

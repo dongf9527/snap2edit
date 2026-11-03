@@ -4,7 +4,7 @@
     snap2edit new <dir>                          生成规格书模板
     snap2edit build <dir>                        双渲染：HTML+SVG 与 PPTX
     snap2edit check <dir> [--original IMG]       四道校验门 + 报告
-        [--no-shot]
+        [--no-shot] [--json]                     --json 输出结构化结果（供 web API）
 """
 
 import argparse
@@ -54,7 +54,7 @@ def cmd_build(args):
     from . import spec as specmod
 
     sp = specmod.load(os.path.join(args.dir, "spec.yaml"))
-    name = sp.get("project", "output")
+    name = specmod.safe_project(sp)
     build = os.path.join(args.dir, "build")
     os.makedirs(build, exist_ok=True)
     html_path = os.path.join(build, f"{name}.html")
@@ -71,6 +71,13 @@ def cmd_check(args):
     from . import spec as specmod, verify
 
     sp = specmod.load(os.path.join(args.dir, "spec.yaml"))
+    if args.json:
+        import json
+
+        data = verify.collect_checks(args.dir, sp, original=args.original,
+                                     do_shot=not args.no_shot, log=None)
+        print(json.dumps(data, ensure_ascii=False))
+        return 0 if data["ok"] else 2
     ok = verify.run_checks(args.dir, sp,
                            original=args.original, do_shot=not args.no_shot)
     return 0 if ok else 2
@@ -95,6 +102,7 @@ def main(argv=None):
     p_check.add_argument("dir")
     p_check.add_argument("--original", default=None, help="原图路径（可选，启用块差异对比）")
     p_check.add_argument("--no-shot", action="store_true", help="跳过 Playwright 截图")
+    p_check.add_argument("--json", action="store_true", help="输出结构化 JSON 结果（供 web API）")
     p_check.set_defaults(func=cmd_check)
 
     args = ap.parse_args(argv)
