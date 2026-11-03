@@ -52,6 +52,18 @@ snap2edit build my-project
 snap2edit check my-project [--original 原图.png]
 ```
 
+## 测试与覆盖率
+
+```bash
+# 引擎（pytest + coverage，Playwright 截图门真实执行）
+python -m coverage run -m pytest tests/ -q
+python -m coverage report          # 当前 ≈99%（.coveragerc 开启 greenlet 并发追踪）
+
+# Web 纯逻辑单测（Node ≥24 原生跑 TS，无需编译）
+cd web && npm test                 # node --test tests/*.test.ts
+npm run test:cov                   # 附 V8 覆盖率报告（当前 100% 行覆盖）
+```
+
 或者直接体验自带 demo（本仓库已含构建产物）：
 
 ```bash
