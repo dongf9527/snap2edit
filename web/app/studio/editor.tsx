@@ -32,6 +32,7 @@ import { streamApi, type BuildEvent, type RenderReport } from "@/lib/api";
 
 const DRAFT_KEY = "snap2edit.studio.draft";
 const HANDOFF_KEY = "snap2edit.studio.spec";
+const SNAP_T_KEY = "snap2edit.studio.snapT";
 
 const BOX_TYPES = ["rect", "rrect", "pill", "circle"] as const;
 const SEG_TYPES = ["line", "arrow"] as const;
@@ -53,6 +54,55 @@ interface RefImage {
   dataUrl: string;
   meta: { width: number; height: number; filename?: string };
 }
+
+type HandleKind =
+  | `resize-${"n" | "s" | "e" | "w" | "nw" | "ne" | "sw" | "se"}`
+  | `scale-${"nw" | "ne" | "sw" | "se"}`
+  | "rotate"
+  | "pt-1"
+  | "pt-2";
+
+interface ResizeCtx {
+  ids: string[];
+  fx: number;
+  fy: number;
+  px0: number;
+  py0: number;
+  axX: boolean;
+  axY: boolean;
+  snap: Record<string, SpecEl>;
+}
+
+interface RotateCtx {
+  ids: string[];
+  cx: number;
+  cy: number;
+  a0: number;
+  snap: Record<string, SpecEl>;
+}
+
+interface BBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+const R1 = (v: number): number => Math.round(v * 10) / 10;
+
+function unionBBox(bs: BBox[]): BBox {
+  const x = Math.min(...bs.map((b) => b.x));
+  const y = Math.min(...bs.map((b) => b.y));
+  return {
+    x,
+    y,
+    w: Math.max(...bs.map((b) => b.x + b.w)) - x,
+    h: Math.max(...bs.map((b) => b.y + b.h)) - y,
+  };
+}
+
+const isBoxEl = (el: SpecEl) => ["rect", "rrect", "pill", "circle"].includes(String(el.type));
+const isSegEl = (el: SpecEl) => el.type === "line" || el.type === "arrow";
 
 /** 深拷贝（spec 均为 JSON 安全结构） */
 function clone<T>(v: T): T {
@@ -77,6 +127,7 @@ export default function StudioEditor() {
   const [interacting, setInteracting] = useState(false);
   const [marquee, setMarquee] = useState<MarqueeState["rect"] | null>(null);
   const [guides, setGuides] = useState<SnapGuides>({ v: [], h: [] });
+  const [snapT, setSnapT] = useState(8);
 
   // 构建与预览（复用 /api/build 与 /api/refine）
   const [buildBusy, setBuildBusy] = useState(false);
@@ -96,6 +147,11 @@ export default function StudioEditor() {
   const dragRef = useRef<{ ids: string[]; sx: number; sy: number } | null>(null);
   const marqueeRef = useRef<MarqueeState | null>(null);
   const snapRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  const resizeRef = useRef<ResizeCtx | null>(null);
+  const resizeScaleRef = useRef<{ sx: number; sy: number }>({ sx: 1, sy: 1 });
+  const rotateRef = useRef<RotateCtx | null>(null);
+  const rotDeltaRef = useRef(0);
+  const ptRef = useRef<{ id: string; which: 1 | 2 } | null>(null);
   const rafRef = useRef(0);
 
   // —— 启动：工作台带入 / 草稿检测 ——
@@ -109,6 +165,15 @@ export default function StudioEditor() {
     }
     setYaml(dumpSpecYaml(blankSpec()));
     if (localStorage.getItem(DRAFT_KEY)) setHasDraft(true);
+    try {
+      const raw = localStorage.getItem(SNAP_T_KEY);
+      if (raw != null) {
+        const v = Number(raw);
+        if (Number.isFinite(v) && v >= 0 && v <= 64) setSnapT(Math.round(v));
+      }
+    } catch {
+      /* 存储异常忽略 */
+    }
   }, []);
 
   // —— 草稿自动保存 ——
@@ -249,7 +314,7 @@ export default function StudioEditor() {
     [applyEdit, doc]
   );
 
-  // —— 画布交互：点选 / 框选多选 / 拖拽吸附 ——
+  // —— 画布交互：点选 / 框选多选 / 拖拽吸附 / 手柄缩放旋转 ——
   const canvasPoint = useCallback(
     (clientX: number, clientY: number) => {
       const r = svgWrapRef.current?.querySelector("svg")?.getBoundingClientRect();
@@ -269,10 +334,162 @@ export default function StudioEditor() {
     }
   }, []);
 
+  /** 逐节点遍历选中元素的 SVG 节点（主形状 + 内嵌文本 + 箭头头） */
+  const forEachNode = useCallback((ids: string[], fn: (el: SVGElement) => void) => {
+    const svgEl = svgWrapRef.current?.querySelector("svg");
+    if (!svgEl) return;
+    for (const id of ids) {
+      svgEl.querySelectorAll(`[id="${id}"],[id="${id}-text"],[id="${id}-head"]`).forEach((node) => fn(node as SVGElement));
+    }
+  }, []);
+
+  const clearNodeTransform = useCallback(
+    (ids: string[]) => {
+      forEachNode(ids, (node) => {
+        node.style.transform = "";
+        node.style.transformOrigin = "";
+      });
+    },
+    [forEachNode]
+  );
+
+  /** 旋转中心：单盒子=自身中心；单文本=锚点；单线段=中点；多选=选区包围盒中心 */
+  const rotCenterOf = useCallback((snap: Record<string, SpecEl>, gb: BBox) => {
+    const ids = Object.keys(snap);
+    if (ids.length === 1) {
+      const el = snap[ids[0]];
+      if (isBoxEl(el)) return { x: Number(el.x ?? 0) + Number(el.w ?? 0) / 2, y: Number(el.y ?? 0) + Number(el.h ?? 0) / 2 };
+      if (isSegEl(el)) return { x: (Number(el.x1 ?? 0) + Number(el.x2 ?? 0)) / 2, y: (Number(el.y1 ?? 0) + Number(el.y2 ?? 0)) / 2 };
+      return { x: Number(el.x ?? 0), y: Number(el.y ?? 0) };
+    }
+    return { x: gb.x + gb.w / 2, y: gb.y + gb.h / 2 };
+  }, []);
+
+  /** 手柄按下：初始化缩放/旋转/端点上下文（快照冻结，松手烘焙） */
+  const startHandle = useCallback(
+    (kind: HandleKind, clientX: number, clientY: number) => {
+      if (!doc) return;
+      const p = canvasPoint(clientX, clientY);
+      const snap: Record<string, SpecEl> = {};
+      for (const el of doc.elements ?? []) if (selIds.includes(el.id)) snap[el.id] = clone(el);
+      const ids = Object.keys(snap);
+      if (!ids.length) return;
+      const gb = unionBBox(ids.map((id) => elBBox(snap[id])));
+      setInteracting(true);
+      if (kind === "rotate") {
+        const c = rotCenterOf(snap, gb);
+        rotateRef.current = {
+          ids,
+          cx: c.x,
+          cy: c.y,
+          a0: (Math.atan2(p.y - c.y, p.x - c.x) * 180) / Math.PI,
+          snap,
+        };
+        rotDeltaRef.current = 0;
+      } else if (kind === "pt-1" || kind === "pt-2") {
+        ptRef.current = { id: ids[0], which: kind === "pt-1" ? 1 : 2 };
+      } else {
+        const dir = kind.split("-")[1];
+        const anchors: Record<string, [number, number, boolean, boolean]> = {
+          nw: [gb.x + gb.w, gb.y + gb.h, true, true],
+          ne: [gb.x, gb.y + gb.h, true, true],
+          sw: [gb.x + gb.w, gb.y, true, true],
+          se: [gb.x, gb.y, true, true],
+          n: [gb.x + gb.w / 2, gb.y + gb.h, false, true],
+          s: [gb.x + gb.w / 2, gb.y, false, true],
+          e: [gb.x, gb.y + gb.h / 2, true, false],
+          w: [gb.x + gb.w, gb.y + gb.h / 2, true, false],
+        };
+        const [fx, fy, axX, axY] = anchors[dir];
+        resizeRef.current = { ids, fx, fy, px0: p.x, py0: p.y, axX, axY, snap };
+        resizeScaleRef.current = { sx: 1, sy: 1 };
+      }
+    },
+    [doc, selIds, canvasPoint, rotCenterOf]
+  );
+
+  /** 缩放烘焙：锚点固定，逐元素按 sx/sy 缩放几何（文本字号随 sy 缩放） */
+  const bakeResize = useCallback(
+    (rs: ResizeCtx, sx: number, sy: number) => {
+      applyEdit((d) => {
+        for (const el of d.elements ?? []) {
+          const s = rs.snap[el.id];
+          if (!s) continue;
+          if (isBoxEl(el)) {
+            el.x = Math.round(rs.fx + (Number(s.x ?? 0) - rs.fx) * sx);
+            el.y = Math.round(rs.fy + (Number(s.y ?? 0) - rs.fy) * sy);
+            el.w = Math.max(2, Math.round(Number(s.w ?? 0) * sx));
+            el.h = Math.max(2, Math.round(Number(s.h ?? 0) * sy));
+          } else if (isSegEl(el)) {
+            el.x1 = Math.round(rs.fx + (Number(s.x1 ?? 0) - rs.fx) * sx);
+            el.y1 = Math.round(rs.fy + (Number(s.y1 ?? 0) - rs.fy) * sy);
+            el.x2 = Math.round(rs.fx + (Number(s.x2 ?? 0) - rs.fx) * sx);
+            el.y2 = Math.round(rs.fy + (Number(s.y2 ?? 0) - rs.fy) * sy);
+          } else {
+            el.x = Math.round(rs.fx + (Number(s.x ?? 0) - rs.fx) * sx);
+            el.y = Math.round(rs.fy + (Number(s.y ?? 0) - rs.fy) * sy);
+            if (s.size != null) el.size = Math.max(4, Math.round(Number(s.size) * sy));
+            if (s.w != null) el.w = Math.max(0, Math.round(Number(s.w) * sx));
+          }
+        }
+      });
+    },
+    [applyEdit]
+  );
+
+  /** 旋转烘焙：单选绕自身中心/锚点/中点；多选各元素中心绕组中心旋转并叠加自身角度 */
+  const bakeRotate = useCallback(
+    (rr: RotateCtx, delta: number) => {
+      applyEdit((d) => {
+        const a = (delta * Math.PI) / 180;
+        const cos = Math.cos(a);
+        const sin = Math.sin(a);
+        const setRot = (el: SpecEl, s: SpecEl) => {
+          const r = R1(((((Number(s.rotate ?? 0) + delta) % 360) + 360) % 360));
+          if (r === 0) delete el.rotate;
+          else el.rotate = r;
+        };
+        for (const el of d.elements ?? []) {
+          const s = rr.snap[el.id];
+          if (!s) continue;
+          if (isBoxEl(el)) {
+            const cx0 = Number(s.x ?? 0) + Number(s.w ?? 0) / 2;
+            const cy0 = Number(s.y ?? 0) + Number(s.h ?? 0) / 2;
+            const ncx = rr.cx + (cx0 - rr.cx) * cos - (cy0 - rr.cy) * sin;
+            const ncy = rr.cy + (cx0 - rr.cx) * sin + (cy0 - rr.cy) * cos;
+            el.x = Math.round(ncx - Number(s.w ?? 0) / 2);
+            el.y = Math.round(ncy - Number(s.h ?? 0) / 2);
+            setRot(el, s);
+          } else if (isSegEl(el)) {
+            for (const [k1, k2] of [["x1", "y1"], ["x2", "y2"]] as const) {
+              const px = Number(s[k1] ?? 0) - rr.cx;
+              const py = Number(s[k2] ?? 0) - rr.cy;
+              el[k1] = Math.round(rr.cx + px * cos - py * sin);
+              el[k2] = Math.round(rr.cy + px * sin + py * cos);
+            }
+          } else {
+            const px = Number(s.x ?? 0) - rr.cx;
+            const py = Number(s.y ?? 0) - rr.cy;
+            el.x = Math.round(rr.cx + px * cos - py * sin);
+            el.y = Math.round(rr.cy + px * sin + py * cos);
+            setRot(el, s);
+          }
+        }
+      });
+    },
+    [applyEdit]
+  );
+
   const onCanvasPointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (!doc) return;
       (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+      // 手柄优先：handle 是 wrap 内覆盖层，不参与画布选中/框选
+      const handle = (e.target as HTMLElement).closest?.("[data-handle]") as HTMLElement | null;
+      if (handle) {
+        startHandle(handle.getAttribute("data-handle") as HandleKind, e.clientX, e.clientY);
+        return;
+      }
       const p = canvasPoint(e.clientX, e.clientY);
       const target = (e.target as SVGElement).closest("[id]");
       const raw = target?.getAttribute("id") ?? "";
@@ -302,16 +519,60 @@ export default function StudioEditor() {
         setInteracting(true);
       }
     },
-    [doc, selIds, canvasPoint]
+    [doc, selIds, canvasPoint, startHandle]
   );
 
   const onCanvasPointerMove = useCallback(
     (e: React.PointerEvent) => {
+      const rs = resizeRef.current;
+      const rr = rotateRef.current;
+      const pt = ptRef.current;
       const dr = dragRef.current;
       const mr = marqueeRef.current;
-      if ((!dr && !mr) || !doc) return;
+      if ((!rs && !rr && !pt && !dr && !mr) || !doc) return;
       const p = canvasPoint(e.clientX, e.clientY);
-      if (dr) {
+      if (rs) {
+        const dx0 = rs.px0 - rs.fx;
+        const dy0 = rs.py0 - rs.fy;
+        const sx = rs.axX && Math.abs(dx0) >= 2 ? Math.max(0.05, (p.x - rs.fx) / dx0) : 1;
+        const sy = rs.axY && Math.abs(dy0) >= 2 ? Math.max(0.05, (p.y - rs.fy) / dy0) : 1;
+        resizeScaleRef.current = { sx, sy };
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          forEachNode(rs.ids, (node) => {
+            node.style.transformOrigin = `${rs.fx}px ${rs.fy}px`;
+            node.style.transform = `scale(${sx}, ${sy})`;
+          });
+        });
+      } else if (rr) {
+        const a = (Math.atan2(p.y - rr.cy, p.x - rr.cx) * 180) / Math.PI;
+        let delta = a - rr.a0;
+        if (e.shiftKey) delta = Math.round(delta / 15) * 15;
+        rotDeltaRef.current = delta;
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          forEachNode(rr.ids, (node) => {
+            node.style.transformOrigin = `${rr.cx}px ${rr.cy}px`;
+            node.style.transform = `rotate(${delta}deg)`;
+          });
+        });
+      } else if (pt) {
+        // 线段端点直拖：绝对坐标实时提交（rAF 节流）
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          applyEdit((d) => {
+            const el = (d.elements ?? []).find((x) => x.id === pt.id);
+            if (!el) return;
+            if (pt.which === 1) {
+              el.x1 = Math.round(p.x);
+              el.y1 = Math.round(p.y);
+            } else {
+              el.x2 = Math.round(p.x);
+              el.y2 = Math.round(p.y);
+            }
+          });
+        });
+      } else if (dr) {
         const rawDx = Math.round(p.x - dr.sx);
         const rawDy = Math.round(p.y - dr.sy);
         let dx = rawDx;
@@ -319,7 +580,7 @@ export default function StudioEditor() {
         let g: SnapGuides = { v: [], h: [] };
         if ((rawDx || rawDy) && !e.altKey) {
           const moving = (doc.elements ?? []).filter((x) => dr.ids.includes(x.id));
-          const s = computeSnap(moving, dr.ids, doc.elements ?? [], { w: canvasW, h: canvasH }, rawDx, rawDy);
+          const s = computeSnap(moving, dr.ids, doc.elements ?? [], { w: canvasW, h: canvasH }, rawDx, rawDy, snapT);
           dx = s.dx;
           dy = s.dy;
           g = s.guides;
@@ -340,20 +601,41 @@ export default function StudioEditor() {
         setMarquee(rect);
       }
     },
-    [doc, canvasPoint, canvasW, canvasH, applyTransform]
+    [doc, canvasPoint, canvasW, canvasH, snapT, applyTransform, applyEdit, forEachNode]
   );
 
   const onCanvasPointerUp = useCallback(
-    (e: React.PointerEvent) => {
+    () => {
+      const rs = resizeRef.current;
+      const rr = rotateRef.current;
+      const pt = ptRef.current;
       const dr = dragRef.current;
       const mr = marqueeRef.current;
+      resizeRef.current = null;
+      rotateRef.current = null;
+      ptRef.current = null;
       dragRef.current = null;
       marqueeRef.current = null;
       setInteracting(false);
       setGuides({ v: [], h: [] });
       setMarquee(null);
+      cancelAnimationFrame(rafRef.current);
+      if (rs) {
+        clearNodeTransform(rs.ids);
+        const { sx, sy } = resizeScaleRef.current;
+        resizeScaleRef.current = { sx: 1, sy: 1 };
+        if (sx !== 1 || sy !== 1) bakeResize(rs, sx, sy);
+        return;
+      }
+      if (rr) {
+        clearNodeTransform(rr.ids);
+        const delta = rotDeltaRef.current;
+        rotDeltaRef.current = 0;
+        if (delta) bakeRotate(rr, delta);
+        return;
+      }
+      if (pt) return; // 端点直拖已实时提交
       if (dr) {
-        cancelAnimationFrame(rafRef.current);
         applyTransform(dr.ids, 0, 0);
         const { dx, dy } = snapRef.current;
         snapRef.current = { dx: 0, dy: 0 };
@@ -377,10 +659,9 @@ export default function StudioEditor() {
               })
               .map((el) => el.id);
         setSelIds([...new Set([...mr.base, ...hits])]);
-        void e;
       }
     },
-    [doc, nudgeMany, applyTransform]
+    [doc, nudgeMany, applyTransform, clearNodeTransform, bakeResize, bakeRotate]
   );
 
   // —— 键盘微调（方向键 1px / Shift 10px，整组生效；Delete 删除所选）——
@@ -599,6 +880,79 @@ export default function StudioEditor() {
     return `(${el.x ?? 0}, ${el.y ?? 0}) ${el.w ?? ""}${el.w ? "×" : ""}${el.h ?? ""}`;
   };
 
+  // —— 变换手柄（DOM 覆盖层；画布坐标 → 百分比定位） ——
+  const selEls = elements.filter((e) => selIds.includes(e.id));
+  const pct = (v: number, total: number) => `${(v / total) * 100}%`;
+  let handleEls: React.ReactNode = null;
+  if (selEls.length === 1) {
+    const el = selEls[0];
+    if (isBoxEl(el)) {
+      const b = elBBox(el);
+      const pts: [number, number, "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w"][] = [
+        [b.x, b.y, "nw"], [b.x + b.w / 2, b.y, "n"], [b.x + b.w, b.y, "ne"],
+        [b.x + b.w, b.y + b.h / 2, "e"], [b.x + b.w, b.y + b.h, "se"],
+        [b.x + b.w / 2, b.y + b.h, "s"], [b.x, b.y + b.h, "sw"], [b.x, b.y + b.h / 2, "w"],
+      ];
+      handleEls = (
+        <>
+          {pts.map(([px, py, dir]) => (
+            <span
+              key={dir}
+              data-handle={`resize-${dir}`}
+              className={`hd hd-r hd-${dir}`}
+              style={{ left: pct(px, canvasW), top: pct(py, canvasH) }}
+            />
+          ))}
+          <span
+            data-handle="rotate"
+            className="hd hd-rot"
+            title="拖拽旋转（Shift 15° 步进）"
+            style={{ left: pct(b.x + b.w / 2, canvasW), top: pct(b.y - 28, canvasH) }}
+          />
+        </>
+      );
+    } else if (isSegEl(el)) {
+      handleEls = (
+        <>
+          <span data-handle="pt-1" className="hd hd-pt" title="拖拽起点"
+            style={{ left: pct(Number(el.x1 ?? 0), canvasW), top: pct(Number(el.y1 ?? 0), canvasH) }} />
+          <span data-handle="pt-2" className="hd hd-pt" title="拖拽终点"
+            style={{ left: pct(Number(el.x2 ?? 0), canvasW), top: pct(Number(el.y2 ?? 0), canvasH) }} />
+          <span data-handle="rotate" className="hd hd-rot" title="拖拽旋转（端点绕中点转，Shift 15° 步进）"
+            style={{
+              left: pct((Number(el.x1 ?? 0) + Number(el.x2 ?? 0)) / 2, canvasW),
+              top: pct(Math.min(Number(el.y1 ?? 0), Number(el.y2 ?? 0)) - 28, canvasH),
+            }} />
+        </>
+      );
+    } else {
+      const b = elBBox(el);
+      handleEls = (
+        <span data-handle="rotate" className="hd hd-rot" title="拖拽旋转（Shift 15° 步进）"
+          style={{ left: pct(b.x + b.w / 2, canvasW), top: pct(b.y - 28, canvasH) }} />
+      );
+    }
+  } else if (selEls.length >= 2) {
+    const gb = unionBBox(selEls.map(elBBox));
+    handleEls = (
+      <>
+        {(["nw", "ne", "sw", "se"] as const).map((dir) => (
+          <span
+            key={dir}
+            data-handle={`scale-${dir}`}
+            className={`hd hd-r hd-${dir}`}
+            title="整组缩放（对角固定）"
+            style={{
+              left: pct(dir.includes("w") ? gb.x : gb.x + gb.w, canvasW),
+              top: pct(dir.startsWith("n") ? gb.y : gb.y + gb.h, canvasH),
+            }} />
+        ))}
+        <span data-handle="rotate" className="hd hd-rot" title="整组旋转（各元素绕组中心公转+自转，Shift 15° 步进）"
+          style={{ left: pct(gb.x + gb.w / 2, canvasW), top: pct(gb.y - 28, canvasH) }} />
+      </>
+    );
+  }
+
   return (
     <section className="studio" aria-label="spec 可视化编辑器">
       <div className="wb-head">
@@ -681,11 +1035,37 @@ export default function StudioEditor() {
 
         {/* 中：画布 */}
         <div className="card studio-canvas-card">
-          <h3>画布（点选 · 拖拽移动 · 框选多选 · Shift 加选 · 方向键微调 · Delete 删除）</h3>
+          <div className="canvas-head">
+            <h3>画布（点选 · 拖拽 · 框选多选 · 手柄缩放旋转 · Shift 转转 15° 步进）</h3>
+            <label className="snap-t" title="拖拽吸附触发距离（画布像素，0 为关闭）">
+              吸附阈值
+              <input
+                type="number"
+                min={0}
+                max={64}
+                value={snapT}
+                onChange={(e) => {
+                  const v = Math.max(0, Math.min(64, Math.round(Number(e.target.value) || 0)));
+                  setSnapT(v);
+                  try {
+                    localStorage.setItem(SNAP_T_KEY, String(v));
+                  } catch {
+                    /* 存储异常忽略 */
+                  }
+                }}
+              />
+              px
+            </label>
+          </div>
           {parseError ? (
             <p className="alert err" role="alert">YAML 解析失败：{parseError}（修正源码后画布恢复）</p>
           ) : (
-            <div className="studio-canvas-wrap">
+            <div
+              className="studio-canvas-wrap"
+              onPointerDown={onCanvasPointerDown}
+              onPointerMove={onCanvasPointerMove}
+              onPointerUp={onCanvasPointerUp}
+            >
               <div
                 className="studio-canvas"
                 ref={svgWrapRef}
@@ -694,9 +1074,6 @@ export default function StudioEditor() {
                     ? `'${doc.font?.name ?? "Noto Sans SC"}', '${doc.font?.fallback ?? "Microsoft YaHei"}', sans-serif`
                     : undefined,
                 }}
-                onPointerDown={onCanvasPointerDown}
-                onPointerMove={onCanvasPointerMove}
-                onPointerUp={onCanvasPointerUp}
                 dangerouslySetInnerHTML={{ __html: svg }}
               />
               {/* 吸附参考线（画布坐标 → 百分比定位，拖拽中实时出现） */}
@@ -718,6 +1095,8 @@ export default function StudioEditor() {
                   }}
                 />
               )}
+              {/* 变换手柄：单选 = 8 向缩放 + 旋转（线段为双端点）；多选 = 4 角等比缩放 + 组旋转 */}
+              {!interacting && selEls.length > 0 && handleEls}
             </div>
           )}
           {validation && (validation.errors.length > 0 || validation.warnings.length > 0) ? (
@@ -779,6 +1158,24 @@ export default function StudioEditor() {
                   粗体
                 </label>
               </div>
+
+              {(isBoxEl(selectedEl) || selectedEl.type === "text") && (
+                <div className="prop-row">
+                  <label>旋转°</label>
+                  <input
+                    type="number"
+                    step={5}
+                    value={Number(selectedEl.rotate ?? 0)}
+                    onChange={(e) => {
+                      const v = R1((((Number(e.target.value) || 0) % 360) + 360) % 360);
+                      patchEl(selectedEl.id, { rotate: v === 0 ? undefined : v });
+                    }}
+                  />
+                  <button className="btn ghost mini" onClick={() => patchEl(selectedEl.id, { rotate: undefined })}>
+                    复位
+                  </button>
+                </div>
+              )}
 
               {(BOX_TYPES as readonly string[]).includes(selectedEl.type) && (
                 <>

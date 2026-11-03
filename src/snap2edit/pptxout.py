@@ -9,6 +9,8 @@
   - 箭头用连接线 + tailEnd 三角头，不用贴图。
 """
 
+import math
+
 from pptx import Presentation
 from pptx.util import Emu, Pt
 from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
@@ -63,10 +65,25 @@ def _outline(sp, color, width_px, m):
         sp.line.fill.background()
 
 
-def _add_text(shapes, el, m, fname, pal, box=None, valign="top"):
+def _rot(el):
+    """元素旋转角（度、顺时针；与 svgout._rot 同语义）。"""
+    r = el.get("rotate")
+    return float(r) % 360.0 if isinstance(r, (int, float)) and not isinstance(r, bool) else 0.0
+
+
+def _rot_pt(px, py, cx, cy, deg):
+    """点 (px,py) 绕 (cx,cy) 顺时针旋转 deg 度。"""
+    a = math.radians(deg)
+    dx, dy = px - cx, py - cy
+    return (cx + dx * math.cos(a) - dy * math.sin(a),
+            cy + dx * math.sin(a) + dy * math.cos(a))
+
+
+def _add_text(shapes, el, m, fname, pal, box=None, valign="top", rot=0.0, pivot=None):
     lines = el.get("lines") or [str(el.get("text", ""))]
     size = float(el["size"])
     lh = float(el.get("line_height", 1.45)) * size
+    centered_box = box is not None
     if box is not None:
         bx, by, bw, bh = (float(v) for v in box)
     else:
@@ -80,8 +97,15 @@ def _add_text(shapes, el, m, fname, pal, box=None, valign="top"):
         else:
             bx = x
         by = y
+    if rot and not centered_box and pivot is not None:
+        # 自由文本旋转中心 = 锚点（与 SVG 同语义）：把文本框平移到
+        # 「原中心绕锚点旋转后的位置」，再叠加 rotation 属性，结果与 SVG 精确一致
+        ncx, ncy = _rot_pt(bx + bw / 2.0, by + bh / 2.0, pivot[0], pivot[1], rot)
+        bx, by = ncx - bw / 2.0, ncy - bh / 2.0
     tb = shapes.add_textbox(Emu(m.emu(bx)), Emu(m.emu(by)), Emu(m.emu(bw)), Emu(m.emu(bh)))
     tb.name = el["id"] if box is None else f'{el["id"]}-text'
+    if rot:
+        tb.rotation = rot
     tf = tb.text_frame
     tf.word_wrap = False
     try:
@@ -142,6 +166,9 @@ def render_pptx(spec, out_path):
             sp = shapes.add_shape(shp, Emu(m.emu(el["x"])), Emu(m.emu(el["y"])),
                                   Emu(m.emu(el["w"])), Emu(m.emu(el["h"])))
             sp.name = el["id"]
+            rot = _rot(el)
+            if rot:
+                sp.rotation = rot
             if t == "pill":
                 sp.adjustments[0] = 0.5
             elif t == "rrect" and el.get("rx") is not None:
@@ -160,9 +187,10 @@ def render_pptx(spec, out_path):
             if el.get("text"):
                 el.setdefault("align", "center")
                 _add_text(shapes, el, m, fname, pal,
-                          box=(el["x"], el["y"], el["w"], el["h"]), valign="middle")
+                          box=(el["x"], el["y"], el["w"], el["h"]), valign="middle",
+                          rot=rot)
         elif t == "text":
-            _add_text(shapes, el, m, fname, pal)
+            _add_text(shapes, el, m, fname, pal, rot=_rot(el), pivot=(el["x"], el["y"]))
         elif t in ("line", "arrow"):
             _add_line(shapes, el, m, pal, arrow=(t == "arrow"))
         else:

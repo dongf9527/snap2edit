@@ -18,12 +18,22 @@ def _n(v):
     return s.rstrip("0").rstrip(".") if "." in s else s
 
 
+def _rot(el):
+    """元素旋转角（度、顺时针；盒子绕自身中心，自由文本绕锚点）。"""
+    r = el.get("rotate")
+    return float(r) % 360.0 if isinstance(r, (int, float)) and not isinstance(r, bool) else 0.0
+
+
+def _rot_attr(deg, cx, cy):
+    return f' transform="rotate({_n(deg)} {_n(cx)} {_n(cy)})"' if deg else ""
+
+
 def _family(spec):
     font = spec.get("font") or {}
     return f"'{font.get('name', 'Noto Sans SC')}', '{font.get('fallback', 'Microsoft YaHei')}', sans-serif"
 
 
-def _text_svg(el, spec, tid, cx, cy, centered):
+def _text_svg(el, spec, tid, cx, cy, centered, rot_c=None):
     pal = spec.get("palette") or {}
     size = float(el["size"])
     lines = el.get("lines") or [str(el.get("text", ""))]
@@ -39,13 +49,16 @@ def _text_svg(el, spec, tid, cx, cy, centered):
     tspans = "".join(
         f'<tspan x="{_n(cx)}" y="{_n(first + k * lh)}">{escape(str(ln))}</tspan>'
         for k, ln in enumerate(lines))
+    rot_attr = _rot_attr(rot_c[0], rot_c[1], rot_c[2]) if rot_c else ""
     return (f'<text id="{tid}" font-size="{_n(size)}" fill="{color}" '
-            f'font-weight="{weight}" text-anchor="{anchor}">{tspans}</text>')
+            f'font-weight="{weight}" text-anchor="{anchor}"{rot_attr}>{tspans}</text>')
 
 
 def _box_svg(el, spec):
     pal = spec.get("palette") or {}
     x, y, w, h = el["x"], el["y"], el["w"], el["h"]
+    rot = _rot(el)
+    rot_attr = _rot_attr(rot, x + w / 2.0, y + h / 2.0)
     raw_fill = el.get("fill")
     if raw_fill is None:
         # 键存在且为 None（VLM 的 none/transparent）→ 透明；键缺失 → 默认卡片色
@@ -57,7 +70,7 @@ def _box_svg(el, spec):
               if stroke else "")
     if el["type"] == "circle":
         out = (f'<ellipse id="{el["id"]}" cx="{_n(x + w / 2.0)}" cy="{_n(y + h / 2.0)}" '
-               f'rx="{_n(w / 2.0)}" ry="{_n(h / 2.0)}" fill="{fill}"{s_attr}/>')
+               f'rx="{_n(w / 2.0)}" ry="{_n(h / 2.0)}" fill="{fill}"{s_attr}{rot_attr}/>')
     else:
         if el["type"] == "rect":
             rx = ""
@@ -65,10 +78,11 @@ def _box_svg(el, spec):
             rx_v = h / 2.0 if el["type"] == "pill" else el.get("rx", min(w, h) * 0.1)
             rx = f' rx="{_n(rx_v)}"'
         out = (f'<rect id="{el["id"]}" x="{_n(x)}" y="{_n(y)}" '
-               f'width="{_n(w)}" height="{_n(h)}"{rx} fill="{fill}"{s_attr}/>')
+               f'width="{_n(w)}" height="{_n(h)}"{rx} fill="{fill}"{s_attr}{rot_attr}/>')
     if el.get("text"):
         out += _text_svg(el, spec, f'{el["id"]}-text',
-                         cx=x + w / 2.0, cy=y + h / 2.0, centered=True)
+                         cx=x + w / 2.0, cy=y + h / 2.0, centered=True,
+                         rot_c=(rot, x + w / 2.0, y + h / 2.0))
     return out
 
 
@@ -95,7 +109,9 @@ def render_element(el, spec):
     if t in ("rect", "rrect", "pill", "circle"):
         return _box_svg(el, spec)
     if t == "text":
-        return _text_svg(el, spec, el["id"], cx=el["x"], cy=el["y"], centered=False)
+        rot = _rot(el)
+        return _text_svg(el, spec, el["id"], cx=el["x"], cy=el["y"], centered=False,
+                         rot_c=(rot, el["x"], el["y"]) if rot else None)
     if t == "line":
         pal = spec.get("palette") or {}
         return (f'<line id="{el["id"]}" x1="{_n(el["x1"])}" y1="{_n(el["y1"])}" '

@@ -81,6 +81,49 @@ elements:
         assert os.path.getsize(p) > 0
 
 
+def test_rotate_end_to_end():
+    """rotate 字段端到端：校验规范化 + SVG transform + PPTX rotation 同语义。"""
+    import io
+    import yaml
+
+    raw = """
+project: "旋转语义测试"
+canvas: {width: 400, height: 300}
+palette: {primary: "#111111", accent: "#2B6CB0", card: "#FFFFFF", bg: "#FFFFFF"}
+texts: ["斜标题", "盒内文"]
+elements:
+  - {id: e1, type: rect, x: 40, y: 40, w: 120, h: 60, fill: "#2B6CB0", rotate: 30, text: "盒内文", size: 14}
+  - {id: e2, type: text, x: 200, y: 60, size: 20, rotate: -15, text: "斜标题"}
+  - {id: e3, type: line, x1: 40, y1: 200, x2: 300, y2: 200, rotate: 999}
+"""
+    sp = specmod.validate(yaml.safe_load(raw))
+    e1, e2, e3 = sp["elements"]
+    assert e1["rotate"] == 30
+    assert e2["rotate"] == 345.0                       # -15 → 345（归一化到 [0,360)）
+    assert "rotate" not in e3                          # 线段端点承载几何，rotate 被剔除
+    try:
+        bad = yaml.safe_load(raw.replace("rotate: 30", "rotate: 竖直"))
+        specmod.validate(bad)
+        raise AssertionError("非数字 rotate 应报 SpecError")
+    except specmod.SpecError as e:
+        assert "rotate" in str(e)
+
+    html = svgout.render_html(sp)
+    assert 'transform="rotate(30 100 70)"' in html      # 盒子绕自身中心
+    assert 'transform="rotate(30 100 70)"' in html and html.count('rotate(30 100 70)') == 2  # 盒内文本同步旋转
+    assert 'transform="rotate(345 200 60)"' in html     # 自由文本绕锚点
+
+    with tempfile.TemporaryDirectory() as td:
+        p = os.path.join(td, "r.pptx")
+        pptxout.render_pptx(sp, p)
+        from pptx import Presentation
+
+        prs = Presentation(p)
+        rot = {s.name: s.rotation for s in prs.slides[0].shapes}
+        assert rot["e1"] == 30 and rot["e1-text"] == 30
+        assert rot["e2"] == 345.0
+
+
 def test_collect_checks_and_cli_json():
     """collect_checks 结构化报告 + CLI check --json 同源输出。"""
     with tempfile.TemporaryDirectory() as td:
@@ -109,5 +152,6 @@ if __name__ == "__main__":
     test_safe_project()
     test_norm_color()
     test_validate_spec_transparent_fill_and_circle()
+    test_rotate_end_to_end()
     test_collect_checks_and_cli_json()
     print("smoke test passed ✓")

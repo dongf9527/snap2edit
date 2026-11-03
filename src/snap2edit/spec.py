@@ -111,6 +111,17 @@ def validate(spec):
         if missing:
             raise SpecError(f"{where}({eid}): 缺少几何字段 {missing}")
 
+        # 旋转（可选）：度、顺时针；盒子绕自身中心，自由文本绕锚点；
+        # 线段/箭头几何完全由端点承载，rotate 键忽略并剔除
+        if "rotate" in el:
+            if t in ("line", "arrow"):
+                el.pop("rotate", None)
+            else:
+                r = el["rotate"]
+                if isinstance(r, bool) or not isinstance(r, (int, float)):
+                    raise SpecError(f"{where}({eid}): rotate 必须是数字（度，顺时针）")
+                el["rotate"] = round(float(r) % 360.0, 1)
+
         if t == "text":
             if not (el.get("text") or el.get("lines")):
                 raise SpecError(f"{where}({eid}): 文本元素需要 text 或 lines")

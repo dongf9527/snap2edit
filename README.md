@@ -99,14 +99,17 @@ python -m snap2edit check examples/demo
 
 | type | 几何字段 | 专属属性 | 说明 |
 |---|---|---|---|
-| `rect` | x y w h | fill / stroke / stroke_width | 矩形 |
-| `rrect` | x y w h | rx | 圆角矩形 |
-| `pill` | x y w h | — | 胶囊（rx=h/2） |
-| `text` | x y (w 可选) | size / bold / color / align / lines / line_height | 自由文本 |
+| `rect` | x y w h | fill / stroke / stroke_width / rotate | 矩形 |
+| `rrect` | x y w h | rx / rotate | 圆角矩形 |
+| `pill` | x y w h | rotate | 胶囊（rx=h/2） |
+| `circle` | x y w h | fill / stroke / stroke_width / rotate | 椭圆（内切于包围盒） |
+| `text` | x y (w 可选) | size / bold / color / align / lines / line_height / rotate | 自由文本 |
 | `line` | x1 y1 x2 y2 | stroke / stroke_width | 直线 |
 | `arrow` | x1 y1 x2 y2 | stroke / stroke_width / head | 箭头（线段+三角两个单元） |
 
 带 `text`+`size` 的盒子类型会自动渲染居中文字（PPTX 侧为独立文本框）。
+`rotate`（v0.2.1+，可选）：度、顺时针；盒子绕自身中心、自由文本绕锚点，双产线同语义
+（SVG `transform=rotate` ⇄ PPTX `rotation` + 文本框重定位）；线段/箭头由端点承载几何，rotate 键被忽略剔除。
 
 ## 目录结构
 

@@ -51,6 +51,16 @@ function n(v: number): string {
   return s.endsWith(".0") ? s.slice(0, -2) : s;
 }
 
+/** 元素旋转角（度、顺时针；与引擎 svgout._rot 同语义） */
+function rotOf(el: SpecEl): number {
+  const r = el.rotate;
+  return typeof r === "number" && Number.isFinite(r) ? ((r % 360) + 360) % 360 : 0;
+}
+
+function rotAttr(deg: number, cx: number, cy: number): string {
+  return deg ? ` transform="rotate(${n(deg)} ${n(cx)} ${n(cy)})"` : "";
+}
+
 function esc(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -76,7 +86,8 @@ function textSvg(
   tid: string,
   cx: number,
   cy: number,
-  centered: boolean
+  centered: boolean,
+  rotC?: { deg: number; cx: number; cy: number }
 ): string {
   const pal = spec.palette ?? {};
   const size = Number(el.size ?? 16);
@@ -89,15 +100,18 @@ function textSvg(
   const tspans = lines
     .map((ln, k) => `<tspan x="${n(cx)}" y="${n(first + k * lh)}">${esc(String(ln))}</tspan>`)
     .join("");
+  const ra = rotC ? rotAttr(rotC.deg, rotC.cx, rotC.cy) : "";
   return (
     `<text id="${esc(tid)}" font-size="${n(size)}" fill="${esc(color)}" ` +
-    `font-weight="${weight}" text-anchor="${anchor}">${tspans}</text>`
+    `font-weight="${weight}" text-anchor="${anchor}"${ra}>${tspans}</text>`
   );
 }
 
 function boxSvg(spec: SpecDoc, el: SpecEl): string {
   const pal = spec.palette ?? {};
   const { x = 0, y = 0, w = 0, h = 0 } = el;
+  const rot = rotOf(el);
+  const ra = rotAttr(rot, x + w / 2, y + h / 2);
   // 与 svgout 一致：fill 键存在且为 null/none → 透明；键缺失 → palette.card
   let fill: string;
   if (el.fill == null) fill = "fill" in el ? "none" : pal.card || "#FFFFFF";
@@ -109,15 +123,17 @@ function boxSvg(spec: SpecDoc, el: SpecEl): string {
   if (el.type === "circle") {
     out =
       `<ellipse id="${esc(el.id)}" cx="${n(x + w / 2)}" cy="${n(y + h / 2)}" ` +
-      `rx="${n(w / 2)}" ry="${n(h / 2)}" fill="${esc(fill)}"${sAttr}/>`;
+      `rx="${n(w / 2)}" ry="${n(h / 2)}" fill="${esc(fill)}"${sAttr}${ra}/>`;
   } else {
     const rxV = el.type === "pill" ? h / 2 : (el.rx ?? Math.min(w, h) * 0.1);
     const rx = el.type === "rect" ? "" : ` rx="${n(rxV)}"`;
     out =
       `<rect id="${esc(el.id)}" x="${n(x)}" y="${n(y)}" ` +
-      `width="${n(w)}" height="${n(h)}"${rx} fill="${esc(fill)}"${sAttr}/>`;
+      `width="${n(w)}" height="${n(h)}"${rx} fill="${esc(fill)}"${sAttr}${ra}/>`;
   }
-  if (el.text) out += textSvg(spec, el, `${el.id}-text`, x + w / 2, y + h / 2, true);
+  if (el.text)
+    out += textSvg(spec, el, `${el.id}-text`, x + w / 2, y + h / 2, true,
+      rot ? { deg: rot, cx: x + w / 2, cy: y + h / 2 } : undefined);
   return out;
 }
 
@@ -150,8 +166,11 @@ export function renderElementSvg(spec: SpecDoc, el: SpecEl): string {
     case "pill":
     case "circle":
       return boxSvg(spec, el);
-    case "text":
-      return textSvg(spec, el, el.id, Number(el.x ?? 0), Number(el.y ?? 0), false);
+    case "text": {
+      const rot = rotOf(el);
+      return textSvg(spec, el, el.id, Number(el.x ?? 0), Number(el.y ?? 0), false,
+        rot ? { deg: rot, cx: Number(el.x ?? 0), cy: Number(el.y ?? 0) } : undefined);
+    }
     case "line": {
       const pal = spec.palette ?? {};
       return (
