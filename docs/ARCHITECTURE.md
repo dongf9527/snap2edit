@@ -49,7 +49,8 @@ Web REST API、数据流与数据模型、测试架构、安全设计、演进�
   （逻辑视图=§4、进程视图=§6、部署视图=§7、数据视图=§9、场景=§3.3 数据流）
   与 **C4 容器/组件两档粒度**（§3.2 容器、§4 组件）；
 - 图表以 ASCII 字符画为主（与仓库其他文档一致，纯文本、可 diff、可审阅）；
-  §3.2 容器图另附 Mermaid 版（GitHub 原生渲染，与 ASCII 图同构、内容一致）；
+  关键视图另附 Mermaid 版（GitHub 原生渲染，均与 ASCII 图同构、内容一致）：
+  §3.2 容器图、§3.3 端到端时序图、§5.4 refine 时序图；
 - 术语首用即释（§2.4 术语表集中汇总）；
 - 所有数字（行数、超时、覆盖率、阈值）均可在仓库中复核，标注了出处。
 
@@ -216,6 +217,43 @@ flowchart TB
      循环 maxRounds 轮（全程 NDJSON：log/tick/round/report/spec/done）
 ⑦ 全绿 done：HTML + PPTX(+PDF) + shot.png + report.md
 ⑧ 正式沉淀：仓库 docs/<案例>/ 归档（任务目录为临时，重启即清空）
+```
+
+**Mermaid 时序图**（GitHub 原生渲染；与上图 8 步流程同构，展示参与者间的消息次序）：
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant BR as 浏览器<br/>（工作台 / studio）
+    participant API as Next.js API<br/>（route.ts ×4）
+    participant VLM as VLM<br/>（glm-5.3-flash）
+    participant ENG as 引擎子进程<br/>（snap2edit CLI）
+    participant FS as 任务目录<br/>/tmp/snap2edit-jobs/…
+
+    rect rgb(240, 249, 255)
+    Note over BR,API: ①–③ 抽取阶段
+    BR->>API: POST /api/spec（image · meta）
+    API->>VLM: 看图抽取 JSON spec
+    VLM-->>API: spec JSON
+    API->>API: normalizeSpec → dumpSpecYaml → validateSpecYaml
+    Note over API,VLM: 失败带错误回询重试一次<br/>VLM 不可用 → 骨架兜底 mode=skeleton
+    API-->>BR: ok ＋ 可编辑 spec.yaml
+    end
+
+    rect rgb(245, 255, 245)
+    Note over BR,FS: ④–⑤ 构建校验阶段
+    BR->>API: POST /api/build（spec）（NDJSON）
+    API->>FS: createJob · 写 spec.yaml
+    API->>ENG: build（产线① ＋ 产线②）
+    ENG->>FS: *.html ＋ *.pptx
+    API->>ENG: check --json
+    ENG-->>API: 四门结构化报告
+    API->>FS: soffice：PPTX→PDF（可选）
+    API-->>BR: NDJSON：log / report / done（jobId · ok · hasPdf）
+    end
+
+    BR->>API: GET /api/artifacts/任务id/文件
+    API-->>BR: html / pptx / pdf / shot.png / report.md
 ```
 
 **与六步标准流程（WORKFLOW.md）的映射**——工具化的本质是把人工流程逐结点收口：
@@ -406,6 +444,39 @@ POST /api/refine { image?, meta?, spec, maxRounds }        （NDJSON 流式）
       ③ 否则：failures（+ 可选原图视觉比对）拼入 buildFixPrompt 回询 VLM
          → VLM 返回修正后整份 spec → 校验 → 下一轮重建复检
       ④ 超限：保留当前最优 spec，附 warnings 收尾
+```
+
+**Mermaid 时序图**（GitHub 原生渲染；与上图循环结构同构，alt/opt 分支对应 ②③④）：
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant BR as 浏览器
+    participant API as /api/refine<br/>（NDJSON 流式）
+    participant ENG as 引擎子进程<br/>（build / check --json）
+    participant VLM as VLM
+    participant FS as 任务目录
+
+    BR->>API: POST（image? · meta? · spec · maxRounds）
+    loop 每轮 ≤ maxRounds（前端可选 1–3）
+        API->>FS: 写 spec.yaml
+        API->>ENG: build
+        ENG->>FS: 产线① *.html ＋ 产线② *.pptx
+        API->>ENG: check --json
+        ENG-->>API: 四门结构化报告
+        API-->>BR: round / report 事件（＋15s tick 心跳）
+        alt 报告 ok = true
+            API-->>BR: done（ok=true · rounds=当前轮）→ 终止
+        else 存在 failures
+            API->>VLM: buildFixPrompt（failures ＋ 可选原图视觉比对）
+            VLM-->>API: 修正后整份 spec（非增量 patch）
+            API->>API: validateSpecYaml 校验修正稿
+            API-->>BR: spec 事件（自动写回编辑器）
+        end
+    end
+    opt 全轮用尽仍未通过
+        API-->>BR: done（ok=false · warnings · 保留当前最优 spec）
+    end
 ```
 
 设计要点：修正策略是**整图重抽取 + 错误清单反馈**而非增量 patch——VLM 对
@@ -825,3 +896,4 @@ rotate 归一化 = round((((deg % 360) + 360) % 360) × 10) / 10  # 双端同式
 |---|---|---|
 | v1.0 | 2026-11-03 | 首版：按 4+1 视图 + C4 组织，覆盖 v0.3.0 全部已实现机制（截至提交 9bae757） |
 | v1.1 | 2026-11-03 | §3.2 增补 Mermaid 版容器图（与 ASCII 图同构）；§1.4 同步图表约定 |
+| v1.2 | 2026-11-03 | §3.3 / §5.4 增补 Mermaid 时序图（与 ASCII 流程同构）；§1.4 图表约定更新 |
