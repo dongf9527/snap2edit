@@ -3,6 +3,7 @@
 运行：pytest tests/ -q
 覆盖：coverage run --source=src/snap2edit -m pytest tests/ -q && coverage report
 """
+import functools
 import json
 import os
 import subprocess
@@ -18,6 +19,29 @@ from snap2edit import cli, geometry, pptxout, spec as specmod, svgout, verify  #
 
 DEMO = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                     "..", "examples", "demo", "spec.yaml")
+
+
+@functools.lru_cache(maxsize=1)
+def _chromium_available():
+    """真实 chromium 可用性探测（整会话仅一次）。
+
+    Playwright 属可选依赖（D5）：装了浏览器则实跑集成路径，
+    未装则跳过而非失败——与引擎"缺省优雅降级"语义一致。"""
+    try:
+        from playwright.sync_api import sync_playwright
+    except Exception:
+        return False
+    try:
+        with sync_playwright() as p:
+            p.chromium.launch().close()
+        return True
+    except Exception:
+        return False
+
+
+_real_browser = pytest.mark.skipif(
+    not _chromium_available(),
+    reason="未安装 playwright/chromium（可选依赖 D5，跳过真实浏览器集成）")
 
 
 def min_spec(elements=None, texts=None):
@@ -253,6 +277,7 @@ def test_check_bounds_branches():
     assert {"a", "b", "c"} <= ids and "d" not in ids
 
 
+@_real_browser
 def test_screenshot_and_ratio_and_diff():
     from PIL import Image
     with tempfile.TemporaryDirectory() as td:
@@ -314,6 +339,7 @@ def test_collect_checks_screenshot_failure_marks_skip(monkeypatch):
         assert data["artifacts"]["shot"] is None
 
 
+@_real_browser
 def test_collect_checks_with_screenshot_and_original():
     with tempfile.TemporaryDirectory() as td:
         from PIL import Image
