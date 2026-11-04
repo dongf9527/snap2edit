@@ -245,7 +245,7 @@ pt/px  = (幻灯片高 EMU ÷ 914400 × 72) ÷ 画布 px 高   # 同上 → 0.75
 |---|---|---|
 | v0.1 | 引擎骨架：F1–F5(P0) + demo + 冒烟测试 | ✅ 已完成（本仓库初始提交） |
 | v0.5 | F5 loop、F6 组件库、F7 可视化报告 | ✅ 全部完成：F5/F6 随 v0.4 交付（含画廊验收）；F7 可视化报告已交付（引擎 67 项单测 100%，demo 实跑验收） |
-| v1.0 | 测试覆盖 ≥ 80%（已达 100%）、文档站、PyPI 发布 | ✅ 全部完成：打包元数据补全（SPDX/classifiers/URLs）+ 发布流水线（tag→Release→PyPI，Trusted Publishing）；文档站 MkDocs Material + GitHub Pages 自动部署；发布操作见 `.github/workflows/release.yml` 头注 |
+| v1.0 | 测试覆盖 ≥ 80%（已达 100%）、文档站、PyPI 发布 | ✅ 全部完成：打包元数据补全（SPDX/classifiers/URLs）+ 发布流水线（tag→Release→PyPI，Trusted Publishing）；文档站 MkDocs Material + GitHub Pages 自动部署；覆盖率升格为分支级（`.coveragerc` branch=True）：引擎 78 项行+分支双 100%（并修复 `loop --max-iters 0` 崩溃与 spec.yaml 缺失未捕获两个健壮性缺陷），Web 测试 60→98 项、行覆盖 89.6%→98.3%（pipeline/vlm 首次入表）；发布操作见 `.github/workflows/release.yml` 头注 |
 | v2.0 | F8 AI 规格书、F9 Web UI、F10 批量/CI | 愿景（F8/F9 部分能力已提前落地：/api/spec VLM 抽取、/studio 编辑器） |
 
 ## 10. 风险与对策

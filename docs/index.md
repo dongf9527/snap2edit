@@ -83,6 +83,6 @@ snap2edit check my-chart         # 4. 四道门校验 → build/report.md + repo
 | | |
 |---|---|
 | 当前版本 | **v1.0.0**（PyPI / GitHub Releases） |
-| 测试覆盖 | 引擎 100%（分支级），Web 100% |
+| 测试覆盖 | 引擎 78 项 · 行+分支 100%；Web 98 项 · 行 98.3% / 分支 84.2%（pipeline/vlm 首次入表） |
 | 协议 | MIT |
 | 里程碑 | v0.1 骨架 ✅ → v0.5 全特性 ✅ → **v1.0 打包发布 ✅** → v2.0 AI 旗舰（规划） |

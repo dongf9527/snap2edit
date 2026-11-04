@@ -183,7 +183,8 @@ snap2edit/
 - **v1.0**（当前）：打包元数据补全（SPDX 许可 / classifiers / URLs）+
   [PyPI 发布](https://pypi.org/project/snap2edit/)（tag → Release 流水线）+
   [MkDocs Material 文档站](https://dongf9527.github.io/snap2edit/)（Pages 自动部署）+
-  CI（引擎 3.9/3.11/3.13 矩阵 + 打包校验 + Web 测试）
+  CI（引擎 3.9/3.11/3.13 矩阵 + 打包校验 + Web 测试）+
+  覆盖率升格分支级（引擎 78 项行+分支双 100%；Web 98 项行 98.3%）
 - **v2.0**：AI 规格书生成（看图写 spec）、Web UI 完整版（`web/` 基础框架已就绪）、批量模式
 
 ## 命名
