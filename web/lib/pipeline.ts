@@ -6,8 +6,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { BuildEvent, RenderReport } from "./api";
-import { createJob, pptxToPdf, runEngine } from "./engine";
-import { validateSpecYaml } from "./spec";
+import { createJob, pptxToPdf, runEngine } from "./engine.ts";
+import { validateSpecYaml } from "./spec.ts";
 
 /** check --json 的完整输出（含服务端 artifacts 绝对路径，不应原样下发给客户端） */
 export type FullReport = RenderReport & {

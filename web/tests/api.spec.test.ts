@@ -119,3 +119,19 @@ test("streamApi：res.body 缺失 → 明确报错", async () => {
   mockFetchOnce(fake);
   await assert.rejects(() => streamApi("/api/build", {}, () => {}), /流式读取/);
 });
+
+test("streamApi：NDJSON 行间空行 / 纯空白行被跳过（dispatch 早退分支）", async () => {
+  const payload = [
+    "\n",
+    JSON.stringify({ type: "log", msg: "a" }) + "\n",
+    "   \n",
+    JSON.stringify({ type: "log", msg: "b" }) + "\n",
+  ].join("");
+  mockFetchOnce(
+    new Response(payload, { status: 200, headers: { "content-type": "application/x-ndjson" } })
+  );
+  const events: BuildEvent[] = [];
+  await streamApi("/x", {}, (ev) => events.push(ev));
+  assert.equal(events.length, 2);
+  assert.deepEqual(events.map((e) => (e as { msg: string }).msg), ["a", "b"]);
+});
