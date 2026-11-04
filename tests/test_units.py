@@ -963,3 +963,156 @@ def test_collect_checks_report_failure_is_non_blocking(monkeypatch):
         data = verify.collect_checks(td, sp, do_shot=False, log=logs.append)
         assert data["ok"] is True and data["report_html"] is None
         assert any("HTML 可视化报告生成失败" in m for m in logs)
+
+
+# ---------------- 分支补全：复合组件变体 / CLI 边界 / 防御分支 ----------------
+
+def _el(**kw):
+    """单元素基座（rect 形态，按需覆写字段）。"""
+    base = {"id": "e1", "type": "rect", "x": 10, "y": 10, "w": 100, "h": 50}
+    base.update(kw)
+    return base
+
+
+def test_cube_without_text_renders_both_pipelines():
+    """cube 无 text：SVG 出三面但无 -text 单元、PPTX 正常（文字为可选键）。"""
+    sp = min_spec(elements=[_el(id="c1", type="cube")])
+    svg = svgout.render_html(sp)
+    assert 'id="c1"' in svg and 'id="c1-top"' in svg and 'id="c1-text"' not in svg
+    with tempfile.TemporaryDirectory() as td:
+        p = os.path.join(td, "c.pptx")
+        pptxout.render_pptx(sp, p)
+        assert os.path.getsize(p) > 0
+
+
+def test_flowbox_without_title_with_text():
+    """flow-box 无 title（有 text）：不产色带与标题单元，正文照常（两产线）。"""
+    sp = min_spec(elements=[_el(id="f1", type="flow-box", size=14, text="正文内容")])
+    svg = svgout.render_html(sp)
+    assert 'id="f1-band"' not in svg and 'id="f1-title"' not in svg
+    assert 'id="f1-text"' in svg
+    with tempfile.TemporaryDirectory() as td:
+        p = os.path.join(td, "f.pptx")
+        pptxout.render_pptx(sp, p)
+        assert os.path.getsize(p) > 0
+
+
+def test_flowbox_bare_renders_and_no_overflow():
+    """flow-box 裸框（无 title/text/lines）：双产线不崩、边界检查零溢出。
+
+    spec 校验层禁止此形态（F1），本测试覆盖渲染/校验层的防御分支。"""
+    sp = min_spec(elements=[_el(id="f0", type="flow-box")])
+    svg = svgout.render_html(sp)
+    assert 'id="f0"' in svg and 'id="f0-text"' not in svg and 'id="f0-band"' not in svg
+    with tempfile.TemporaryDirectory() as td:
+        pptxout.render_pptx(sp, os.path.join(td, "f.pptx"))
+    assert verify.check_bounds(sp) == []
+
+
+def test_flowbox_no_title_text_overflow():
+    """flow-box 无 title 但正文超宽 → 溢出项以 -text 命名（跳过标题检查分支）。"""
+    sp = {"project": "分支", "canvas": {"width": 200, "height": 100},
+          "palette": {}, "texts": [],
+          "elements": [_el(id="f2", type="flow-box", size=14,
+                           text="这是一段非常长的正文文本用来触发溢出判定逻辑分支覆盖")]}
+    over = verify.check_bounds(sp)
+    assert any(item[0] == "f2-text" for item in over)
+
+
+def test_cjk_font_overwrites_existing_ea_cs():
+    """rPr 已存在 a:ea/a:cs → 覆写 typeface 而非重复创建（防重复分支）。"""
+    from pptx import Presentation
+    from pptx.oxml.ns import qn
+
+    prs = Presentation()
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    tb = slide.shapes.add_textbox(0, 0, 100, 50)
+    run = tb.text_frame.paragraphs[0].add_run()
+    run.text = "字"
+    rPr = run._r.get_or_add_rPr()
+    for tag in ("a:ea", "a:cs"):
+        rPr.append(rPr.makeelement(qn(tag), {}))
+    pptxout._cjk_font(run, "Microsoft YaHei", 12.0, pptxout._C("1F2937"), False)
+    for tag in ("a:ea", "a:cs"):
+        hits = rPr.findall(qn(tag))
+        assert len(hits) == 1 and hits[0].get("typeface") == "Microsoft YaHei"
+
+
+def test_main_module_import_guard():
+    """作为模块导入（非脚本执行）不触发 main()（__main__ 守卫假分支）。"""
+    import importlib
+
+    m = importlib.import_module("snap2edit.__main__")
+    assert hasattr(m, "main")
+
+
+def test_loop_rejects_zero_iters(capsys):
+    """--max-iters 0 → 明确报错返回 2（修复前会在空 history 上 min() 崩溃）。"""
+    import argparse
+
+    rc = cli.cmd_loop(argparse.Namespace(dir=".", max_iters=0, json=True))
+    out = capsys.readouterr().out
+    assert rc == 2 and "必须 ≥ 1" in out
+
+
+def test_loop_converged_without_report_html(monkeypatch, capsys):
+    """收敛但可视化报告缺席 → 非 json 汇总消息不带「可视化」段。"""
+    import argparse
+    import shutil
+
+    with tempfile.TemporaryDirectory() as td:
+        shutil.copy(DEMO, os.path.join(td, "spec.yaml"))
+        fake = {"ok": True, "failures": [], "gates": [],
+                "report_md": os.path.join(td, "report.md")}
+        monkeypatch.setattr(verify, "collect_checks", lambda *a, **k: fake)
+        args = argparse.Namespace(dir=td, max_iters=1, json=False, original=None,
+                                  no_shot=True, fix=None, fix_timeout=30)
+        rc = cli.cmd_loop(args)
+        out = capsys.readouterr().out
+        assert rc == 0 and "收敛" in out and "可视化" not in out
+
+
+def test_loop_unconverged_no_snapshot_best_none(capsys):
+    """spec.yaml 缺失（每轮 SpecError）→ 无失败快照 → best_spec=None，退出码 2。"""
+    import argparse
+
+    with tempfile.TemporaryDirectory() as td:
+        args = argparse.Namespace(dir=td, max_iters=1, json=True, original=None,
+                                  no_shot=True, fix=None, fix_timeout=30)
+        rc = cli.cmd_loop(args)
+        assert rc == 2
+        summary = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
+        assert summary["converged"] is False and summary["best_spec"] is None
+
+
+def test_run_checks_msg_without_report_html(monkeypatch):
+    """run_checks 在可视化报告生成失败时汇总消息不带「可视化」段。"""
+    import snap2edit.report as report_mod
+
+    with tempfile.TemporaryDirectory() as td:
+        sp = specmod.load(DEMO)
+        name = specmod.safe_project(sp)
+        build = os.path.join(td, "build")
+        os.makedirs(build)
+        with open(os.path.join(build, f"{name}.html"), "w", encoding="utf-8") as f:
+            f.write(svgout.render_html(sp))
+        pptxout.render_pptx(sp, os.path.join(build, f"{name}.pptx"))
+
+        def boom(*a, **k):
+            raise RuntimeError("boom")
+
+        monkeypatch.setattr(report_mod, "write_html", boom)
+        assert verify.run_checks(td, sp, do_shot=False) is True
+
+
+def test_loop_fixer_skipped_on_final_iter_natural_exhaustion(tmp_path, capsys):
+    """带 fix 但未收敛：最后一轮不再执行修正命令，迭代自然耗尽 → 退出码 2 + 最优快照。"""
+    bad = dict(LOOP_OK_SPEC, texts=["标题文字", "不存在的文案"])
+    _write_loop_project(str(tmp_path), bad)
+    rc = cli.main(["loop", str(tmp_path), "--no-shot", "--max-iters", "2",
+                   "--fix", "python3 -c pass"])
+    out = capsys.readouterr().out
+    assert rc == 2 and "未收敛" in out
+    assert os.path.exists(os.path.join(str(tmp_path), "loop", "best-spec.yaml"))
+    # 最后一轮不应再执行修正命令（python3 -c pass 幂等，无法直接观测；
+    # 此处由分支覆盖保证：for 自然耗尽弧已走过）

@@ -1,6 +1,7 @@
 # coverage.py 配置：playwright sync API 基于 greenlet 调度，
 # 默认只追线程会漏记 `with sync_playwright()` 块内语句，需开启 greenlet 并发追踪。
 [run]
+branch = True
 source = src/snap2edit
 concurrency = thread, greenlet
 

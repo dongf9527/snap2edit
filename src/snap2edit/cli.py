@@ -131,6 +131,10 @@ def _run_fixer(fix, d, spec_path, it, report_path, failures, timeout, log):
 def cmd_loop(args):
     from . import spec as specmod, verify
 
+    if args.max_iters < 1:
+        print(f"✗ --max-iters 必须 ≥ 1（当前 {args.max_iters}），未执行任何迭代")
+        return 2
+
     d = args.dir
     spec_path = os.path.join(d, "spec.yaml")
     loop_dir = os.path.join(d, "loop")
@@ -142,7 +146,7 @@ def cmd_loop(args):
             sp = specmod.load(spec_path)
             _do_build(d, sp)
             build_err = None
-        except specmod.SpecError as e:
+        except (specmod.SpecError, FileNotFoundError) as e:
             sp, build_err = None, str(e)
 
         # --- check ---
@@ -194,13 +198,15 @@ def cmd_loop(args):
             with open(os.path.join(loop_dir, f"report-iter{it}.html"), "w", encoding="utf-8") as f:
                 f.write(rep)
 
-        if it == args.max_iters:
-            break
+        # （迭代耗尽由 range 上界自然结束，无需显式 break）
+
         if not args.fix:
             print("✗ 未指定 --fix 修正命令，无法自动迭代修正（可先手动改 spec.yaml 后重试）")
             break
-        _run_fixer(args.fix, d, spec_path, it, report_path, failures,
-                   args.fix_timeout, log=print)
+        if it < args.max_iters:
+            # 最后一轮无需再执行修正（没有下一轮了）；迭代耗尽由 range 上界自然结束
+            _run_fixer(args.fix, d, spec_path, it, report_path, failures,
+                       args.fix_timeout, log=print)
 
     # --- 未收敛：保留最少失败轮为最优 ---
     best = min(history, key=lambda h: len(h["failures"]))
