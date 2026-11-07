@@ -40,8 +40,11 @@ git ls-remote origin refs/heads/main        # 远程 main
 git status --short                          # 工作区必须干净（无未提交改动）
 ```
 
-**凭据安全**：推送凭据仅内嵌在单次 push URL 中使用，不写入 remote 配置、不落盘；
-命令输出一律经脱敏处理（token 替换为 `[REDACTED]`）后才进入会话记录。
+**凭据安全**：推送凭据由 PAT 四层保管机制统一管理（L1 `~/.git-credentials` 热路径 +
+L2/L3 `.secrets/` 密文层，登记簿见 `.ai-vault/`，规范见 [`TOKEN_MANAGEMENT.md`](TOKEN_MANAGEMENT.md)）；
+remote URL 永远干净、明文零 argv 零回显、密文与分片永不入仓；命令输出一律经脱敏处理
+（token 替换为 `[REDACTED]`）后才进入会话记录。新会话开工若推送报 `could not read
+Username`，先跑 `python3 scripts/tokenctl.py wire && python3 scripts/tokenctl.py verify`。
 
 **会话产物归档**（规则 4 的落地约定）：
 

@@ -2,16 +2,19 @@
 # -*- coding: utf-8 -*-
 """tokenctl —— snap2edit 四层 PAT 保管与恢复工具（正本随仓旅行，路径自举）
 
-层位（详见 docs/TOKEN_MANAGEMENT.md）:
-  L0 入仓永续层  <repo>/.ai-vault/   token.enc + vault.key.enc + restore.py + meta.json + README.md
-  L1 推送热路径  ~/.git-credentials   git credential store 工作文件（0600，仓库外）
-  L2 主密文层    $TOKENCTL_HOME/.secrets/{vault/token.enc, keys/vault.key}（0600）
-  L3 三分片兜底  $TOKENCTL_HOME/.secrets/shards/token.shard.{1,2,3}.b64（0600）
+层位（v2 公开仓适配，详见 docs/TOKEN_MANAGEMENT.md）:
+  L0 入仓登记层  <repo>/.ai-vault/   meta.json + README.md（零密文——2026-11-07 事件后，
+                                     公开仓不放任何可复原材料，密文链已移出）
+  L1 推送热路径  ~/.git-credentials   git credential store 工作文件（0600，唯一明文例外）
+  L2 主密文层    <repo>/.secrets/{vault/token.enc, keys/vault.key}（0600，gitignore 隔离）
+  L3 三分片兜底  <repo>/.secrets/shards/token.shard.{1,2,3}.b64（0600，任二片重组）
 
 命令: status / verify / wire / ingest --file F / vault-sync / rebuild-shards / push
 安全约定: token 明文零 argv、零回显、零落文档；输出仅掩码与 fp16 指纹。
 算法: AES-256-CBC + PBKDF2-HMAC-SHA256 20 万迭代（openssl CLI）；
       口令经 env 注入进程，不经 argv、不经终端。
+恢复链: L1 缺 → wire（L2→L3 逐层拉回）；L2+L3 俱灭 → owner 重发票（ingest）。
+      公开仓不承载密文，无 L0 密文自恢复——吊销+重发是终极兜底。
 """
 import base64
 import hashlib
@@ -30,7 +33,9 @@ from urllib.parse import urlparse
 # ---------- 路径自举 ----------
 HERE = Path(__file__).resolve().parent            # <repo>/scripts/
 REPO = HERE.parent                                # snap2edit 仓根
-HOME = Path(os.environ.get("TOKENCTL_HOME", REPO.parent))   # 项目根（默认 /home/z/my-project）
+# v2 适配：敏感层默认收进本仓 gitignore 隔离区（.secrets/），不再写外层目录
+# （事件复盘：v1 默认 REPO.parent 是外层自动化工作区，曾把 L2/L3 写入其 git 跟踪面）
+HOME = Path(os.environ.get("TOKENCTL_HOME", REPO))
 L0 = REPO / ".ai-vault"
 L2_VAULT = HOME / ".secrets" / "vault"
 L2_KEYS = HOME / ".secrets" / "keys"
@@ -217,114 +222,24 @@ def token_from_any_layer():
     sh = read_shards()
     if sum(1 for v in sh.values() if v) >= 2:
         return combine(sh), "L3"
-    rp = L0 / "restore.py"
-    if rp.exists():
-        subprocess.run([sys.executable, str(rp)], check=True)
-        t = read_l1() or read_token_l2()
-        if t:
-            return (t.encode() if isinstance(t, str) else t), "L0"
     return None, None
 
 
-# ---------- restore.py 模板（L0 自含外层口令 K2，仅 stdlib + openssl CLI） ----------
-RESTORE_TEMPLATE = r'''#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""L0 自恢复（自含外层口令 K2；仅依赖 Python stdlib + openssl CLI，token 零回显）
-
-执行: python3 .ai-vault/restore.py
-链路: K2 → 解 vault.key.enc → vault.key → 解 token.enc → token（仅内存）
-      → fp16 比对 meta.json → 回写 L1(0600)+L2(0600)+L3(三片,0600)
-"""
-import base64, hashlib, json, os, subprocess, sys
-from pathlib import Path
-
-K2 = "__K2__"
-HERE = Path(__file__).resolve().parent              # .ai-vault/
-REPO = HERE.parent                                  # snap2edit 仓根
-HOME = Path(os.environ.get("TOKENCTL_HOME", REPO.parent))
-L1 = Path.home() / ".git-credentials"
-L2_VAULT = HOME / ".secrets" / "vault"
-L2_KEYS = HOME / ".secrets" / "keys"
-L3_DIR = HOME / ".secrets" / "shards"
-META = HERE / "meta.json"
-OWNER = "dongf9527"
-HOST = "github.com"
-ITER = 200000
-
-
-def op_ssl(data, passwd, dec=False):
-    cmd = ["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", str(ITER)]
-    cmd += ["-d"] if dec else ["-salt"]
-    cmd += ["-pass", "env:TK_PV"]
-    env = dict(os.environ, TK_PV=passwd)
-    return subprocess.run(cmd, input=data, capture_output=True, check=True, env=env).stdout
-
-
-def secure_write(p, data, mode=0o600):
-    p.parent.mkdir(parents=True, exist_ok=True)
-    if isinstance(data, str):
-        data = data.encode()
-    with open(p, "wb") as f:
-        os.fchmod(f.fileno(), mode)
-        f.write(data)
-        f.flush()
-        os.fsync(f.fileno())
-    os.chmod(p, mode)
-
-
-def write_l1(tok):
-    r = subprocess.run(["git", "config", "--global", "credential.helper"],
-                       capture_output=True, text=True)
-    if r.stdout.strip() != "store":
-        subprocess.run(["git", "config", "--global", "credential.helper", "store"], check=True)
-    lines = []
-    if L1.exists():
-        lines = [l for l in L1.read_text().splitlines() if "@" + HOST not in l]
-    lines.append("https://%s:%s@%s" % (OWNER, tok, HOST))
-    L1.write_text("\n".join(lines) + "\n")
-    os.chmod(L1, 0o600)
-
-
-def write_l3(tok):
-    n = len(tok)
-    a, b = tok[: n // 2], tok[n // 2:]
-    L = max(len(a), len(b))
-    m = bytes(x ^ y for x, y in zip(a.rjust(L, b"\x00"), b.rjust(L, b"\x00")))
-    for i, s in ((1, m), (2, a), (3, b)):
-        secure_write(L3_DIR / ("token.shard.%d.b64" % i), base64.b64encode(s))
-
-
-def main():
-    key = op_ssl((HERE / "vault.key.enc").read_bytes(), K2, dec=True).decode()
-    tok = op_ssl((HERE / "token.enc").read_bytes(), key, dec=True)
-    meta = json.loads(META.read_text())
-    fp = hashlib.sha256(tok).hexdigest()[:16]
-    if fp != meta["fp16"]:
-        print("[restore] 指纹不符（疑似串票）——拒绝落层", file=sys.stderr)
-        sys.exit(2)
-    # L2: token.enc 用 L0 在库密文原样回写（与 vault.key 同源同配），vault.key 回写明文层
-    secure_write(L2_VAULT / "token.enc", (HERE / "token.enc").read_bytes())
-    secure_write(L2_KEYS / "vault.key", key)
-    write_l1(tok.decode())
-    write_l3(tok)
-    print("[restore] 本地三层已重建: L1(helper)+L2(token.enc %dB)+L3(3 shards)" % (HERE / "token.enc").stat().st_size)
-    print("[restore] mask=%s fp16=%s —— token 零回显" % (meta["mask"], fp))
-
-
-if __name__ == "__main__":
-    main()
-'''
+# ---------- L0（v2 公开仓适配）----------
+# v1 的 RESTORE_TEMPLATE（自含外层口令 K2 的自恢复脚本）已随 2026-11-07 安全事件移除：
+# public 仓中「密文 + 密钥密文 + 内嵌口令」三件套等同明文公开（复盘见
+# docs/TOKEN_MANAGEMENT.md §八）。恢复链改为 L2→L3 本地自愈 + 吊销重发兜底。
 
 
 # ---------- 七个命令 ----------
 def cmd_status():
     m, a, b = read_shards().values()
     n3 = sum(1 for v in (m, a, b) if v is not None)
-    l0_ok = all((L0 / f).exists() for f in ("token.enc", "vault.key.enc", "restore.py", "meta.json"))
+    l0_ok = META.exists() and (L0 / "README.md").exists()
     l1_ok = L1.exists() and ("@" + HOST) in L1.read_text()
     l1_perm = oct(L1.stat().st_mode & 0o777)[2:] if L1.exists() else "-"
     l2_ok = (L2_VAULT / "token.enc").exists() and (L2_KEYS / "vault.key").exists()
-    print(f"[status] L0 {'OK(入仓密文层)' if l0_ok else '缺失'} / "
+    print(f"[status] L0 {'OK(入仓登记簿)' if l0_ok else '缺失'} / "
           f"L1 {'OK(%s)' % l1_perm if l1_ok else '缺失'} / "
           f"L2 {'OK' if l2_ok else '缺失'} / L3 {n3}/3")
     meta = load_meta()
@@ -363,7 +278,7 @@ def cmd_wire():
     n3 = sum(1 for v in (m, a, b) if v is not None)
     l2_ok = (L2_VAULT / "token.enc").exists() and (L2_KEYS / "vault.key").exists()
     print(f"[wire] 灾情: L1 {'缺失' if not read_l1() else '在'} / L2 {'缺失' if not l2_ok else '在'} / "
-          f"L3 {n3}/3 / L0 {'OK' if (L0 / 'restore.py').exists() else '缺失'}")
+          f"L3 {n3}/3 / L0 {'OK' if META.exists() else '缺失'}")
     if l2_ok:
         tok = read_token_l2()
         check_fp(tok, quiet=True)
@@ -380,15 +295,12 @@ def cmd_wire():
         write_l2(tok, key)          # vault.key 已灭 → 新钥重封
         write_l1(tok.decode())
         write_l3(tok)
-        cmd_vault_sync()            # L0 同步重封（restore.py 的 K2 不变）
+        cmd_vault_sync()            # L0 登记簿同步（零密文，仅刷新 meta/README）
         print(f"[restore] 源层=L3 → 本地三层已重建（vault.key 轮换，L0 已同步）")
         print(f"[restore] mask={mask_of(tok)} fp16={fp16(tok)} —— token 零回显")
         return
-    rp = L0 / "restore.py"
-    if rp.exists():
-        subprocess.run([sys.executable, str(rp)], check=True)
-        return
-    print("[wire] 四层全灭（连 .ai-vault 都没了）——重新 clone 后先跑 restore.py", file=sys.stderr)
+    print("[wire] L2/L3 俱灭，公开仓无密文可拉（v2 设计）——请 owner 后台重发票，"
+          "走 ingest（docs/TOKEN_MANAGEMENT.md §六）", file=sys.stderr)
     sys.exit(1)
 
 
@@ -411,52 +323,51 @@ def cmd_ingest(file: Path, expires=None, expires_note=None):
     print(f"[ingest] 三层落位: L2(token.enc {(L2_VAULT / 'token.enc').stat().st_size}B + vault.key 32B-hex) "
           f"+ L3(3 shards) + L1(0600); login={meta['login']}")
     print(f"[ingest] 原件已粉碎; mask={meta['mask']} fp16={meta['fp16']}")
-    print("[ingest] 提醒: 请跑 vault-sync 刷新 L0（换票后必须，否则灾后拉回的是旧票密文）")
+    print("[ingest] 提醒: 请跑 vault-sync 刷新 L0 登记簿（换票后必须，保持户口本与实票一致）")
 
 
 def cmd_vault_sync():
-    enc = L2_VAULT / "token.enc"
-    key = read_key()
-    if not enc.exists() or not key:
-        print("[vault-sync] L2 不全（vault-sync 以 L2 为源）——先 wire", file=sys.stderr)
+    """刷新 L0 登记簿（v2 公开仓适配：零密文入仓，只写 meta.json + README.md）。"""
+    tok, src = token_from_any_layer()
+    if not tok:
+        print("[vault-sync] 无可用票源（L1/L2/L3 皆空）——先 wire 或 ingest", file=sys.stderr)
         sys.exit(1)
+    meta = load_meta() or {}
+    meta.update(mask=mask_of(tok), fp16=fp16(tok), login=meta.get("login", OWNER),
+                expires=meta.get("expires"), expires_note=meta.get("expires_note"),
+                scheme="https", updated=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                layers={"L0": ".ai-vault/ 登记簿（零密文，公开仓不放可复原材料）",
+                        "L1": "~/.git-credentials（0600，唯一明文例外）",
+                        "L2": ".secrets/{vault/token.enc, keys/vault.key}（0600，gitignore 隔离）",
+                        "L3": ".secrets/shards/token.shard.{1,2,3}.b64（0600，任二片重组）"})
     L0.mkdir(parents=True, exist_ok=True)
-    # K2：restore.py 已在 → 提取；否则新生成
-    rp = L0 / "restore.py"
-    if rp.exists():
-        m = re.search(r'K2 = "([0-9a-f]{64})"', rp.read_text())
-        k2 = m.group(1)
-    else:
-        k2 = secrets.token_bytes(32).hex()
-    secure_write(L0 / "token.enc", enc.read_bytes(), mode=0o644)
-    secure_write(L0 / "vault.key.enc", op_ssl(key.encode(), k2), mode=0o644)
-    secure_write(L0 / "restore.py", RESTORE_TEMPLATE.replace("__K2__", k2), mode=0o644)
-    if not META.exists():
-        tok = op_ssl(enc.read_bytes(), key, dec=True)
-        save_meta(tok, OWNER)
+    secure_write(META, json.dumps(meta, ensure_ascii=False, indent=2) + "\n", mode=0o644)
     secure_write(L0 / "README.md", L0_README, mode=0o644)
-    # 回读验真：K2 → vault.key → token → fp16
-    k2b = op_ssl((L0 / "vault.key.enc").read_bytes(), k2, dec=True).decode()
-    tok = op_ssl((L0 / "token.enc").read_bytes(), k2b, dec=True)
-    check_fp(tok)
-    print(f"[vault-sync] L0 已刷新: token.enc {(L0 / 'token.enc').stat().st_size}B + "
-          f"vault.key.enc {(L0 / 'vault.key.enc').stat().st_size}B + restore.py(K2 内嵌) + meta.json + README.md")
-    print("[vault-sync] 提醒: .ai-vault/ 密文变更必须随本轮 commit+push 入 GitHub")
+    print(f"[vault-sync] L0 登记簿已刷新（零密文）: meta.json + README.md（票源={src} fp16={fp16(tok)}）")
+    print("[vault-sync] 提醒: .ai-vault/ 变更随本轮 commit+push 入 GitHub")
 
 
-L0_README = """# .ai-vault —— CASE: snap2edit 入仓永续层（L0）
+L0_README = """# .ai-vault —— snap2edit 入仓登记层（L0，v2 公开仓适配）
 
-本目录只放**密文与自恢复脚本**（0644 入仓无妨，守卫钩子不拦密文形态）：
+> 2026-11-07 安全事件后重评（docs/TOKEN_MANAGEMENT.md §八）：本仓为 **public**，
+> 公开仓不放任何可复原材料——v1 的 `token.enc + vault.key.enc + restore.py(K2 内嵌)`
+> 密文链已整体移除（历史提交中的旧密文在旧票吊销后即惰性）。本目录现在只放**登记簿**：
 
 | 文件 | 内容 |
 |---|---|
-| `token.enc` | PAT 密文（AES-256-CBC + PBKDF2-HMAC-SHA256 20 万迭代；口令 = vault.key） |
-| `vault.key.enc` | 内层密钥 vault.key 的密文（口令 = K2，K2 内嵌于 restore.py） |
-| `restore.py` | 自含 K2 的自恢复脚本（仅依赖 stdlib + openssl CLI）：`python3 .ai-vault/restore.py` |
-| `meta.json` | token 户口本（mask/fp16/login/expires/scheme/updated），零 token 材料 |
+| `meta.json` | token 户口本：mask/fp16/login/expires/updated/layers（SHA-256 前 16 位指纹，不可逆推） |
 | `README.md` | 本说明 |
 
-灾后恢复：clone 本仓 → `python3 .ai-vault/restore.py`（或 `python3 scripts/tokenctl.py wire`）→ `verify`。
+本地敏感层（gitignore 隔离，永不入 git）：
+
+| 层 | 位置 | 说明 |
+|---|---|---|
+| L1 | `~/.git-credentials` | 推送热路径，0600，唯一明文例外 |
+| L2 | `.secrets/{vault/token.enc, keys/vault.key}` | AES-256-CBC + PBKDF2 20 万迭代，密钥分文件，0600 |
+| L3 | `.secrets/shards/token.shard.{1,2,3}.b64` | 切半 A‖B + mask=A⊕B，任二片重组，0600 |
+
+灾后恢复：`python3 scripts/tokenctl.py status` → `wire`（L2→L3 逐层拉回）→ `verify`。
+L2/L3 俱灭（沙箱整卷清空）→ owner 后台重发票走 `ingest`（吊销+重发是终极兜底）。
 详见 `docs/TOKEN_MANAGEMENT.md`。
 """
 
@@ -472,7 +383,11 @@ def cmd_rebuild_shards():
 
 
 def cmd_push(args):
-    r = subprocess.run(["git", "push", *args], cwd=REPO)
+    """git push 包装：输出强制脱敏（token 形态串 → [REDACTED]）。"""
+    r = subprocess.run(["git", "push", *args], cwd=REPO, capture_output=True, text=True)
+    out = (r.stdout or "") + (r.stderr or "")
+    out = re.sub(r"(ghp_|github_pat_)[A-Za-z0-9_]+", lambda m: m.group(1) + "[REDACTED]", out)
+    sys.stdout.write(out)
     sys.exit(r.returncode)
 
 

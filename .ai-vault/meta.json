@@ -5,5 +5,11 @@
   "expires": null,
   "expires_note": null,
   "scheme": "https",
-  "updated": "2026-11-07T13:44:42+0000"
+  "updated": "2026-11-07T14:28:46+0000",
+  "layers": {
+    "L0": ".ai-vault/ 登记簿（零密文，公开仓不放可复原材料）",
+    "L1": "~/.git-credentials（0600，唯一明文例外）",
+    "L2": ".secrets/{vault/token.enc, keys/vault.key}（0600，gitignore 隔离）",
+    "L3": ".secrets/shards/token.shard.{1,2,3}.b64（0600，任二片重组）"
+  }
 }
