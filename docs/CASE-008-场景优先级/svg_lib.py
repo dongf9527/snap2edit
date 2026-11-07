@@ -36,14 +36,3 @@ def tri(id, points, fill):
 def band_top_rounded(id, x, y, w, h, r, fill):
     return (rrect(id, x, y, w, h, r, fill) +
             rect(id + '-sq', x, y + r, w, h - r, fill))
-
-def wechat_logo(id, cx, cy, color='#ACADAE', dot='#E3E1DF'):
-    """微信双气泡水印 logo：以 (cx,cy) 为中心，总宽 64px（实测 [1056,1121]x[872,928]）"""
-    return (f'<g id="{id}">'
-            f'<rect x="{cx-31.5}" y="{cy-24}" width="44" height="44" rx="10" fill="{color}"/>'
-            f'<circle cx="{cx-15.5}" cy="{cy-9}" r="3" fill="{dot}"/>'
-            f'<circle cx="{cx-1.5}" cy="{cy-9}" r="3" fill="{dot}"/>'
-            f'<rect x="{cx-2.5}" y="{cy-1}" width="35" height="28" rx="8" fill="{color}"/>'
-            f'<circle cx="{cx+8.5}" cy="{cy+10}" r="2.6" fill="{dot}"/>'
-            f'<circle cx="{cx+19.5}" cy="{cy+10}" r="2.6" fill="{dot}"/>'
-            f'</g>')

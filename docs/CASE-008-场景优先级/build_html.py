@@ -3,7 +3,7 @@
 import os, sys, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from spec import *
-from svg_lib import text, rrect, rect, circle, line, tri, band_top_rounded, wechat_logo, esc
+from svg_lib import text, rrect, rect, circle, line, tri, band_top_rounded, esc
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '场景优先级复刻.html')
 
@@ -101,7 +101,7 @@ for bi, (bx, byy, bw, bh, fill, ttl, sub, tb, sb) in enumerate(m['badges'], 1):
     S.append(text(f'm-badge-{bi}-sub', bx + bw / 2, sb, sub, m['badge_sub_size'], 400,
                   C['white'], anchor='middle'))
 
-# ---------- P3 / P4 表格：先画全部矩形（含水印下层），文字最后画 ----------
+# ---------- P3 / P4 表格：先画全部矩形，文字最后画 ----------
 TABLES = [(T3, 't3'), (T4, 't4')]
 for t, prefix in TABLES:
     S.append(rect(f'{prefix}-header', t['x'], t['y'], t['w'], t['header_h'], C['navy']))
@@ -124,17 +124,9 @@ for t, prefix in TABLES:
         S.append(rect(f'{prefix}-cell-{ri+1}', t['cell_x'], t['rows'][ri][0], t['cell_w'],
                       t['rows'][ri][1] - t['rows'][ri][0], cell))
 
-# ---------- 水印（色块之上、文字之下） ----------
-wm = WATERMARK
-S.append(f'<g id="watermark-group">')
-S.append(wechat_logo('watermark-logo', wm['logo_cx'], wm['logo_cy'], wm['color'], C['wm_dot']))
-S.append(text('watermark-1', wm['x1'], wm['baseline'], wm['text1'], wm['size1'], wm['weight1'],
-              wm['color']))
-S.append(text('watermark-2', wm['x2'], wm['baseline'], wm['text2'], wm['size2'], wm['weight2'],
-              wm['color'], spacing=wm['spacing2']))
-S.append('</g>')
-
-# ---------- P3 / P4 表格文字（压在水印之上，与原图层级一致） ----------
+# ---------- P3 / P4 表格文字 ----------
+# v2 迭代（2026-11-07）：原水印层（logo + 公众号 + 解决方案研究所）已按要求移除，
+# 表格文字不再需要压印水印层级，直接绘制。
 for tk, (t, prefix) in enumerate(TABLES):
     for ri, row in enumerate(t['data']):
         n = ri + 1

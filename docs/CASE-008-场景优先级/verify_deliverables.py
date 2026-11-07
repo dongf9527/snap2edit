@@ -44,8 +44,9 @@ PHRASES = [
     '先试点', '补充条件', '隔离验证',
     '优先投入，快速试点，验证价值并迭代优化', '选择典型业务线，分阶段扩展应用范围',
     '完善合规与法务复核机制，满足条件后推进', '在隔离环境中小额验证，评估风险并完善管控',
-    '公众号', '解决方案研究所',
 ]
+# v2 迭代（2026-11-07）：'公众号' / '解决方案研究所' 随水印移除退出文案清单；
+# 并在下方新增两条「无水印」反向断言（终检 15→17 项）。
 
 # ================= HTML 终检 =================
 html = open(HTML, encoding='utf-8').read()
@@ -61,6 +62,8 @@ missing = [p for p in PHRASES if p not in html]
 check('HTML 关键文案逐条 in', not missing, f'缺失:{missing[:5]}')
 bad = re.findall(r'XXX|TODO|待补充|【|undefined|NaN', html)
 check('HTML 无占位符', not bad, f'{bad[:5]}')
+wm_html = ('公众号' in html) or ('解决方案研究所' in html) or ('watermark' in html)
+check('HTML 无水印（v2 迭代移除）', not wm_html)
 
 # ================= PPTX 终检 =================
 prs = Presentation(PPTX)
@@ -93,6 +96,8 @@ missing_p = [p for p in PHRASES if p not in joined]
 check('PPTX 关键文案逐条 in', not missing_p, f'缺失:{missing_p[:5]}')
 badp = re.findall(r'XXX|TODO|待补充|【|undefined|NaN', joined)
 check('PPTX 无占位符', not badp, f'{badp[:5]}')
+wm_pptx = ('公众号' in joined) or ('解决方案研究所' in joined)
+check('PPTX 无水印（v2 迭代移除）', not wm_pptx)
 check('PPTX 边界零溢出', not overflow, f'{overflow[:5]}')
 
 # 中文字体抽查

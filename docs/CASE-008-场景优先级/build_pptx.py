@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Step4: CASE-008 python-pptx 原生 PPTX（文本框+形状，Picture=0）
 同一份 spec.py 喂养；坐标 px→EMU；基线→文本框顶 = baseline - 0.86*size。
-z-order 与 HTML 一致：底→卡→芯片→P1→P2→P3/P4 矩形→水印→P3/P4 文字。
+z-order 与 HTML 一致：底→卡→芯片→P1→P2→P3/P4 矩形→P3/P4 文字。
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -136,21 +136,8 @@ for t, prefix in TABLES:
         add_rect(sh, t['cell_x'], t['rows'][ri][0], t['cell_w'],
                  t['rows'][ri][1] - t['rows'][ri][0], fill=row[-2])
 
-# ---------- 水印（色块之上、文字之下） ----------
-wm = WATERMARK
-lcx, lcy = wm['logo_cx'], wm['logo_cy']
-add_rect(sh, lcx - 31.5, lcy - 24, 44, 44, fill=wm['color'], radius=10)
-add_oval(sh, lcx - 15.5, lcy - 9, 3, fill=C['wm_dot'])
-add_oval(sh, lcx - 1.5, lcy - 9, 3, fill=C['wm_dot'])
-add_rect(sh, lcx - 2.5, lcy - 1, 35, 28, fill=wm['color'], radius=8)
-add_oval(sh, lcx + 8.5, lcy + 10, 2.6, fill=C['wm_dot'])
-add_oval(sh, lcx + 19.5, lcy + 10, 2.6, fill=C['wm_dot'])
-T(wm['x1'], wm['baseline'], 200, wm['text1'], wm['size1'], wm['weight1'], wm['color'],
-  tag='水印1')
-T(wm['x2'], wm['baseline'], 400, wm['text2'], wm['size2'], wm['weight2'], wm['color'],
-  tag='水印2', spc=wm['spacing2'])
-
 # ---------- P3 / P4 文字层 ----------
+# v2 迭代（2026-11-07）：原水印层（logo 2 矩形 + 4 圆点 + 2 文本框）已按要求移除。
 for ti, (t, prefix) in enumerate(TABLES):
     for ri, row in enumerate(t['data']):
         n = ri + 1
