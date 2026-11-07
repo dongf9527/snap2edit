@@ -4,6 +4,7 @@
 > 如何提交、哪些操作绝对禁止。任何会话内的改动都必须遵守本表执行。
 >
 > - 生效日期：2026-11-03
+> - 最近修订：2026-11-07（规则 2 仓库位置调整）
 > - 适用范围：`https://github.com/dongf9527/snap2edit.git` 及其全部本地克隆
 
 ## 核心规则表
@@ -11,7 +12,7 @@
 | # | 规则 | 说明 |
 |---|------|------|
 | 1 | **唯一同步方式** | 所有代码/文档改动通过 `git commit` + `git push` 推送到 GitHub，不在对话中凭空产生代码 |
-| 2 | **仓库位置** | `/home/z/my-project/download/snap2edit/`（远程：<https://github.com/dongf9527/snap2edit.git>），不在其他目录创建 `.git` |
+| 2 | **仓库位置** | `/home/z/my-project/snap2edit/`（远程：<https://github.com/dongf9527/snap2edit.git>），不在其他目录创建 `.git`（2026-11-07 注记：原 `/home/z/my-project/download/snap2edit/` 同步废弃，全库仅以本路径为准） |
 | 3 | **提交规范** | 小步提交，commit message 使用 conventional commits 风格（`feat:` / `fix:` / `docs:` / `refactor:` / `chore:` / `test:`） |
 | 4 | **会话记录** | 分析/评估/测试记录写入 `docs/` 目录，以 Markdown 形式提交推送 |
 | 5 | **禁止 force push** | 绝不使用 `git push --force`；同理禁止对已推送 commit 执行 `--amend` 后再推送（等效 force，同样触犯本条，2026-10-24 注记）；未推送 commit 的 amend 属修正笔误常规手段，不受限 |
@@ -23,7 +24,7 @@
 **同步操作标准动作**（规则 1 的落地步骤）：
 
 ```bash
-cd /home/z/my-project/download/snap2edit   # 规则 2：唯一仓库位置
+cd /home/z/my-project/snap2edit            # 规则 2：唯一仓库位置
 git pull --ff-only                          # 先拉齐远程（禁止 merge commit 式拉取）
 # ... 本地修改 ...
 git add <files>
