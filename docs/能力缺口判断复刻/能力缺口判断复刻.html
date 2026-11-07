@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>准备度评分与能力缺口诊断</title>
+<style>
+  html,body { margin:0; padding:0; background:#FFFFFF; }
+  #stage { width:1728px; height:972px; position:relative; }
+  svg { display:block; }
+  text { font-family:Noto Sans SC, Microsoft YaHei, PingFang SC, sans-serif; }
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="canvas" viewBox="0 0 1728 972" width="1728" height="972" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="1728" height="972" fill="#FFFFFF"/>
+  <g id="title" class="unit" data-unit="title">
+    <text x="36" y="88" font-size="76" fill="#0B2140" font-weight="700" stroke="#0B2140" stroke-width="2.0">准备度评分与能力缺口诊断</text>
+  </g>
+  <g id="band_bg" class="unit" data-unit="band_bg">
+    <rect x="18.0" y="795.0" width="1694.0" height="43.0" rx="4" fill="#F2F4F7"/>
+  </g>
+  <g id="table_header" class="unit" data-unit="table_header">
+    <path d="M 19 206 L 19 140 Q 19 129 30 129 L 1005 129 Q 1016 129 1016 140 L 1016 206 Z" fill="#253E56"/><line x1="231.5" y1="135.0" x2="231.5" y2="200.0" stroke="#FFFFFF" stroke-width="3" stroke-linecap="butt"/><line x1="387.5" y1="135.0" x2="387.5" y2="200.0" stroke="#FFFFFF" stroke-width="3" stroke-linecap="butt"/><line x1="703.5" y1="135.0" x2="703.5" y2="200.0" stroke="#FFFFFF" stroke-width="3" stroke-linecap="butt"/><text x="126" y="180" font-size="28" fill="#FFFFFF" font-weight="700" text-anchor="middle">维度</text><text x="311" y="180" font-size="28" fill="#FFFFFF" font-weight="700" text-anchor="middle">权重</text><text x="543" y="164" font-size="28" fill="#FFFFFF" font-weight="700" text-anchor="middle">现状评分</text><text x="543" y="193" font-size="21" fill="#FFFFFF" font-weight="400" text-anchor="middle">(满分5)</text><text x="865" y="164" font-size="28" fill="#FFFFFF" font-weight="700" text-anchor="middle">目标评分</text><text x="865" y="193" font-size="21" fill="#FFFFFF" font-weight="400" text-anchor="middle">(满分5)</text>
+  </g>
+  <g id="table_grid" class="unit" data-unit="table_grid">
+    <line x1="19.0" y1="286.0" x2="1016.0" y2="286.0" stroke="#E9ECF1" stroke-width="2.5" stroke-linecap="butt"/><line x1="19.0" y1="359.0" x2="1016.0" y2="359.0" stroke="#E9ECF1" stroke-width="2.5" stroke-linecap="butt"/><line x1="19.0" y1="436.0" x2="1016.0" y2="436.0" stroke="#E9ECF1" stroke-width="2.5" stroke-linecap="butt"/><line x1="19.0" y1="514.0" x2="1016.0" y2="514.0" stroke="#E9ECF1" stroke-width="2.5" stroke-linecap="butt"/><line x1="19.0" y1="592.0" x2="1016.0" y2="592.0" stroke="#E9ECF1" stroke-width="2.5" stroke-linecap="butt"/><line x1="233.0" y1="206.0" x2="233.0" y2="672.0" stroke="#F0F2F5" stroke-width="2" stroke-linecap="butt"/><line x1="389.0" y1="206.0" x2="389.0" y2="672.0" stroke="#F0F2F5" stroke-width="2" stroke-linecap="butt"/><line x1="705.0" y1="206.0" x2="705.0" y2="672.0" stroke="#F0F2F5" stroke-width="2" stroke-linecap="butt"/><rect x="19.0" y="672.0" width="997.0" height="94.0" rx="0" fill="#EAEDF1"/><line x1="19.0" y1="670.5" x2="1016.0" y2="670.5" stroke="#DFE3E9" stroke-width="3" stroke-linecap="butt"/><line x1="595.5" y1="672.0" x2="595.5" y2="766.0" stroke="#FFFFFF" stroke-width="3" stroke-linecap="butt"/><line x1="808.5" y1="672.0" x2="808.5" y2="766.0" stroke="#FFFFFF" stroke-width="3" stroke-linecap="butt"/>
+  </g>
+  <g id="r1_icon" class="unit" data-unit="r1_icon">
+    <circle cx="76.0" cy="251.0" r="29.00" fill="#223952"/><circle cx="73.3" cy="253.7" r="15.66" fill="none" stroke="#FFFFFF" stroke-width="2.97"/><circle cx="73.3" cy="253.7" r="8.64" fill="none" stroke="#FFFFFF" stroke-width="2.7"/><circle cx="73.3" cy="253.7" r="2.27" fill="#FFFFFF"/><line x1="97.6" y1="229.4" x2="76.5" y2="250.5" stroke="#FFFFFF" stroke-width="2.97" stroke-linecap="round"/><polygon points="102.2,228.1 96.2,234.0 92.5,224.3" fill="#FFFFFF"/>
+  </g>
+  <g id="r1_name" class="unit" data-unit="r1_name">
+    <text x="130" y="260" font-size="27" fill="#1A2C4B" font-weight="700" text-anchor="start">战略</text>
+  </g>
+  <g id="r1_weight" class="unit" data-unit="r1_weight">
+    <text x="311" y="258" font-size="26" fill="#1A2C4B" font-weight="400" text-anchor="middle">20%</text>
+  </g>
+  <g id="r1_nownum" class="unit" data-unit="r1_nownum">
+    <text x="425" y="246" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">3.5</text>
+  </g>
+  <g id="r1_nowbar" class="unit" data-unit="r1_nowbar">
+    <rect x="424.0" y="253.0" width="248.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="424.0" y="253.0" width="192.0" height="19.0" rx="2" fill="#455E7A"/>
+  </g>
+  <g id="r1_tgtnum" class="unit" data-unit="r1_tgtnum">
+    <text x="744" y="246" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">4.0</text>
+  </g>
+  <g id="r1_tgtbar" class="unit" data-unit="r1_tgtbar">
+    <rect x="743.0" y="253.0" width="246.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="743.0" y="253.0" width="53.0" height="19.0" rx="2" fill="#264059"/><rect x="796.0" y="253.0" width="152.0" height="19.0" rx="2" fill="#455E7A"/>
+  </g>
+  <g id="r2_icon" class="unit" data-unit="r2_icon">
+    <circle cx="76.0" cy="323.0" r="29.00" fill="#616A4E"/><polygon points="95.6,319.2 95.6,326.8 90.6,327.8 89.7,330.0 92.6,334.2 87.2,339.6 83.0,336.7 80.8,337.6 79.8,342.6 72.2,342.6 71.2,337.6 69.0,336.7 64.8,339.6 59.4,334.2 62.3,330.0 61.4,327.8 56.4,326.8 56.4,319.2 61.4,318.2 62.3,316.0 59.4,311.8 64.8,306.4 69.0,309.3 71.2,308.4 72.2,303.4 79.8,303.4 80.8,308.4 83.0,309.3 87.2,306.4 92.6,311.8 89.7,316.0 90.6,318.2" fill="#FFFFFF"/><circle cx="76.0" cy="323.0" r="5.67" fill="#616A4E"/>
+  </g>
+  <g id="r2_name" class="unit" data-unit="r2_name">
+    <text x="130" y="332" font-size="27" fill="#1A2C4B" font-weight="700" text-anchor="start">流程</text>
+  </g>
+  <g id="r2_weight" class="unit" data-unit="r2_weight">
+    <text x="311" y="330" font-size="26" fill="#1A2C4B" font-weight="400" text-anchor="middle">20%</text>
+  </g>
+  <g id="r2_nownum" class="unit" data-unit="r2_nownum">
+    <text x="425" y="318" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">3.0</text>
+  </g>
+  <g id="r2_nowbar" class="unit" data-unit="r2_nowbar">
+    <rect x="424.0" y="325.0" width="248.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="424.0" y="325.0" width="162.0" height="19.0" rx="2" fill="#828B6E"/>
+  </g>
+  <g id="r2_tgtnum" class="unit" data-unit="r2_tgtnum">
+    <text x="744" y="318" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">4.0</text>
+  </g>
+  <g id="r2_tgtbar" class="unit" data-unit="r2_tgtbar">
+    <rect x="743.0" y="325.0" width="246.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="743.0" y="325.0" width="205.0" height="19.0" rx="2" fill="#818B6D"/>
+  </g>
+  <g id="r3_icon" class="unit" data-unit="r3_icon">
+    <circle cx="76.0" cy="397.0" r="29.00" fill="#6A594A"/><path d="M 59.8 380.8 L 92.2 380.8 L 92.2 415.4 A 16.2 5.7 0 0 1 59.8 415.4 Z" fill="#FFFFFF"/><ellipse cx="76.0" cy="380.8" rx="16.2" ry="5.7" fill="#FFFFFF"/><polyline points="92.2,392.7 91.9,393.8 91.0,394.8 89.5,395.8 87.5,396.7 85.0,397.4 82.2,397.9 79.2,398.2 76.0,398.4 72.8,398.2 69.8,397.9 67.0,397.4 64.5,396.7 62.5,395.8 61.0,394.8 60.1,393.8 59.8,392.7" fill="none" stroke="#6A594A" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/><polyline points="92.2,404.6 91.9,405.7 91.0,406.7 89.5,407.7 87.5,408.6 85.0,409.3 82.2,409.8 79.2,410.1 76.0,410.2 72.8,410.1 69.8,409.8 67.0,409.3 64.5,408.6 62.5,407.7 61.0,406.7 60.1,405.7 59.8,404.6" fill="none" stroke="#6A594A" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="r3_name" class="unit" data-unit="r3_name">
+    <text x="130" y="406" font-size="27" fill="#1A2C4B" font-weight="700" text-anchor="start">数据</text>
+  </g>
+  <g id="r3_weight" class="unit" data-unit="r3_weight">
+    <text x="311" y="404" font-size="26" fill="#1A2C4B" font-weight="400" text-anchor="middle">20%</text>
+  </g>
+  <g id="r3_nownum" class="unit" data-unit="r3_nownum">
+    <text x="425" y="392" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">2.5</text>
+  </g>
+  <g id="r3_nowbar" class="unit" data-unit="r3_nowbar">
+    <rect x="424.0" y="399.0" width="248.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="424.0" y="399.0" width="134.0" height="19.0" rx="2" fill="#99897A"/>
+  </g>
+  <g id="r3_tgtnum" class="unit" data-unit="r3_tgtnum">
+    <text x="744" y="392" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">4.0</text>
+  </g>
+  <g id="r3_tgtbar" class="unit" data-unit="r3_tgtbar">
+    <rect x="743.0" y="399.0" width="246.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="743.0" y="399.0" width="205.0" height="19.0" rx="2" fill="#9A8A7B"/>
+  </g>
+  <g id="r4_icon" class="unit" data-unit="r4_icon">
+    <circle cx="76.0" cy="475.0" r="29.00" fill="#76718D"/><rect x="61.4" y="459.9" width="29.2" height="20.5" rx="2.16" fill="none" stroke="#FFFFFF" stroke-width="2.97"/><line x1="55.5" y1="488.0" x2="96.5" y2="488.0" stroke="#FFFFFF" stroke-width="3.7800000000000002" stroke-linecap="round"/>
+  </g>
+  <g id="r4_name" class="unit" data-unit="r4_name">
+    <text x="130" y="484" font-size="27" fill="#1A2C4B" font-weight="700" text-anchor="start">技术</text>
+  </g>
+  <g id="r4_weight" class="unit" data-unit="r4_weight">
+    <text x="311" y="482" font-size="26" fill="#1A2C4B" font-weight="400" text-anchor="middle">15%</text>
+  </g>
+  <g id="r4_nownum" class="unit" data-unit="r4_nownum">
+    <text x="425" y="470" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">3.0</text>
+  </g>
+  <g id="r4_nowbar" class="unit" data-unit="r4_nowbar">
+    <rect x="424.0" y="477.0" width="248.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="424.0" y="477.0" width="162.0" height="19.0" rx="2" fill="#88849D"/>
+  </g>
+  <g id="r4_tgtnum" class="unit" data-unit="r4_tgtnum">
+    <text x="744" y="470" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">4.0</text>
+  </g>
+  <g id="r4_tgtbar" class="unit" data-unit="r4_tgtbar">
+    <rect x="743.0" y="477.0" width="246.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="743.0" y="477.0" width="205.0" height="19.0" rx="2" fill="#88849E"/>
+  </g>
+  <g id="r5_icon" class="unit" data-unit="r5_icon">
+    <circle cx="76.0" cy="553.0" r="29.00" fill="#283A52"/><circle cx="85.2" cy="546.2" r="5.40" fill="#FFFFFF"/><path d="M 76.1 568.0 L 76.1 554.8 Q 76.1 549.8 81.1 549.8 L 89.3 549.8 Q 94.3 549.8 94.3 554.8 L 94.3 568.0 Z" fill="#FFFFFF"/><circle cx="69.5" cy="541.1" r="6.75" fill="#FFFFFF"/><path d="M 58.2 568.1 L 58.2 551.6 Q 58.2 545.4 64.4 545.4 L 74.6 545.4 Q 80.9 545.4 80.9 551.6 L 80.9 568.1 Z" fill="#FFFFFF"/>
+  </g>
+  <g id="r5_name" class="unit" data-unit="r5_name">
+    <text x="130" y="562" font-size="27" fill="#1A2C4B" font-weight="700" text-anchor="start">人才</text>
+  </g>
+  <g id="r5_weight" class="unit" data-unit="r5_weight">
+    <text x="311" y="560" font-size="26" fill="#1A2C4B" font-weight="400" text-anchor="middle">10%</text>
+  </g>
+  <g id="r5_nownum" class="unit" data-unit="r5_nownum">
+    <text x="425" y="548" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">2.0</text>
+  </g>
+  <g id="r5_nowbar" class="unit" data-unit="r5_nowbar">
+    <rect x="424.0" y="555.0" width="248.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="424.0" y="555.0" width="102.0" height="19.0" rx="2" fill="#4A637D"/>
+  </g>
+  <g id="r5_tgtnum" class="unit" data-unit="r5_tgtnum">
+    <text x="744" y="548" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">3.5</text>
+  </g>
+  <g id="r5_tgtbar" class="unit" data-unit="r5_tgtbar">
+    <rect x="743.0" y="555.0" width="246.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="743.0" y="555.0" width="175.0" height="19.0" rx="2" fill="#2B455F"/>
+  </g>
+  <g id="r6_icon" class="unit" data-unit="r6_icon">
+    <circle cx="76.0" cy="630.0" r="29.00" fill="#61694C"/><polyline points="76.0,611.6 90.6,617.6 90.6,632.2 83.8,643.5 76.0,650.0 68.2,643.5 61.4,632.2 61.4,617.6 76.0,611.6" fill="none" stroke="#FFFFFF" stroke-width="2.97" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="r6_name" class="unit" data-unit="r6_name">
+    <text x="130" y="639" font-size="27" fill="#1A2C4B" font-weight="700" text-anchor="start">治理</text>
+  </g>
+  <g id="r6_weight" class="unit" data-unit="r6_weight">
+    <text x="311" y="637" font-size="26" fill="#1A2C4B" font-weight="400" text-anchor="middle">15%</text>
+  </g>
+  <g id="r6_nownum" class="unit" data-unit="r6_nownum">
+    <text x="425" y="625" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">2.0</text>
+  </g>
+  <g id="r6_nowbar" class="unit" data-unit="r6_nowbar">
+    <rect x="424.0" y="632.0" width="248.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="424.0" y="632.0" width="102.0" height="19.0" rx="2" fill="#848C6F"/>
+  </g>
+  <g id="r6_tgtnum" class="unit" data-unit="r6_tgtnum">
+    <text x="744" y="625" font-size="26" fill="#0E1F3C" font-weight="400" text-anchor="start">4.0</text>
+  </g>
+  <g id="r6_tgtbar" class="unit" data-unit="r6_tgtbar">
+    <rect x="743.0" y="632.0" width="246.0" height="19.0" rx="2" fill="#D7DDE4"/><rect x="743.0" y="632.0" width="205.0" height="19.0" rx="2" fill="#818A6B"/>
+  </g>
+  <g id="total_label" class="unit" data-unit="total_label">
+    <text x="126" y="727" font-size="28" fill="#0D223E" font-weight="700" text-anchor="middle">合计</text>
+  </g>
+  <g id="total_pct" class="unit" data-unit="total_pct">
+    <text x="311" y="725" font-size="26" fill="#17324E" font-weight="400" text-anchor="middle">100%</text>
+  </g>
+  <g id="total_h1" class="unit" data-unit="total_h1">
+    <text x="489" y="706" font-size="22" fill="#21324C" font-weight="500" text-anchor="middle">加权现状评分</text>
+  </g>
+  <g id="total_v1" class="unit" data-unit="total_v1">
+    <text x="487" y="748" font-size="36" fill="#0E1F3C" font-weight="700" text-anchor="middle">2.75</text>
+  </g>
+  <g id="total_h2" class="unit" data-unit="total_h2">
+    <text x="702" y="706" font-size="22" fill="#21324C" font-weight="500" text-anchor="middle">加权目标评分</text>
+  </g>
+  <g id="total_v2" class="unit" data-unit="total_v2">
+    <text x="702" y="748" font-size="36" fill="#626E4B" font-weight="700" text-anchor="middle">3.95</text>
+  </g>
+  <g id="total_h3" class="unit" data-unit="total_h3">
+    <text x="912" y="705" font-size="22" fill="#21324C" font-weight="500" text-anchor="middle">差距</text>
+  </g>
+  <g id="total_v3" class="unit" data-unit="total_v3">
+    <text x="913" y="748" font-size="36" fill="#8F8177" font-weight="700" text-anchor="middle">1.20</text>
+  </g>
+  <g id="panel_strip" class="unit" data-unit="panel_strip">
+    <path d="M 1032 210 L 1032 137 Q 1032 127 1042 127 L 1701 127 Q 1711 127 1711 137 L 1711 210 Z" fill="#EEF1F4"/>
+  </g>
+  <g id="panel_title" class="unit" data-unit="panel_title">
+    <text x="1057" y="183" font-size="33" fill="#0E2440" font-weight="700" stroke="#0E2440" stroke-width="1.2">能力缺口差距排序</text>
+  </g>
+  <g id="panel_sub1" class="unit" data-unit="panel_sub1">
+    <text x="1687" y="177" font-size="21" fill="#22354E" font-weight="700" text-anchor="end">差距分值</text>
+  </g>
+  <g id="panel_sub2" class="unit" data-unit="panel_sub2">
+    <text x="1687" y="197" font-size="17" fill="#22354E" font-weight="400" text-anchor="end">(目标-现状)</text>
+  </g>
+  <g id="panel_vline" class="unit" data-unit="panel_vline">
+    <line x1="1206.0" y1="225.0" x2="1206.0" y2="703.0" stroke="#E3E7EB" stroke-width="2" stroke-linecap="butt"/>
+  </g>
+  <g id="p1_badge" class="unit" data-unit="p1_badge">
+    <rect x="1050.0" y="235.0" width="54.0" height="54.0" rx="12" fill="#5F684A"/><text x="1077" y="273" font-size="30" fill="#FFFFFF" font-weight="700" text-anchor="middle">1</text>
+  </g>
+  <g id="p1_name" class="unit" data-unit="p1_name">
+    <text x="1128" y="272" font-size="28" fill="#14263F" font-weight="700" text-anchor="start">治理</text>
+  </g>
+  <g id="p1_track" class="unit" data-unit="p1_track">
+    <rect x="1206.0" y="238.5" width="434.0" height="47.0" rx="3" fill="#E7EBEE"/>
+  </g>
+  <g id="p1_fill" class="unit" data-unit="p1_fill">
+    <rect x="1206.0" y="238.5" width="321.0" height="47.0" rx="3" fill="#7A8364"/>
+  </g>
+  <g id="p1_value" class="unit" data-unit="p1_value">
+    <text x="1681" y="273" font-size="31" fill="#7A8364" font-weight="700" text-anchor="end">2.0</text>
+  </g>
+  <g id="p2_badge" class="unit" data-unit="p2_badge">
+    <rect x="1050.0" y="312.0" width="54.0" height="54.0" rx="12" fill="#7C6B59"/><text x="1077" y="350" font-size="30" fill="#FFFFFF" font-weight="700" text-anchor="middle">2</text>
+  </g>
+  <g id="p2_name" class="unit" data-unit="p2_name">
+    <text x="1128" y="349" font-size="28" fill="#14263F" font-weight="700" text-anchor="start">数据</text>
+  </g>
+  <g id="p2_track" class="unit" data-unit="p2_track">
+    <rect x="1206.0" y="315.5" width="434.0" height="47.0" rx="3" fill="#E7EBEE"/>
+  </g>
+  <g id="p2_fill" class="unit" data-unit="p2_fill">
+    <rect x="1206.0" y="315.5" width="242.0" height="47.0" rx="3" fill="#978678"/>
+  </g>
+  <g id="p2_value" class="unit" data-unit="p2_value">
+    <text x="1681" y="350" font-size="31" fill="#978678" font-weight="700" text-anchor="end">1.5</text>
+  </g>
+  <g id="p3_badge" class="unit" data-unit="p3_badge">
+    <rect x="1050.0" y="393.0" width="54.0" height="54.0" rx="12" fill="#7A7491"/><text x="1077" y="431" font-size="30" fill="#FFFFFF" font-weight="700" text-anchor="middle">3</text>
+  </g>
+  <g id="p3_name" class="unit" data-unit="p3_name">
+    <text x="1128" y="430" font-size="28" fill="#14263F" font-weight="700" text-anchor="start">人才</text>
+  </g>
+  <g id="p3_track" class="unit" data-unit="p3_track">
+    <rect x="1206.0" y="396.5" width="434.0" height="47.0" rx="3" fill="#E7EBEE"/>
+  </g>
+  <g id="p3_fill" class="unit" data-unit="p3_fill">
+    <rect x="1206.0" y="396.5" width="242.0" height="47.0" rx="3" fill="#88859D"/>
+  </g>
+  <g id="p3_value" class="unit" data-unit="p3_value">
+    <text x="1681" y="431" font-size="31" fill="#88859D" font-weight="700" text-anchor="end">1.5</text>
+  </g>
+  <g id="p4_badge" class="unit" data-unit="p4_badge">
+    <rect x="1050.0" y="475.0" width="54.0" height="54.0" rx="12" fill="#293D55"/><text x="1077" y="513" font-size="30" fill="#FFFFFF" font-weight="700" text-anchor="middle">4</text>
+  </g>
+  <g id="p4_name" class="unit" data-unit="p4_name">
+    <text x="1128" y="512" font-size="28" fill="#14263F" font-weight="700" text-anchor="start">流程</text>
+  </g>
+  <g id="p4_track" class="unit" data-unit="p4_track">
+    <rect x="1206.0" y="478.5" width="434.0" height="47.0" rx="3" fill="#E7EBEE"/>
+  </g>
+  <g id="p4_fill" class="unit" data-unit="p4_fill">
+    <rect x="1206.0" y="478.5" width="171.0" height="47.0" rx="3" fill="#3A5672"/>
+  </g>
+  <g id="p4_value" class="unit" data-unit="p4_value">
+    <text x="1681" y="513" font-size="31" fill="#3A5672" font-weight="700" text-anchor="end">1.0</text>
+  </g>
+  <g id="p5_badge" class="unit" data-unit="p5_badge">
+    <rect x="1050.0" y="555.0" width="54.0" height="54.0" rx="12" fill="#616A4B"/><text x="1077" y="593" font-size="30" fill="#FFFFFF" font-weight="700" text-anchor="middle">5</text>
+  </g>
+  <g id="p5_name" class="unit" data-unit="p5_name">
+    <text x="1128" y="592" font-size="28" fill="#14263F" font-weight="700" text-anchor="start">技术</text>
+  </g>
+  <g id="p5_track" class="unit" data-unit="p5_track">
+    <rect x="1206.0" y="558.5" width="434.0" height="47.0" rx="3" fill="#E7EBEE"/>
+  </g>
+  <g id="p5_fill" class="unit" data-unit="p5_fill">
+    <rect x="1206.0" y="558.5" width="171.0" height="47.0" rx="3" fill="#7B8565"/>
+  </g>
+  <g id="p5_value" class="unit" data-unit="p5_value">
+    <text x="1681" y="593" font-size="31" fill="#7B8565" font-weight="700" text-anchor="end">1.0</text>
+  </g>
+  <g id="p6_badge" class="unit" data-unit="p6_badge">
+    <rect x="1050.0" y="637.0" width="54.0" height="54.0" rx="12" fill="#7C6957"/><text x="1077" y="675" font-size="30" fill="#FFFFFF" font-weight="700" text-anchor="middle">6</text>
+  </g>
+  <g id="p6_name" class="unit" data-unit="p6_name">
+    <text x="1128" y="674" font-size="28" fill="#14263F" font-weight="700" text-anchor="start">战略</text>
+  </g>
+  <g id="p6_track" class="unit" data-unit="p6_track">
+    <rect x="1206.0" y="640.5" width="434.0" height="47.0" rx="3" fill="#E7EBEE"/>
+  </g>
+  <g id="p6_fill" class="unit" data-unit="p6_fill">
+    <rect x="1206.0" y="640.5" width="87.0" height="47.0" rx="3" fill="#978677"/>
+  </g>
+  <g id="p6_value" class="unit" data-unit="p6_value">
+    <text x="1681" y="675" font-size="31" fill="#978677" font-weight="700" text-anchor="end">0.5</text>
+  </g>
+  <g id="band_title" class="unit" data-unit="band_title">
+    <text x="41" y="819" font-size="30" fill="#0E2440" font-weight="700" stroke="#0E2440" stroke-width="1.0">重点行动与优先事项</text>
+  </g>
+  <g id="band_note" class="unit" data-unit="band_note">
+    <text x="1685" y="819" font-size="16" fill="#90949C" font-weight="400" text-anchor="end">分值与权重用于项目决策；非行业基准。</text>
+  </g>
+  <g id="a1_icon" class="unit" data-unit="a1_icon">
+    <circle cx="82.0" cy="882.0" r="37.50" fill="#776350"/><path d="M 64.6 864.6 L 99.4 864.6 L 99.4 901.7 A 17.4 6.1 0 0 1 64.6 901.7 Z" fill="#FFFFFF"/><ellipse cx="82.0" cy="864.6" rx="17.4" ry="6.1" fill="#FFFFFF"/><polyline points="99.4,877.4 99.1,878.5 98.1,879.7 96.5,880.7 94.3,881.7 91.7,882.4 88.7,883.0 85.4,883.3 82.0,883.5 78.6,883.3 75.3,883.0 72.3,882.4 69.7,881.7 67.5,880.7 65.9,879.7 64.9,878.5 64.6,877.4" fill="none" stroke="#776350" stroke-width="2.9000000000000004" stroke-linecap="round" stroke-linejoin="round"/><polyline points="99.4,890.1 99.1,891.3 98.1,892.5 96.5,893.5 94.3,894.4 91.7,895.2 88.7,895.7 85.4,896.1 82.0,896.2 78.6,896.1 75.3,895.7 72.3,895.2 69.7,894.4 67.5,893.5 65.9,892.5 64.9,891.3 64.6,890.1" fill="none" stroke="#776350" stroke-width="2.9000000000000004" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="a1_box" class="unit" data-unit="a1_box">
+    <rect x="143.0" y="850.0" width="429.0" height="86.0" rx="14" fill="#F0EBE6"/>
+  </g>
+  <g id="a1_badge" class="unit" data-unit="a1_badge">
+    <rect x="155.0" y="868.0" width="48.0" height="47.0" rx="10" fill="#6D5946"/><text x="179" y="901" font-size="26" fill="#FFFFFF" font-weight="700" text-anchor="middle">1</text>
+  </g>
+  <g id="a1_name" class="unit" data-unit="a1_name">
+    <text x="215" y="902" font-size="27" fill="#14263F" font-weight="700" text-anchor="start">数据</text>
+  </g>
+  <g id="a1_div" class="unit" data-unit="a1_div">
+    <line x1="282.0" y1="878.0" x2="282.0" y2="906.0" stroke="#A8A9AD" stroke-width="2.5" stroke-linecap="butt"/>
+  </g>
+  <g id="a1_text" class="unit" data-unit="a1_text">
+    <text x="296" y="902" font-size="20" fill="#14263F" font-weight="400" text-anchor="start">先完成数据授权和质量核验</text>
+  </g>
+  <g id="a2_icon" class="unit" data-unit="a2_icon">
+    <circle cx="654.0" cy="882.0" r="37.50" fill="#636C4B"/><polyline points="654.0,862.3 669.7,868.7 669.7,884.3 662.4,896.5 654.0,903.5 645.6,896.5 638.3,884.3 638.3,868.7 654.0,862.3" fill="none" stroke="#FFFFFF" stroke-width="3.19" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="a2_box" class="unit" data-unit="a2_box">
+    <rect x="714.0" y="850.0" width="423.0" height="86.0" rx="14" fill="#ECEDE8"/>
+  </g>
+  <g id="a2_badge" class="unit" data-unit="a2_badge">
+    <rect x="730.0" y="868.0" width="48.0" height="47.0" rx="10" fill="#5D6648"/><text x="754" y="901" font-size="26" fill="#FFFFFF" font-weight="700" text-anchor="middle">2</text>
+  </g>
+  <g id="a2_name" class="unit" data-unit="a2_name">
+    <text x="792" y="902" font-size="27" fill="#14263F" font-weight="700" text-anchor="start">治理</text>
+  </g>
+  <g id="a2_div" class="unit" data-unit="a2_div">
+    <line x1="858.0" y1="878.0" x2="858.0" y2="906.0" stroke="#A8A9AD" stroke-width="2.5" stroke-linecap="butt"/>
+  </g>
+  <g id="a2_text" class="unit" data-unit="a2_text">
+    <text x="872" y="902" font-size="25" fill="#14263F" font-weight="400" text-anchor="start">先明确上线责任</text>
+  </g>
+  <g id="a3_icon" class="unit" data-unit="a3_icon">
+    <circle cx="1206.0" cy="882.0" r="37.50" fill="#2C3D52"/><circle cx="1215.9" cy="874.7" r="5.80" fill="#FFFFFF"/><path d="M 1206.1 898.1 L 1206.1 883.9 Q 1206.1 878.6 1211.5 878.6 L 1220.2 878.6 Q 1225.6 878.6 1225.6 883.9 L 1225.6 898.1 Z" fill="#FFFFFF"/><circle cx="1199.0" cy="869.2" r="7.25" fill="#FFFFFF"/><path d="M 1186.9 898.2 L 1186.9 880.4 Q 1186.9 873.8 1193.6 873.8 L 1204.5 873.8 Q 1211.2 873.8 1211.2 880.4 L 1211.2 898.2 Z" fill="#FFFFFF"/>
+  </g>
+  <g id="a3_box" class="unit" data-unit="a3_box">
+    <rect x="1272.0" y="850.0" width="439.0" height="86.0" rx="14" fill="#F1EFF4"/>
+  </g>
+  <g id="a3_badge" class="unit" data-unit="a3_badge">
+    <rect x="1292.0" y="868.0" width="48.0" height="47.0" rx="10" fill="#77738B"/><text x="1316" y="901" font-size="26" fill="#FFFFFF" font-weight="700" text-anchor="middle">3</text>
+  </g>
+  <g id="a3_name" class="unit" data-unit="a3_name">
+    <text x="1356" y="902" font-size="27" fill="#14263F" font-weight="700" text-anchor="start">人才</text>
+  </g>
+  <g id="a3_div" class="unit" data-unit="a3_div">
+    <line x1="1422.0" y1="878.0" x2="1422.0" y2="906.0" stroke="#A8A9AD" stroke-width="2.5" stroke-linecap="butt"/>
+  </g>
+  <g id="a3_text" class="unit" data-unit="a3_text">
+    <text x="1438" y="902" font-size="23" fill="#14263F" font-weight="400" text-anchor="start">先培训业务主责</text>
+  </g>
+  <g id="wm_icon" class="unit" data-unit="wm_icon">
+    <ellipse cx="1077.8" cy="897.1" rx="20.8" ry="14.1" fill="#ACAFB4"/><polygon points="1068.2,906.2 1068.2,916.6 1079.8,909.3" fill="#ACAFB4"/><circle cx="1073.2" cy="895.3" r="2.11" fill="#FFFFFF"/><circle cx="1082.4" cy="895.3" r="2.11" fill="#FFFFFF"/><ellipse cx="1099.2" cy="906.2" rx="16.5" ry="11.2" fill="#ACAFB4"/><polygon points="1105.8,913.5 1107.1,922.9 1096.2,916.6" fill="#ACAFB4"/><circle cx="1094.9" cy="904.1" r="1.78" fill="#FFFFFF"/><circle cx="1102.8" cy="904.1" r="1.78" fill="#FFFFFF"/>
+  </g>
+  <g id="wm_text" class="unit" data-unit="wm_text">
+    <text x="1134" y="918" font-size="50" fill="#ACAFB4" font-weight="400" text-anchor="start">公众号·解决方案研究所</text>
+  </g>
+</svg>
+</div>
+</body>
+</html>
