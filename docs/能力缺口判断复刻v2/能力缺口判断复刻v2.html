@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>准备度评分与能力缺口诊断 · 复刻 v2</title>
+<style>
+  html,body { margin:0; padding:0; background:#FEFEFE; }
+  #canvas { width:1728px; height:972px; overflow:hidden; }
+  text { font-family:'Noto Sans SC','Noto Sans CJK SC',sans-serif; }
+</style>
+</head>
+<body>
+<div id="canvas">
+<svg id="stage" viewBox="0 0 1728 972" width="1728" height="972" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans SC, sans-serif">
+<rect id="bg" x="0" y="0" width="1728" height="972" rx="0" fill="#FEFEFE"/>
+<text id="main-title" x="37" y="90" font-family="Noto Sans SC, sans-serif" font-size="78" font-weight="800" fill="#253E56" stroke="#253E56" stroke-width="1.6" text-anchor="start" letter-spacing="-1.4">准备度评分与能力缺口诊断</text>
+<rect id="tbl-container" x="17" y="127" width="998" height="663" rx="14" fill="#FFFFFF" stroke="#E8EBEF" stroke-width="2"/>
+<path id="tbl-header" d="M 17 208 L 17 141 Q 17 127 31 127 L 1001 127 Q 1015 127 1015 141 L 1015 208 Z" fill="#253E56"/>
+<rect id="hdr-sep-1" x="233" y="141" width="2" height="53" fill="#FFFFFF"/>
+<rect id="hdr-sep-2" x="389" y="141" width="2" height="53" fill="#FFFFFF"/>
+<rect id="hdr-sep-3" x="842" y="141" width="2" height="53" fill="#FFFFFF"/>
+<text id="hdr-t-0" x="125" y="181" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">维度</text>
+<text id="hdr-t-1" x="310" y="181" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">权重</text>
+<text id="hdr-t-2" x="545" y="163" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">现状评分</text>
+<text id="hdr-t-3" x="546" y="193" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="400" fill="#FFFFFF" text-anchor="middle">（满分5）</text>
+<text id="hdr-t-4" x="865" y="163" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">目标评分</text>
+<text id="hdr-t-5" x="864" y="193" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="400" fill="#FFFFFF" text-anchor="middle">（满分5）</text>
+<rect id="row-stripe-1" x="19" y="208.0" width="994" height="76.8" fill="#FAFBFC"/>
+<rect id="row-sep-1" x="19" y="284.8" width="994" height="2" fill="#EAECF1"/>
+<rect id="row-stripe-3" x="19" y="361.7" width="994" height="76.8" fill="#FAFBFC"/>
+<rect id="row-sep-2" x="19" y="361.7" width="994" height="2" fill="#EAECF1"/>
+<rect id="row-sep-3" x="19" y="438.5" width="994" height="2" fill="#EAECF1"/>
+<rect id="row-stripe-5" x="19" y="515.3" width="994" height="76.8" fill="#FAFBFC"/>
+<rect id="row-sep-4" x="19" y="515.3" width="994" height="2" fill="#EAECF1"/>
+<rect id="row-sep-5" x="19" y="592.2" width="994" height="2" fill="#EAECF1"/>
+<circle id="row1-icon-circle" cx="78" cy="251" r="31" fill="#253E56"/>
+<g id="row1-icon" transform="translate(78,251)"><g id="row1-icon-glyph"><circle cx="0" cy="0" r="18.599999999999998" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><circle cx="0" cy="0" r="10.23" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><circle cx="0" cy="0" r="3.1" fill="#FFFFFF"/><line x1="2.48" y1="-2.48" x2="22.32" y2="-22.32" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/><line x1="13.64" y1="-27.28" x2="20.46" y2="-20.46" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/><line x1="20.46" y1="-30.38" x2="27.28" y2="-23.56" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/></g></g>
+<text id="row1-name" x="130" y="263" font-family="Noto Sans SC, sans-serif" font-size="27" font-weight="500" fill="#253E56" text-anchor="start">战略</text>
+<text id="row1-weight" x="311" y="247" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="500" fill="#253E56" text-anchor="middle">20%</text>
+<text id="row1-score-cur" x="424" y="247" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">3.5</text>
+<rect id="row1-cur-track" x="423" y="254" width="249" height="17" rx="2" fill="#E4E7EB"/>
+<rect id="row1-cur-fill" x="424" y="254" width="189" height="17" rx="2" fill="#435D78"/>
+<text id="row1-score-tgt" x="744" y="247" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">4.0</text>
+<rect id="row1-tgt-track" x="743" y="254" width="247" height="17" rx="2" fill="#DFE4E9"/>
+<rect id="row1-tgt-fill-a" x="744" y="254" width="52" height="17" rx="2" fill="#2A445C"/>
+<rect id="row1-tgt-fill-b" x="795" y="254" width="153" height="17" rx="2" fill="#435D78"/>
+<circle id="row2-icon-circle" cx="78" cy="323" r="31" fill="#6E7852"/>
+<g id="row2-icon" transform="translate(78,323)"><g id="row2-icon-glyph"><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(0)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(45)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(90)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(135)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(180)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(225)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(270)"/><rect x="-4.96" y="-22.94" width="9.92" height="7.44" rx="1.55" fill="#FFFFFF" transform="rotate(315)"/><circle cx="0" cy="0" r="16.74" fill="none" stroke="#FFFFFF" stroke-width="8.06"/><circle cx="0" cy="0" r="4.65" fill="#FFFFFF"/></g></g>
+<text id="row2-name" x="130" y="335" font-family="Noto Sans SC, sans-serif" font-size="27" font-weight="500" fill="#253E56" text-anchor="start">流程</text>
+<text id="row2-weight" x="311" y="319" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="500" fill="#253E56" text-anchor="middle">20%</text>
+<text id="row2-score-cur" x="424" y="319" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">3.0</text>
+<rect id="row2-cur-track" x="423" y="326" width="249" height="17" rx="2" fill="#E4E7EB"/>
+<rect id="row2-cur-fill" x="424" y="326" width="162" height="17" rx="2" fill="#848C6E"/>
+<text id="row2-score-tgt" x="744" y="319" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">4.0</text>
+<rect id="row2-tgt-track" x="743" y="326" width="247" height="17" rx="2" fill="#DFE4E9"/>
+<rect id="row2-tgt-fill" x="744" y="326" width="205" height="17" rx="2" fill="#848C6E"/>
+<circle id="row3-icon-circle" cx="78" cy="398" r="31" fill="#7A6853"/>
+<g id="row3-icon" transform="translate(78,398)"><g id="row3-icon-glyph"><path d="M -17.98 -8.680000000000001 L -17.98 11.16 A 17.98 7.4399999999999995 0 0 0 17.98 11.16 L 17.98 -8.680000000000001 Z" fill="#FFFFFF"/><ellipse cx="0" cy="-8.680000000000001" rx="17.98" ry="7.4399999999999995" fill="#FFFFFF"/><path d="M -17.98 -1.24 A 17.98 7.4399999999999995 0 0 0 17.98 -1.24" fill="none" stroke="#7A6853" stroke-width="2.6"/><path d="M -17.98 5.58 A 17.98 7.4399999999999995 0 0 0 17.98 5.58" fill="none" stroke="#7A6853" stroke-width="2.6"/></g></g>
+<text id="row3-name" x="130" y="410" font-family="Noto Sans SC, sans-serif" font-size="27" font-weight="500" fill="#253E56" text-anchor="start">数据</text>
+<text id="row3-weight" x="311" y="394" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="500" fill="#253E56" text-anchor="middle">20%</text>
+<text id="row3-score-cur" x="424" y="394" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">2.5</text>
+<rect id="row3-cur-track" x="423" y="401" width="249" height="17" rx="2" fill="#E4E7EB"/>
+<rect id="row3-cur-fill" x="424" y="401" width="133" height="17" rx="2" fill="#998879"/>
+<text id="row3-score-tgt" x="744" y="394" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">4.0</text>
+<rect id="row3-tgt-track" x="743" y="401" width="247" height="17" rx="2" fill="#DFE4E9"/>
+<rect id="row3-tgt-fill" x="744" y="401" width="205" height="17" rx="2" fill="#998879"/>
+<circle id="row4-icon-circle" cx="78" cy="476" r="31" fill="#7D7A96"/>
+<g id="row4-icon" transform="translate(78,476)"><g id="row4-icon-glyph"><rect x="-19.22" y="-16.740000000000002" width="38.44" height="23.56" rx="2.48" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><path d="M -24.8 13.64 L 24.8 13.64 L 19.84 6.2 L -19.84 6.2 Z" fill="#FFFFFF"/></g></g>
+<text id="row4-name" x="130" y="488" font-family="Noto Sans SC, sans-serif" font-size="27" font-weight="500" fill="#253E56" text-anchor="start">技术</text>
+<text id="row4-weight" x="311" y="472" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="500" fill="#253E56" text-anchor="middle">15%</text>
+<text id="row4-score-cur" x="424" y="472" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">3.0</text>
+<rect id="row4-cur-track" x="423" y="479" width="249" height="17" rx="2" fill="#E4E7EB"/>
+<rect id="row4-cur-fill" x="424" y="479" width="161" height="17" rx="2" fill="#8A879F"/>
+<text id="row4-score-tgt" x="744" y="472" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">4.0</text>
+<rect id="row4-tgt-track" x="743" y="479" width="247" height="17" rx="2" fill="#DFE4E9"/>
+<rect id="row4-tgt-fill" x="744" y="479" width="205" height="17" rx="2" fill="#8A879F"/>
+<circle id="row5-icon-circle" cx="78" cy="553" r="31" fill="#2A3F57"/>
+<g id="row5-icon" transform="translate(78,553)"><g id="row5-icon-glyph"><circle cx="10.540000000000001" cy="-10.540000000000001" r="6.51" fill="#FFFFFF"/><path d="M 1.8599999999999999 9.299999999999999 A 10.540000000000001 10.540000000000001 0 0 1 10.540000000000001 -2.48 A 10.540000000000001 10.540000000000001 0 0 1 19.22 9.299999999999999 Z" fill="#FFFFFF"/><circle cx="-8.06" cy="-8.06" r="8.370000000000001" fill="#FFFFFF"/><path d="M -21.080000000000002 14.879999999999999 A 13.64 13.64 0 0 1 -8.06 -0.62 A 13.64 13.64 0 0 1 4.96 14.879999999999999 Z" fill="#FFFFFF"/></g></g>
+<text id="row5-name" x="130" y="565" font-family="Noto Sans SC, sans-serif" font-size="27" font-weight="500" fill="#253E56" text-anchor="start">人才</text>
+<text id="row5-weight" x="311" y="549" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="500" fill="#253E56" text-anchor="middle">10%</text>
+<text id="row5-score-cur" x="424" y="549" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">2.0</text>
+<rect id="row5-cur-track" x="423" y="556" width="249" height="17" rx="2" fill="#E4E7EB"/>
+<rect id="row5-cur-fill" x="424" y="556" width="102" height="17" rx="2" fill="#49627E"/>
+<text id="row5-score-tgt" x="744" y="549" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">3.5</text>
+<rect id="row5-tgt-track" x="743" y="556" width="247" height="17" rx="2" fill="#DFE4E9"/>
+<rect id="row5-tgt-fill" x="744" y="556" width="174" height="17" rx="2" fill="#2B4660"/>
+<circle id="row6-icon-circle" cx="78" cy="631" r="31" fill="#5E6849"/>
+<g id="row6-icon" transform="translate(78,631)"><g id="row6-icon-glyph"><path d="M 0 -22.94 C 8.06 -18.599999999999998 16.740000000000002 -16.12 21.7 -15.5 L 21.7 4.340000000000001 C 21.7 14.26 10.540000000000001 20.46 0 24.18 C -10.540000000000001 20.46 -21.7 14.26 -21.7 4.340000000000001 L -21.7 -15.5 C -16.740000000000002 -16.12 -8.06 -18.599999999999998 0 -22.94 Z" fill="none" stroke="#FFFFFF" stroke-width="4.2" stroke-linejoin="round"/></g></g>
+<text id="row6-name" x="130" y="643" font-family="Noto Sans SC, sans-serif" font-size="27" font-weight="500" fill="#253E56" text-anchor="start">治理</text>
+<text id="row6-weight" x="311" y="627" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="500" fill="#253E56" text-anchor="middle">15%</text>
+<text id="row6-score-cur" x="424" y="627" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">2.0</text>
+<rect id="row6-cur-track" x="423" y="634" width="249" height="17" rx="2" fill="#E4E7EB"/>
+<rect id="row6-cur-fill" x="424" y="634" width="101" height="17" rx="2" fill="#848C6E"/>
+<text id="row6-score-tgt" x="744" y="627" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">4.0</text>
+<rect id="row6-tgt-track" x="743" y="634" width="247" height="17" rx="2" fill="#DFE4E9"/>
+<rect id="row6-tgt-fill" x="744" y="634" width="205" height="17" rx="2" fill="#848C6E"/>
+<path id="sum-band" d="M 17 669 L 1015 669 L 1015 776 Q 1015 790 1001 790 L 31 790 Q 17 790 17 776 Z" fill="#EDF0F3"/>
+<text id="sum-合计" x="128" y="730" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#253E56" text-anchor="middle">合计</text>
+<text id="sum-100%" x="311" y="728" font-family="Noto Sans SC, sans-serif" font-size="24" font-weight="600" fill="#253E56" text-anchor="middle">100%</text>
+<text id="sum-加权现状评分" x="489" y="700" font-family="Noto Sans SC, sans-serif" font-size="22" font-weight="400" fill="#253E56" text-anchor="middle">加权现状评分</text>
+<text id="sum-2.75" x="487" y="748" font-family="Noto Sans SC, sans-serif" font-size="40" font-weight="800" fill="#12264A" text-anchor="middle">2.75</text>
+<text id="sum-加权目标评分" x="702" y="700" font-family="Noto Sans SC, sans-serif" font-size="22" font-weight="400" fill="#253E56" text-anchor="middle">加权目标评分</text>
+<text id="sum-3.95" x="702" y="748" font-family="Noto Sans SC, sans-serif" font-size="40" font-weight="800" fill="#677052" text-anchor="middle">3.95</text>
+<text id="sum-差距" x="912" y="700" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="400" fill="#253E56" text-anchor="middle">差距</text>
+<text id="sum-1.20" x="913" y="748" font-family="Noto Sans SC, sans-serif" font-size="40" font-weight="800" fill="#978778" text-anchor="middle">1.20</text>
+<rect id="rpanel-body" x="1032" y="127" width="680" height="640" rx="14" fill="#FFFFFF" stroke="#E8EBEF" stroke-width="2"/>
+<path id="rpanel-band" d="M 1032 210 L 1032 141 Q 1032 127 1046 127 L 1698 127 Q 1712 127 1712 141 L 1712 210 Z" fill="#EEF0F3"/>
+<text id="rpanel-title" x="1058" y="181" font-family="Noto Sans SC, sans-serif" font-size="33" font-weight="700" fill="#253E56" text-anchor="start">能力缺口差距排序</text>
+<text id="rpanel-note1" x="1687" y="176" font-family="Noto Sans SC, sans-serif" font-size="23" font-weight="500" fill="#5A6472" text-anchor="end">差距分值</text>
+<text id="rpanel-note2" x="1687" y="196" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#6B7280" text-anchor="end">（目标-现状）</text>
+<rect id="gap1-badge" x="1051" y="234" width="52" height="52" rx="10" fill="#60694B"/>
+<text id="gap1-badge-num" x="1077" y="270" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text id="gap1-name" x="1127" y="270" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="500" fill="#253E56" text-anchor="start">治理</text>
+<rect id="gap1-track" x="1207" y="237" width="398" height="46" rx="6" fill="#E4E7EB"/>
+<rect id="gap1-fill" x="1207" y="237" width="319" height="46" rx="6" fill="#7C8465"/>
+<text id="gap1-val" x="1680" y="274" font-family="Noto Sans SC, sans-serif" font-size="38" font-weight="700" fill="#5E6749" text-anchor="end">2.0</text>
+<rect id="gap2-badge" x="1051" y="312" width="52" height="52" rx="10" fill="#7C6A58"/>
+<text id="gap2-badge-num" x="1077" y="348" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text id="gap2-name" x="1127" y="348" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="500" fill="#253E56" text-anchor="start">数据</text>
+<rect id="gap2-track" x="1207" y="315" width="398" height="46" rx="6" fill="#E4E7EB"/>
+<rect id="gap2-fill" x="1207" y="315" width="239" height="46" rx="6" fill="#968677"/>
+<text id="gap2-val" x="1680" y="352" font-family="Noto Sans SC, sans-serif" font-size="38" font-weight="700" fill="#817161" text-anchor="end">1.5</text>
+<rect id="gap3-badge" x="1051" y="393" width="52" height="52" rx="10" fill="#7D7893"/>
+<text id="gap3-badge-num" x="1077" y="429" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text id="gap3-name" x="1127" y="429" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="500" fill="#253E56" text-anchor="start">人才</text>
+<rect id="gap3-track" x="1207" y="396" width="398" height="46" rx="6" fill="#E4E7EB"/>
+<rect id="gap3-fill" x="1207" y="396" width="240" height="46" rx="6" fill="#86839C"/>
+<text id="gap3-val" x="1680" y="433" font-family="Noto Sans SC, sans-serif" font-size="38" font-weight="700" fill="#6F6A8B" text-anchor="end">1.5</text>
+<rect id="gap4-badge" x="1051" y="474" width="52" height="52" rx="10" fill="#2A3F57"/>
+<text id="gap4-badge-num" x="1077" y="510" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text id="gap4-name" x="1127" y="510" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="500" fill="#253E56" text-anchor="start">流程</text>
+<rect id="gap4-track" x="1207" y="477" width="398" height="46" rx="6" fill="#E4E7EB"/>
+<rect id="gap4-fill" x="1207" y="477" width="169" height="46" rx="6" fill="#435D78"/>
+<text id="gap4-val" x="1680" y="514" font-family="Noto Sans SC, sans-serif" font-size="38" font-weight="700" fill="#314E6D" text-anchor="end">1.0</text>
+<rect id="gap5-badge" x="1051" y="556" width="52" height="52" rx="10" fill="#626B4D"/>
+<text id="gap5-badge-num" x="1077" y="592" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+<text id="gap5-name" x="1127" y="592" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="500" fill="#253E56" text-anchor="start">技术</text>
+<rect id="gap5-track" x="1207" y="559" width="398" height="46" rx="6" fill="#E4E7EB"/>
+<rect id="gap5-fill" x="1207" y="559" width="169" height="46" rx="6" fill="#7C8465"/>
+<text id="gap5-val" x="1680" y="596" font-family="Noto Sans SC, sans-serif" font-size="38" font-weight="700" fill="#66704F" text-anchor="end">1.0</text>
+<rect id="gap6-badge" x="1051" y="637" width="52" height="52" rx="10" fill="#7C6A58"/>
+<text id="gap6-badge-num" x="1077" y="673" font-family="Noto Sans SC, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">6</text>
+<text id="gap6-name" x="1127" y="673" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="500" fill="#253E56" text-anchor="start">战略</text>
+<rect id="gap6-track" x="1207" y="640" width="398" height="46" rx="6" fill="#E4E7EB"/>
+<rect id="gap6-fill" x="1207" y="640" width="85" height="46" rx="6" fill="#968677"/>
+<text id="gap6-val" x="1680" y="677" font-family="Noto Sans SC, sans-serif" font-size="38" font-weight="700" fill="#786655" text-anchor="end">0.5</text>
+<rect id="bot-panel" x="17" y="777" width="1694" height="160" rx="14" fill="#F2F4F7"/>
+<text id="bot-title" x="41" y="820" font-family="Noto Sans SC, sans-serif" font-size="30" font-weight="700" fill="#253E56" text-anchor="start">重点行动与优先事项</text>
+<text id="bot-note" x="1676" y="817" font-family="Noto Sans SC, sans-serif" font-size="15" font-weight="400" fill="#6A7280" text-anchor="end">分值与权重用于项目决策；非行业基准。</text>
+<rect id="card1" x="143" y="847" width="425" height="90" rx="14" fill="#F0EAE6"/>
+<circle id="card1-icon-circle" cx="93" cy="889" r="35" fill="#705E4D"/>
+<g id="card1-icon" transform="translate(93,889)"><g id="card1-icon-glyph"><ellipse cx="0" cy="-8.5" rx="15.5" ry="6.5" fill="none" stroke="#FFFFFF" stroke-width="3"/><path d="M -15.5 -8.5 L -15.5 8.5 A 15.5 6.5 0 0 0 15.5 8.5 L 15.5 -8.5" fill="none" stroke="#FFFFFF" stroke-width="3"/><path d="M -15.5 0.5 A 15.5 6.5 0 0 0 15.5 0.5" fill="none" stroke="#FFFFFF" stroke-width="3"/></g></g>
+<rect id="card1-badge" x="156" y="868" width="48" height="48" rx="10" fill="#6E5B4A"/>
+<text id="card1-badge-num" x="180" y="901" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text id="card1-label" x="222" y="902" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">数据</text>
+<text id="card1-divider" x="280" y="900" font-family="Noto Sans SC, sans-serif" font-size="24" font-weight="300" fill="#B9C0C9" text-anchor="start">|</text>
+<text id="card1-text" x="294" y="899" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="400" fill="#3A4450" text-anchor="start">先完成数据授权和质量核验</text>
+<rect id="card2" x="714" y="847" width="418" height="90" rx="14" fill="#EBEDE8"/>
+<circle id="card2-icon-circle" cx="653" cy="884" r="35" fill="#6C785A"/>
+<g id="card2-icon" transform="translate(653,884)"><g id="card2-icon-glyph"><path d="M 0 -18.5 C 6.5 -15.0 13.5 -13.0 17.5 -12.5 L 17.5 3.5000000000000004 C 17.5 11.5 8.5 16.5 0 19.5 C -8.5 16.5 -17.5 11.5 -17.5 3.5000000000000004 L -17.5 -12.5 C -13.5 -13.0 -6.5 -15.0 0 -18.5 Z" fill="none" stroke="#FFFFFF" stroke-width="4.2" stroke-linejoin="round"/></g></g>
+<rect id="card2-badge" x="727" y="868" width="48" height="48" rx="10" fill="#66714F"/>
+<text id="card2-badge-num" x="751" y="901" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text id="card2-label" x="793" y="902" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">治理</text>
+<text id="card2-divider" x="851" y="900" font-family="Noto Sans SC, sans-serif" font-size="24" font-weight="300" fill="#B9C0C9" text-anchor="start">|</text>
+<text id="card2-text" x="883" y="899" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="400" fill="#3A4450" text-anchor="start">先明确上线责任</text>
+<rect id="card3" x="1276" y="847" width="409" height="90" rx="14" fill="#F1EFF4"/>
+<circle id="card3-icon-circle" cx="1207" cy="885" r="35" fill="#4A5568"/>
+<g id="card3-icon" transform="translate(1207,885)"><g id="card3-icon-glyph"><circle cx="8.5" cy="-8.5" r="5.25" fill="#FFFFFF"/><path d="M 1.5 7.5 A 8.5 8.5 0 0 1 8.5 -2.0 A 8.5 8.5 0 0 1 15.5 7.5 Z" fill="#FFFFFF"/><circle cx="-6.5" cy="-6.5" r="6.75" fill="#FFFFFF"/><path d="M -17.0 12.0 A 11.0 11.0 0 0 1 -6.5 -0.5 A 11.0 11.0 0 0 1 4.0 12.0 Z" fill="#FFFFFF"/></g></g>
+<rect id="card3-badge" x="1289" y="868" width="48" height="48" rx="10" fill="#7D7893"/>
+<text id="card3-badge-num" x="1313" y="901" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text id="card3-label" x="1355" y="902" font-family="Noto Sans SC, sans-serif" font-size="25" font-weight="700" fill="#253E56" text-anchor="start">人才</text>
+<text id="card3-divider" x="1413" y="900" font-family="Noto Sans SC, sans-serif" font-size="24" font-weight="300" fill="#B9C0C9" text-anchor="start">|</text>
+<text id="card3-text" x="1439" y="899" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="400" fill="#3A4450" text-anchor="start">先培训业务主责</text>
+<g id="watermark-group" opacity="0.75">
+<g id="watermark-wechat" transform="translate(1079,899)"><g id="watermark-wechat-glyph"><rect x="-29.45" y="-22.32" width="40.300000000000004" height="30.38" rx="9.299999999999999" fill="#A9A7AA"/><circle cx="-16.12" cy="-10.540000000000001" r="2.79" fill="#EBEDE8"/><circle cx="-3.1" cy="-10.540000000000001" r="2.79" fill="#EBEDE8"/><rect x="-3.1" y="-1.55" width="32.550000000000004" height="25.419999999999998" rx="8.06" fill="#A9A7AA"/><circle cx="8.680000000000001" cy="8.06" r="2.48" fill="#EBEDE8"/><circle cx="18.599999999999998" cy="8.06" r="2.48" fill="#EBEDE8"/></g></g>
+<text id="watermark" x="1689" y="905" font-family="Noto Sans SC, sans-serif" font-size="50" font-weight="700" fill="#A9A7AA" text-anchor="end" letter-spacing="1.3">公众号·解决方案研究所</text>
+</g>
+</svg>
+</div>
+</body>
+</html>
