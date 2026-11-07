@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>场景优先级与组合决策 · 复刻（CASE-008）</title>
+<style>
+  html,body { margin:0; padding:0; background:#FDFDFD; }
+  #canvas { width:1728px; height:972px; overflow:hidden; }
+  text { font-family:'Noto Sans SC','Noto Sans CJK SC',sans-serif; }
+</style>
+</head>
+<body>
+<div id="canvas">
+<svg id="stage" viewBox="0 0 1728 972" width="1728" height="972" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans SC, sans-serif">
+<rect id="bg" x="0" y="0" width="1728" height="972" fill="#FDFDFD"/>
+<text id="main-title" x="31" y="72" font-family="Noto Sans SC, sans-serif" font-size="60" font-weight="800" fill="#0A2440" text-anchor="start">场景优先级与组合决策</text>
+<rect id="card1" x="22" y="106" width="909" height="539" rx="10" fill="#FFFFFF" stroke="#E4E8ED" stroke-width="1.5"/>
+<rect id="card1-band" x="24" y="108" width="905" height="49" rx="8" fill="#1B3A52"/><rect id="card1-band-sq" x="24" y="116" width="905" height="41" fill="#1B3A52"/>
+<text id="card1-title" x="46" y="142" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="start" letter-spacing="0.6">场景优先级排序模型</text>
+<rect id="card2" x="943" y="106" width="763" height="537" rx="10" fill="#FFFFFF" stroke="#E4E8ED" stroke-width="1.5"/>
+<rect id="card2-band" x="945" y="108" width="759" height="49" rx="8" fill="#1B3A52"/><rect id="card2-band-sq" x="945" y="116" width="759" height="41" fill="#1B3A52"/>
+<text id="card2-title" x="971" y="142" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="start" letter-spacing="0.7">场景价值与可行性矩阵</text>
+<rect id="card3" x="22" y="654" width="901" height="288" rx="10" fill="#FFFFFF" stroke="#E4E8ED" stroke-width="1.5"/>
+<rect id="card3-band" x="24" y="656" width="897" height="47" rx="8" fill="#1B3A52"/><rect id="card3-band-sq" x="24" y="664" width="897" height="39" fill="#1B3A52"/>
+<text id="card3-title" x="46" y="690" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="start">风险门槛与关键要求</text>
+<text id="card3-suffix" x="281" y="690" font-family="Noto Sans SC, sans-serif" font-size="21.5" font-weight="700" fill="#ECF0F2" text-anchor="start">（独立于排序得分）</text>
+<rect id="card4" x="936" y="654" width="771" height="288" rx="10" fill="#FFFFFF" stroke="#E4E8ED" stroke-width="1.5"/>
+<rect id="card4-band" x="938" y="656" width="766" height="47" rx="8" fill="#1B3A52"/><rect id="card4-band-sq" x="938" y="664" width="766" height="39" fill="#1B3A52"/>
+<text id="card4-title" x="959" y="690" font-family="Noto Sans SC, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="start" letter-spacing="-0.2">投资组合与推进策略</text>
+<rect id="chip1-body" x="44" y="169" width="257" height="169" rx="8" fill="#EDEFF1"/>
+<rect id="chip1-band" x="44" y="169" width="257" height="41" rx="8" fill="#80866F"/><rect id="chip1-band-sq" x="44" y="177" width="257" height="33" fill="#80866F"/>
+<text id="chip1-label" x="144" y="198" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">价值</text>
+<text id="chip1-pct" x="208.5" y="198" font-family="Noto Sans SC, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">(40%)</text>
+<text id="chip1-line-1" x="61" y="239" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">对业务目标的贡献程度</text>
+<text id="chip1-line-2" x="61" y="267" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">如效率提升、成本节约、</text>
+<text id="chip1-line-3" x="61" y="294" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">收入增长、体验改善</text>
+<text id="chip1-line-4" x="61" y="322" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">1 – 5 分</text>
+<rect id="chip2-body" x="350" y="169" width="257" height="169" rx="8" fill="#EDEFF1"/>
+<rect id="chip2-band" x="350" y="169" width="257" height="41" rx="8" fill="#968478"/><rect id="chip2-band-sq" x="350" y="177" width="257" height="33" fill="#968478"/>
+<text id="chip2-label" x="444" y="198" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">可行性</text>
+<text id="chip2-pct" x="518" y="198" font-family="Noto Sans SC, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">(35%)</text>
+<text id="chip2-line-1" x="367" y="239" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">技术成熟度、数据可获得性</text>
+<text id="chip2-line-2" x="367" y="267" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">实施复杂度、资源投入</text>
+<text id="chip2-line-4" x="367" y="322" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">1 – 5 分</text>
+<rect id="chip3-body" x="655" y="169" width="256" height="169" rx="8" fill="#EDEFF1"/>
+<rect id="chip3-band" x="655" y="169" width="256" height="41" rx="8" fill="#787692"/><rect id="chip3-band-sq" x="655" y="177" width="256" height="33" fill="#787692"/>
+<text id="chip3-label" x="749" y="198" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">可控性</text>
+<text id="chip3-pct" x="823.5" y="198" font-family="Noto Sans SC, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">(25%)</text>
+<text id="chip3-line-1" x="672" y="239" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">风险可控程度</text>
+<text id="chip3-line-2" x="672" y="267" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">可控性越高、风险越易控制</text>
+<text id="chip3-line-4" x="672" y="322" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="500" fill="#33415A" text-anchor="start">1 – 5 分</text>
+<rect id="t1-header" x="37" y="352" width="880" height="59" fill="#1B3A52"/>
+<rect id="t1-hdrsep-1" x="255" y="364" width="2" height="35" fill="#FFFFFF"/>
+<rect id="t1-hdrsep-2" x="413.5" y="364" width="2" height="35" fill="#FFFFFF"/>
+<rect id="t1-hdrsep-3" x="586.5" y="364" width="2" height="35" fill="#FFFFFF"/>
+<rect id="t1-hdrsep-4" x="748.5" y="364" width="2" height="35" fill="#FFFFFF"/>
+<text id="t1-htxt-0" x="123" y="390" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">场景</text>
+<text id="t1-htxt-1" x="334" y="376" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">价值</text>
+<text id="t1-htxt-2" x="334" y="400" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">(40%)</text>
+<text id="t1-htxt-3" x="500" y="376" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">可行性</text>
+<text id="t1-htxt-4" x="500" y="400" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">(35%)</text>
+<text id="t1-htxt-5" x="668" y="376" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">可控性</text>
+<text id="t1-htxt-6" x="668" y="400" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">(25%)</text>
+<text id="t1-htxt-7" x="832" y="390" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">加权总分</text>
+<rect id="t1-under" x="37" y="411.5" width="880" height="1.5" fill="#DFE6EB"/>
+<rect id="t1-row1-main" x="37" y="413" width="712" height="47.5" fill="#F5F6F8"/>
+<rect id="t1-row1-score" x="749" y="413" width="168" height="47.5" fill="#EAEFF4"/>
+<rect id="t1-row2-main" x="37" y="461.5" width="712" height="50.5" fill="#E5EBF1"/>
+<rect id="t1-row2-score" x="749" y="461.5" width="168" height="50.5" fill="#F7F8FA"/>
+<rect id="t1-row3-main" x="37" y="513" width="712" height="50.5" fill="#F5F6F8"/>
+<rect id="t1-row3-score" x="749" y="513" width="168" height="50.5" fill="#EAEFF4"/>
+<rect id="t1-row4-main" x="37" y="564.5" width="712" height="49.5" fill="#E5EBF1"/>
+<rect id="t1-row4-score" x="749" y="564.5" width="168" height="49.5" fill="#F7F8FA"/>
+<circle id="t1-badge-1" cx="71" cy="436.5" r="17.5" fill="#7D856C"/>
+<text id="t1-badge-num-1" x="71" y="443.0" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text id="t1-name-1" x="104" y="447" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="600" fill="#1D253C" text-anchor="start">知识助手</text>
+<text id="t1-num-1-1" x="334" y="446" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">4</text>
+<text id="t1-num-1-2" x="500" y="446" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">4</text>
+<text id="t1-num-1-3" x="668" y="446" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">4</text>
+<text id="t1-score-1" x="833.5" y="446" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#111932" text-anchor="middle">4.00</text>
+<circle id="t1-badge-2" cx="71" cy="486.5" r="17.5" fill="#968478"/>
+<text id="t1-badge-num-2" x="71" y="493.0" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text id="t1-name-2" x="104" y="497" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="600" fill="#1D253C" text-anchor="start">工单分流</text>
+<text id="t1-num-2-1" x="334" y="496" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">4</text>
+<text id="t1-num-2-2" x="500" y="496" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">3</text>
+<text id="t1-num-2-3" x="668" y="496" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">4</text>
+<text id="t1-score-2" x="833.5" y="496" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#111932" text-anchor="middle">3.65</text>
+<circle id="t1-badge-3" cx="71" cy="538" r="17.5" fill="#797692"/>
+<text id="t1-badge-num-3" x="71" y="544.5" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text id="t1-name-3" x="104" y="549" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="600" fill="#1D253C" text-anchor="start">合同审查辅助</text>
+<text id="t1-num-3-1" x="334" y="548" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">4</text>
+<text id="t1-num-3-2" x="500" y="548" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">3</text>
+<text id="t1-num-3-3" x="668" y="548" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">2</text>
+<text id="t1-score-3" x="833.5" y="547.5" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#111932" text-anchor="middle">3.15</text>
+<circle id="t1-badge-4" cx="71" cy="589" r="17.5" fill="#868383"/>
+<text id="t1-badge-num-4" x="71" y="595.5" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text id="t1-name-4" x="104" y="600" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="600" fill="#1D253C" text-anchor="start">自动付款 Agent</text>
+<text id="t1-num-4-1" x="334" y="599" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">5</text>
+<text id="t1-num-4-2" x="500" y="599" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">2</text>
+<text id="t1-num-4-3" x="668" y="599" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="400" fill="#27314C" text-anchor="middle">1</text>
+<text id="t1-score-4" x="833.5" y="598.5" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#111932" text-anchor="middle">2.95</text>
+<rect id="quad-1" x="1043" y="169" width="314" height="208" fill="#E9F2E9"/>
+<rect id="quad-2" x="1363" y="169" width="327" height="208" fill="#E1EFFA"/>
+<rect id="quad-3" x="1043" y="383" width="314" height="178" fill="#EDEBE9"/>
+<rect id="quad-4" x="1363" y="383" width="327" height="178" fill="#EBE8F3"/>
+<line id="axis-y" x1="1039.5" y1="188" x2="1039.5" y2="564" stroke="#081630" stroke-width="2.4"/>
+<polygon id="axis-y-arrow" points="1039.5,173 1034.0,186 1045.0,186" fill="#081630"/>
+<line id="axis-x" x1="1040" y1="565.5" x2="1682" y2="565.5" stroke="#081630" stroke-width="2.4"/>
+<polygon id="axis-x-arrow" points="1692,565.5 1679,560.0 1679,571.0" fill="#081630"/>
+<text id="m-label-0" x="986" y="207" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#3A485F" text-anchor="middle">高</text>
+<text id="m-label-1" x="975" y="367" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#3A485F" text-anchor="middle">价</text>
+<text id="m-label-2" x="975" y="394" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#3A485F" text-anchor="middle">值</text>
+<text id="m-label-3" x="980" y="576" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#3A485F" text-anchor="middle">低</text>
+<text id="m-label-4" x="1358" y="625" font-family="Noto Sans SC, sans-serif" font-size="22.5" font-weight="700" fill="#3A485F" text-anchor="middle">可行性</text>
+<text id="m-label-5" x="1674" y="604" font-family="Noto Sans SC, sans-serif" font-size="20" font-weight="700" fill="#3A485F" text-anchor="middle">高</text>
+<rect id="m-badge-1" x="1113" y="174" width="177" height="60" rx="8" fill="#849179"/>
+<text id="m-badge-1-title" x="1201.5" y="201" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">先补能力</text>
+<text id="m-badge-1-sub" x="1201.5" y="225" font-family="Noto Sans SC, sans-serif" font-size="15" font-weight="400" fill="#FFFFFF" text-anchor="middle">(高价值·低可行性)</text>
+<rect id="m-badge-2" x="1436" y="173" width="177" height="60" rx="8" fill="#7F9DBC"/>
+<text id="m-badge-2-title" x="1524.5" y="200" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">优先试点</text>
+<text id="m-badge-2-sub" x="1524.5" y="224" font-family="Noto Sans SC, sans-serif" font-size="15" font-weight="400" fill="#FFFFFF" text-anchor="middle">(高价值·高可行性)</text>
+<rect id="m-badge-3" x="1114" y="484" width="176" height="59" rx="8" fill="#9B887C"/>
+<text id="m-badge-3-title" x="1202.0" y="511" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">暂缓</text>
+<text id="m-badge-3-sub" x="1202.0" y="535" font-family="Noto Sans SC, sans-serif" font-size="15" font-weight="400" fill="#FFFFFF" text-anchor="middle">(低价值·低可行性)</text>
+<rect id="m-badge-4" x="1436" y="484" width="176" height="59" rx="8" fill="#817D94"/>
+<text id="m-badge-4-title" x="1524.0" y="511" font-family="Noto Sans SC, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">小额验证</text>
+<text id="m-badge-4-sub" x="1524.0" y="535" font-family="Noto Sans SC, sans-serif" font-size="15" font-weight="400" fill="#FFFFFF" text-anchor="middle">(低价值·高可行性)</text>
+<rect id="t3-header" x="37" y="717" width="871" height="41" fill="#1B3A52"/>
+<rect id="t3-hdrsep-1" x="190.5" y="723" width="2" height="29" fill="#FFFFFF"/>
+<rect id="t3-hdrsep-2" x="419.5" y="723" width="2" height="29" fill="#FFFFFF"/>
+<rect id="t3-hdrsep-3" x="737.5" y="723" width="2" height="29" fill="#FFFFFF"/>
+<text id="t3-htxt-0" x="49" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">场景</text>
+<text id="t3-htxt-1" x="207" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">主要风险</text>
+<text id="t3-htxt-2" x="434" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">风险门槛与要求</text>
+<text id="t3-htxt-3" x="756" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">结论</text>
+<rect id="t3-stripe-2" x="37" y="803" width="871" height="37" fill="#F4F6F8"/>
+<rect id="t3-stripe-4" x="37" y="885" width="871" height="40" fill="#F4F6F8"/>
+<rect id="t3-sep-1" x="37" y="800.5" width="871" height="2" fill="#E2E6EC"/>
+<rect id="t3-sep-2" x="37" y="840.5" width="871" height="2" fill="#E2E6EC"/>
+<rect id="t3-sep-3" x="37" y="882.5" width="871" height="2" fill="#E2E6EC"/>
+<rect id="t3-sep-4" x="37" y="925.5" width="871" height="2" fill="#E2E6EC"/>
+<rect id="t3-cell-1" x="739" y="760" width="169" height="40" fill="#DCE6D1"/>
+<rect id="t3-cell-2" x="739" y="803" width="169" height="37" fill="#DCE6D2"/>
+<rect id="t3-cell-3" x="739" y="843" width="169" height="39" fill="#D2D0DF"/>
+<rect id="t3-cell-4" x="739" y="885" width="169" height="40" fill="#DAD6D4"/>
+<rect id="t4-header" x="951" y="717" width="740" height="41" fill="#1B3A52"/>
+<rect id="t4-hdrsep-1" x="1118.5" y="723" width="2" height="29" fill="#FFFFFF"/>
+<rect id="t4-hdrsep-2" x="1274.5" y="723" width="2" height="29" fill="#FFFFFF"/>
+<text id="t4-htxt-0" x="963" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">场景</text>
+<text id="t4-htxt-1" x="1134" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">优先级决策</text>
+<text id="t4-htxt-2" x="1296" y="746" font-family="Noto Sans SC, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">推进策略</text>
+<rect id="t4-stripe-2" x="951" y="803" width="740" height="37" fill="#F4F6F8"/>
+<rect id="t4-stripe-4" x="951" y="885" width="740" height="40" fill="#F4F6F8"/>
+<rect id="t4-sep-1" x="951" y="800.5" width="740" height="2" fill="#E2E6EC"/>
+<rect id="t4-sep-2" x="951" y="840.5" width="740" height="2" fill="#E2E6EC"/>
+<rect id="t4-sep-3" x="951" y="882.5" width="740" height="2" fill="#E2E6EC"/>
+<rect id="t4-sep-4" x="951" y="925.5" width="740" height="2" fill="#E2E6EC"/>
+<rect id="t4-cell-1" x="1120" y="760" width="155" height="40" fill="#DCE6D2"/>
+<rect id="t4-cell-2" x="1120" y="803" width="155" height="37" fill="#DDE6D3"/>
+<rect id="t4-cell-3" x="1120" y="843" width="155" height="39" fill="#D2D0DF"/>
+<rect id="t4-cell-4" x="1120" y="885" width="155" height="40" fill="#DAD6D4"/>
+<g id="watermark-group">
+<g id="watermark-logo"><rect x="1057.0" y="876" width="44" height="44" rx="10" fill="#ACADAE"/><circle cx="1073.0" cy="891" r="3" fill="#E3E1DF"/><circle cx="1087.0" cy="891" r="3" fill="#E3E1DF"/><rect x="1086.0" y="899" width="35" height="28" rx="8" fill="#ACADAE"/><circle cx="1097.0" cy="910" r="2.6" fill="#E3E1DF"/><circle cx="1108.0" cy="910" r="2.6" fill="#E3E1DF"/></g>
+<text id="watermark-1" x="1136" y="920" font-family="Noto Sans SC, sans-serif" font-size="45" font-weight="700" fill="#ACADAE" text-anchor="start">公众号</text>
+<text id="watermark-2" x="1329" y="920" font-family="Noto Sans SC, sans-serif" font-size="45" font-weight="700" fill="#ACADAE" text-anchor="start" letter-spacing="1">解决方案研究所</text>
+</g>
+<text id="t3-name-1" x="50" y="786" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">知识助手</text>
+<text id="t3-risk-1" x="210" y="786" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">内容准确性、数据安全</text>
+<text id="t3-gate-1" x="437" y="786" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">符合数据安全与内容治理要求</text>
+<text id="t3-pill-1" x="823.5" y="787" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#33414E" text-anchor="middle">可进入试点</text>
+<text id="t3-name-2" x="50" y="827" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">工单分流</text>
+<text id="t3-risk-2" x="210" y="827" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">分类准确率、业务中断</text>
+<text id="t3-gate-2" x="437" y="827" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">满足准确率与灰度运行要求</text>
+<text id="t3-pill-2" x="823.5" y="828" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#33414E" text-anchor="middle">可进入试点</text>
+<text id="t3-name-3" x="50" y="868" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">合同审查辅助</text>
+<text id="t3-risk-3" x="210" y="868" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">法律合规、责任界定</text>
+<text id="t3-gate-3" x="437" y="868" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">须法务复核，满足合规要求</text>
+<text id="t3-pill-3" x="823.5" y="869" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#575767" text-anchor="middle">需补充条件</text>
+<text id="t3-name-4" x="50" y="910" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">自动付款 Agent</text>
+<text id="t3-risk-4" x="210" y="910" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">资金安全、合规风险</text>
+<text id="t3-gate-4" x="437" y="910" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">涉及资金支付，风险门槛高</text>
+<text id="t3-pill-4" x="823.5" y="911" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#6B6763" text-anchor="middle">暂缓推进</text>
+<text id="t4-name-1" x="964" y="788" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">知识助手</text>
+<text id="t4-strategy-1" x="1298" y="788" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">优先投入，快速试点，验证价值并迭代优化</text>
+<text id="t4-pill-1" x="1197.5" y="789" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#33414E" text-anchor="middle">先试点</text>
+<text id="t4-name-2" x="964" y="829" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">工单分流</text>
+<text id="t4-strategy-2" x="1298" y="829" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">选择典型业务线，分阶段扩展应用范围</text>
+<text id="t4-pill-2" x="1197.5" y="830" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#33414E" text-anchor="middle">先试点</text>
+<text id="t4-name-3" x="964" y="871" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">合同审查辅助</text>
+<text id="t4-strategy-3" x="1298" y="871" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">完善合规与法务复核机制，满足条件后推进</text>
+<text id="t4-pill-3" x="1197.5" y="871" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#575767" text-anchor="middle">补充条件</text>
+<text id="t4-name-4" x="964" y="913" font-family="Noto Sans SC, sans-serif" font-size="19" font-weight="700" fill="#212C42" text-anchor="start">自动付款 Agent</text>
+<text id="t4-strategy-4" x="1298" y="913" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="400" fill="#3D4860" text-anchor="start">在隔离环境中小额验证，评估风险并完善管控</text>
+<text id="t4-pill-4" x="1197.5" y="913" font-family="Noto Sans SC, sans-serif" font-size="18.5" font-weight="700" fill="#6B6763" text-anchor="middle">隔离验证</text>
+</svg>
+</div>
+</body>
+</html>
